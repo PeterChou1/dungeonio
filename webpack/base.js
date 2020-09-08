@@ -2,7 +2,7 @@ const webpack = require("webpack");
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-
+console.log(path.resolve(__dirname, "../src/assets"));
 module.exports = {
   mode: "development",
   devtool: "eval-source-map",
@@ -24,6 +24,10 @@ module.exports = {
         use: "file-loader"
       }
     ]
+  },
+  devServer: {
+    contentBase: path.resolve(__dirname, "../src/")
+
   },
   plugins: [
     new CleanWebpackPlugin({
