@@ -3,8 +3,8 @@ import {playerConfig} from '../config/playerconfig';
 
 export class IdleState extends State {
     enter(scene, player){
-        player.setVelocity(0);
-        player.anims.play('idle');
+        player.sprite.setVelocity(0);
+        player.sprite.anims.play('idle');
     }
 
     execute(scene, player){
@@ -12,19 +12,30 @@ export class IdleState extends State {
         //console.log('idle state');
         if (scene.keys.left.isDown){
             //console.log('left');
-            player.setFlipX(true);
+            player.sprite.setFlipX(true);
             player.direction = playerConfig.direction.left
             this.stateMachine.transition('run');
+            return;
         } else if (scene.keys.right.isDown) {
             //console.log('right');
-            player.setFlipX(false);
+            player.sprite.setFlipX(false);
             player.direction = playerConfig.direction.right
             this.stateMachine.transition('run');
+            return;
         } 
 
-        if (scene.keys.up.isDown && player.body.onFloor()) {
+        if (scene.keys.up.isDown && player.isTouching.ground) {
             //console.log('jump');
             this.stateMachine.transition('jump');
+            return;
+        }
+        if (scene.keys.down.isDown && player.onPlatform){
+            this.stateMachine.transition('platformfall');
+            return; 
+        }
+        if (!player.isTouching.ground){
+            this.stateMachine.transition('fall');
+            return;
         }
     }
 }
@@ -32,23 +43,28 @@ export class IdleState extends State {
 export class RunState extends State {
 
     enter(scene, player){
-        player.anims.play('run');
+        player.sprite.anims.play('run');
     }
     execute(scene, player) {
         ////console.log(player.direction);
         if (player.direction === playerConfig.direction.left) {
             //console.log('going left');
-            player.setVelocityX(-playerConfig.groundspeed)
+            player.sprite.setVelocityX(-playerConfig.groundspeed)
         } else if (player.direction === playerConfig.direction.right) {
             //console.log('going right');
-            player.setVelocityX(playerConfig.groundspeed)
+            player.sprite.setVelocityX(playerConfig.groundspeed)
         }
 
-        if (scene.keys.up.isDown && player.body.onFloor()){
+        if (scene.keys.up.isDown && player.isTouching.ground){
             this.stateMachine.transition('jump');
             return;
-        } else if (!player.body.onFloor()) {
+        } else if (!player.isTouching.ground) {
             this.stateMachine.transition('fall');
+            return;
+        }
+        
+        if (scene.keys.down.isDown && player.onPlatform){
+            this.stateMachine.transition('platformfall');
             return;
         }
         // transition to idle if left and right key are not pressed
@@ -66,30 +82,27 @@ export class RunState extends State {
 export class FallState extends State {
 
     enter(scene, player) {
-        player.anims.play('fall');
+        player.sprite.anims.play('fall');
     }
-
     execute(scene, player) {
         if (scene.keys.right.isDown){
-            player.setVelocityX(playerConfig.airspeed);
+            player.sprite.setVelocityX(playerConfig.airspeed);
         } else if (scene.keys.left.isDown) {
-            player.setVelocityX(-playerConfig.airspeed);
+            player.sprite.setVelocityX(-playerConfig.airspeed);
         }
-
-        if (player.body.onFloor()){
+        if (player.isTouching.ground){
             ////console.log(player.body.onFloor());
             this.stateMachine.transition('idle');
-        }
-        
+            return;
+        }   
     }
-
 }
 
 export class JumpState extends State {
     enter(scene, player) {
-        player.anims.play('jump');
-        player.setVelocityY(-playerConfig.jumpheight);
-        player.once('animationcomplete', () => {
+        player.sprite.anims.play('jump');
+        player.sprite.setVelocityY(-playerConfig.jumpheight);
+        player.sprite.once('animationcomplete', () => {
             this.stateMachine.transition('fall')
             return;
         })
@@ -100,10 +113,34 @@ export class JumpState extends State {
     }
 }
 
+// special fall state enable player to fall through softplatform
+export class PlatformFall extends State {
+    enter(scene, player) {
+        player.sprite.anims.play('fall');
+        player.onPlatform = false;
+    }
+
+    execute(scene, player){
+        if (scene.keys.right.isDown){
+            player.sprite.setVelocityX(playerConfig.airspeed);
+        } else if (scene.keys.left.isDown) {
+            player.sprite.setVelocityX(-playerConfig.airspeed);
+        }
+
+        if (player.isTouching.ground){
+            ////console.log(player.body.onFloor());
+            this.stateMachine.transition('idle');
+            return;
+        }
+
+    }
+}
+
 
 export const playerState = {
     idle: new IdleState(),
     run: new RunState(),
     jump: new JumpState(),
-    fall: new FallState()
+    fall: new FallState(),
+    platformfall: new PlatformFall()
 }

@@ -1,8 +1,10 @@
 import { StateMachine } from '../state/stateMachine';
 import { playerState }  from '../state/playerState';
+import { gameConfig } from '../config/globalconfig';
 
 export default class Player {
     constructor(scene, x, y, scale) {
+        this.scene = scene;
         this.sprite = scene.physics.add.sprite(x, y, "player", 0);
         this.sprite.setScale(scale, scale);
         this.sprite.setCollideWorldBounds('true');
@@ -43,11 +45,26 @@ export default class Player {
             frames: scene.anims.generateFrameNames('player', {start: 4, end: 7}),
             frameRate: 10
         })
+        if (gameConfig.debug){
+            this.debug();
+        }
     }
 
     update() {
         // Move sprite & change animation based on keyboard input (see CodeSandbox)
         this.stateMachine.step();
+        if (gameConfig.debug){
+            this.debugUpdate();
+        }
+    }
+
+
+    debug() {
+        this.playerdebug = this.scene.add.text(10, 10, `Player State: ${this.stateMachine.state}`,  { font: '"Times"' });
+    }
+
+    debugUpdate(){
+        this.playerdebug.setText(`Player State: ${this.stateMachine.state}`);
     }
     
     destroy() {

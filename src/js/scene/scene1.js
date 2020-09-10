@@ -1,7 +1,6 @@
 import Phaser from "phaser";
 import Player from "../entity/player";
-
-const debug = true;
+import {gameConfig} from '../config/globalconfig';
 
 export class StartLevel extends Phaser.Scene {
     constructor() {
@@ -13,7 +12,7 @@ export class StartLevel extends Phaser.Scene {
               default: 'arcade',
               arcade:
                   {
-                      debug: debug,
+                      debug: gameConfig.debug,
                       gravity:
                           {
                               y: 800
@@ -40,16 +39,9 @@ export class StartLevel extends Phaser.Scene {
             faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
         });
         console.log(this.player);
-        this.player.sprite.setDebug(true, true, 255);
-        //.body.setDebug(true, true, new Phaser.Display.Color(255, 0, 0, 0));
-        this.playerdebug = this.add.text(10, 10, `Player State: ${this.player.stateMachine.state}`,  { font: '"Times"' });
-    }
-
-
-    debugUpdate(){
-        this.playerdebug.setText(`Player State: ${this.player.stateMachine.state}`);
-    }
-  
+        // this.player.sprite.setDebug(true, true, 255);
+        //.body.setDebug(true, true, new Phaser.Display.Color(255, 0, 0, 0))
+    }  
   
     create() {
       console.log('create level 1');
@@ -72,7 +64,7 @@ export class StartLevel extends Phaser.Scene {
       this.player = new Player(this, 32, 368, 2);
       this.physics.add.collider(this.player.sprite, this.gamelayer.ground);
 
-      if (debug){
+      if (gameConfig.debug){
           this.debug();
       }
     }
@@ -81,9 +73,6 @@ export class StartLevel extends Phaser.Scene {
       //console.log('update');
       //this.Controls.update(delta);
       this.player.update();
-      if (debug){
-          this.debugUpdate();
-      }
     }
 }
 
