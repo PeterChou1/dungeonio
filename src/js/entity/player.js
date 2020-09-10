@@ -1,53 +1,30 @@
 import { StateMachine } from '../state/stateMachine';
 import { playerState }  from '../state/playerState';
 import { gameConfig } from '../config/globalconfig';
+import { playerAnims } from '../config/playerconfig';
+import { PlayerPhysics } from '../physics/playerPhysics';
+import { createanims } from '../utils/utils';
+
 
 export default class Player {
     constructor(scene, x, y, scale) {
         this.scene = scene;
-        this.sprite = scene.physics.add.sprite(x, y, "player", 0);
-        this.sprite.setScale(scale, scale);
-        this.sprite.setCollideWorldBounds('true');
+        this.sprite = scene.matter.add.sprite(0, 0, "player", 0);
         // initialize player state machine
         this.stateMachine = new StateMachine(
             'idle',
             playerState,
-            [scene, this.sprite]
+            [scene, this]
         )
+        console.log('---player---');
+        console.log(playerAnims);
+        this.physics = new PlayerPhysics(scene, this.sprite, this.stateMachine, x, y, scale);
         // create player animation
-        scene.anims.create({
-            key: 'run',
-            frames: scene.anims.generateFrameNumbers('player', {start: 8, end: 13}),
-            frameRate: 10,
-            repeat: -1
-          })
-        scene.anims.create({
-            key: 'idle',
-            frames: scene.anims.generateFrameNumbers('player', {start: 0, end: 3 }),
-            frameRate: 10,
-            repeat: -1
-        })
-        console.log(scene.anims.generateFrameNumbers('player', {start: 0, end: 3 }));
-    
-        scene.anims.create({
-                key: 'jump',
-                frames: scene.anims.generateFrameNumbers('player', {start: 14, end: 18}),
-                frameRate: 10
-        })
-        scene.anims.create({
-            key:'fall',
-            frames: scene.anims.generateFrameNumbers('player', {start: 22, end: 23 }),
-            frameRate: 10,
-            repeat: -1
-        })
-        scene.anims.create({
-            key: 'landing',
-            frames: scene.anims.generateFrameNames('player', {start: 4, end: 7}),
-            frameRate: 10
-        })
+        createanims(scene, playerAnims);
         if (gameConfig.debug){
             this.debug();
         }
+        this.scene.events.on("update", this.update, this);
     }
 
     update() {
@@ -58,13 +35,14 @@ export default class Player {
         }
     }
 
-
     debug() {
-        this.playerdebug = this.scene.add.text(10, 10, `Player State: ${this.stateMachine.state}`,  { font: '"Times"' });
+        this.playerdebug = this.scene.add.text(10, 10, `Player State: ${this.stateMachine.state} \n isTouching {left: ${this.physics.isTouching.left}, right: ${this.physics.isTouching.right}, ground: ${this.physics.isTouching.ground}, top: ${this.physics.isTouching.top}, nearbottom: ${this.physics.isTouching.nearground}} onPlatfrom: ${this.physics.onPlatform}`,  
+                                               { font: '"Times"', fontSize: '32px' });
     }
 
     debugUpdate(){
-        this.playerdebug.setText(`Player State: ${this.stateMachine.state}`);
+        this.playerdebug.setText(`Player State: ${this.stateMachine.state} \n isTouching {left: ${this.physics.isTouching.left}, right: ${this.physics.isTouching.right}, ground: ${this.physics.isTouching.ground}, top: ${this.physics.isTouching.top}, nearbottom: ${this.physics.isTouching.nearground}} onPlatfrom: ${this.physics.onPlatform}`,   
+                                             { font: '"Times"', fontSize: '32px' });
     }
     
     destroy() {
