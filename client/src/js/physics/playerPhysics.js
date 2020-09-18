@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import {collisionData} from '../config/globalconfig';
+import {collisionData} from '../../../../common/globalConfig.ts';
 const {Body, Bodies} = Phaser.Physics.Matter.Matter;
 /*
  Encapsulate all physics behaviour for player
@@ -7,14 +7,19 @@ const {Body, Bodies} = Phaser.Physics.Matter.Matter;
 export class PlayerPhysics {
 
     constructor(scene, sprite, stateMachine, x, y, scale){
+        console.log('sprite physics');
+        console.log(sprite.width);
+        console.log(sprite.height)
         this.scene = scene;
         this.sprite = sprite;
         this.stateMachine = stateMachine;
         this.isTouching = {left: false, right: false, ground: false, top: false, nearground: false};
         this.onPlatform = false;
-        const {width : w, height: h} = this.sprite;
-        const mainBody = Bodies.rectangle(0, 0, w * 0.6, h * 2, { chamfer: {radius: 5}});
         this.sprite.setScale(scale);
+        const {width : w, height: h} = this.sprite;
+        console.log('--player--');
+        console.log(`width ${w} height: ${h}`);
+        const mainBody = Bodies.rectangle(0, 0, w * 0.6, h * scale, { chamfer: {radius: 5}});
         this.sensors = {
             nearbottom: Bodies.rectangle(0, h + 25, w, 50, {isSensor: true}),
             bottom: Bodies.rectangle(0, h , w  , 2, {isSensor: true}),
@@ -32,9 +37,11 @@ export class PlayerPhysics {
                 mask: collisionData.category.hard,
             }
         })
+
+
         this.sprite
             .setExistingBody(compoundBody)
-            .setScale(2)
+            .setScale(scale)
             .setFixedRotation()
             .setPosition(x, y);
 

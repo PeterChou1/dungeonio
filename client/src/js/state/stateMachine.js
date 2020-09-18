@@ -1,3 +1,5 @@
+
+
 export class StateMachine {
     constructor(initialState, possibleStates, stateArgs=[]) {
       this.initialState = initialState;
@@ -28,12 +30,4 @@ export class StateMachine {
     }
 }
   
-export class State {
-    enter() {
-
-    }
-
-    execute() {
-
-    }
-}
+export class State {}

@@ -4,6 +4,7 @@
 export const createanims = (scene, anims) => {
     anims.forEach((anim) => {
         anim.frames = scene.anims.generateFrameNumbers(...anim.frames)
-        scene.anims.create(anim);
+        const anims = scene.anims.create(anim);
+        console.log('msPerFrame', anims.msPerFrame);
     })
 }

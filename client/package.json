@@ -1,21 +1,23 @@
 {
   "name": "phaser3-project-template",
-  "version": "1.0.0",
-  "description": "A Phaser 3 project template with ES6 support via [Babel 7](https://babeljs.io/) and [Webpack 4](https://webpack.js.org/)\r that includes hot-reloading for development and production-ready builds.",
-  "main": "index.js",
+  "version": "1.1.0",
+  "description": "A Phaser 3 Project Template",
+  "main": "src/index.js",
   "scripts": {
-    "server": "ts-node server/server.ts",
-    "dev": "ts-node-dev server/server.ts"
+    "build": "webpack --config webpack/prod.js ",
+    "start": "webpack-dev-server --config webpack/base.js --open"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PeterChou1/phaser3-project-template.git"
+    "url": "git+https://github.com/photonstorm/phaser3-project-template.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Richard Davey <rdavey@gmail.com> (http://www.photonstorm.com)",
+  "license": "MIT",
+  "licenseUrl": "http://www.opensource.org/licenses/mit-license.php",
   "bugs": {
-    "url": "https://github.com/PeterChou1/phaser3-project-template/issues"
+    "url": "https://github.com/photonstorm/phaser3-project-template/issues"
   },
+  "homepage": "https://github.com/photonstorm/phaser3-project-template#readme",
   "devDependencies": {
     "@babel/core": "^7.7.2",
     "@babel/plugin-transform-runtime": "^7.11.5",
@@ -47,6 +49,5 @@
     "phaser": "^3.20.1",
     "phaser-matter-collision-plugin": "^0.10.2",
     "socket.io": "^2.3.0"
-  },
-  "homepage": "https://github.com/PeterChou1/phaser3-project-template#readme"
+  }
 }

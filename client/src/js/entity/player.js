@@ -1,13 +1,18 @@
 import { StateMachine } from '../state/stateMachine';
 import { playerState }  from '../state/playerState';
-import { gameConfig } from '../config/globalconfig';
+import { gameConfig, messageType } from '../../../../common/globalConfig.ts';
 import { playerAnims } from '../config/playerconfig';
 import { PlayerPhysics } from '../physics/playerPhysics';
 import { createanims } from '../utils/utils';
-
+//import io from 'socket.io-client';
 
 export default class Player {
-    constructor(scene, x, y, scale) {
+    constructor(scene, x, y, scale, room) {
+        //this.socket = io.connect();
+        // 
+        this.room = room;
+        console.log('---room---');
+        console.log(this.room);
         this.scene = scene;
         this.sprite = scene.matter.add.sprite(0, 0, "player", 0);
         // initialize player state machine
@@ -17,19 +22,22 @@ export default class Player {
             [scene, this]
         )
         console.log('---player---');
-        console.log(playerAnims);
+        this.sprite.anims.msPerFrame
         this.physics = new PlayerPhysics(scene, this.sprite, this.stateMachine, x, y, scale);
         // create player animation
         createanims(scene, playerAnims);
         if (gameConfig.debug){
             this.debug();
         }
+
         this.scene.events.on("update", this.update, this);
     }
 
     update() {
         // Move sprite & change animation based on keyboard input (see CodeSandbox)
         this.stateMachine.step();
+        // potentially slow (optimize latter)
+        //this.room.send(messageType.move, this.stateMachine.state);
         if (gameConfig.debug){
             this.debugUpdate();
         }

@@ -1,8 +1,9 @@
 import {State} from './stateMachine'
 import {playerConfig} from '../config/playerconfig';
-import {collisionData} from '../config/globalconfig';
+import {collisionData} from '../../../../common/globalConfig.ts';
 
 export class IdleState extends State {
+  
     enter(scene, player){
         player.sprite.setVelocity(0);
         player.sprite.anims.play('idle');
@@ -119,11 +120,9 @@ export class JumpState extends State {
             this.stateMachine.transition('fall')
             return;
         })
-        //scene.anims.on('jump', () => {
-        //    //console.log('animation complete');
-        //    player.setVelocityY(playerConfig.jumpheight);
-        //}, scene)
     }
+
+    execute(scene, player){}
 }
 
 export const playerState = {

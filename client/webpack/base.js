@@ -25,7 +25,8 @@ module.exports = {
     ]
   },
   devServer: {
-    contentBase: path.resolve(__dirname, "../src/")
+    contentBasePublicPath: '/public',
+    contentBase: path.resolve(__dirname, "../../common/assets")
   },
   plugins: [
     new CleanWebpackPlugin({
@@ -36,7 +37,7 @@ module.exports = {
       WEBGL_RENDERER: JSON.stringify(true)
     }),
     new HtmlWebpackPlugin({
-      template: "./index.html"
+      template:  "./index.html"
     })
   ]
 };
