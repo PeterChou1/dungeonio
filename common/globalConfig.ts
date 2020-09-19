@@ -11,7 +11,8 @@ export const collisionData = {
         soft : 0x0002, // soft platform
     }, 
     group : {
-        player: 1 // any object with group id 1 can interact with the player
+        player: 1,  // any object with group id 1 can interact with the player
+        noplayer: 2 // any object with group id -1 can not interact with player
     }
 }
 

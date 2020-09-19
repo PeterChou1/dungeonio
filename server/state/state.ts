@@ -33,9 +33,15 @@ export class GameState extends Schema {
     }
 
 
-    updatePlayer(id, x, y){
-
-
+    updatePlayer(id, {x, y, flipX, collisionData, state}){
+        console.log(x, y, flipX, collisionData, state);
+        this.players[id].x = x;
+        this.players[id].y = y;
+        this.players[id].flipX = flipX;
+        this.players[id].collisionData.splice(0, this.players[id].collisionData.length);
+        this.players[id].collisionData.push(...collisionData);
+        //collisionData.forEach( data => this.players[id].collisionData.push(data));
+        this.players[id].state = state;
     }
 }
 

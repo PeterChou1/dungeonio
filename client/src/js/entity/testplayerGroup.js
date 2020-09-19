@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { PlayerM } from './testplayer'
+import { PlayerT } from './testplayer'
 
 export class PlayerGroup extends Phaser.GameObjects.Group {
 

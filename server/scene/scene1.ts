@@ -3,7 +3,7 @@ import { collisionData } from "../../common/globalConfig";
 import { Player } from '../entities/player';
 import { PlayerGroup } from '../entities/playerGroup';
 import { messageType } from '../../common/globalConfig';
-import PhaserMatterCollisionPlugin from "phaser-matter-collision-plugin";
+import PhaserMatterCollisionPlugin from "../utils/matterCollision";
 
 export class StartLevel extends Phaser.Scene {
     map : Phaser.Tilemaps.Tilemap;
@@ -32,13 +32,8 @@ export class StartLevel extends Phaser.Scene {
         this.room = this.game.config.preBoot();
         this.plugins.removeScenePlugin('matterCollision');
         this.plugins.installScenePlugin('matterCollision', PhaserMatterCollisionPlugin, 'matterCollision', this);
-        //@ts-ignore check matter collision exist after installation
-        if (this.matterCollision === undefined){
-            // re init if matterCollision undefined
-            console.log('mattercollision undefined re-init');
-            this.init();
-        }
         console.log('---- init ----');
+        setTimeout(() => {console.log('test')}, 1000);
 
     }
 
@@ -50,7 +45,7 @@ export class StartLevel extends Phaser.Scene {
 
     create(){
         //@ts-ignore playergroups
-        this.playergroup = this.add.existing(new PlayerGroup(this))
+        this.playergroup = new PlayerGroup(this);
         this.map = this.add.tilemap("map");
         this.tileset = this.map.addTilesetImage("mainlevbuild", "tiles");
         this.ground = this.map.createDynamicLayer("ground", this.tileset, 0, 0);

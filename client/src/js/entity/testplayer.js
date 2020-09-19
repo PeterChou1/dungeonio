@@ -5,7 +5,7 @@ import {collisionData} from '../../../../common/globalConfig.ts';
 const {Body, Bodies} = Phaser.Physics.Matter.Matter;
 
 
-export class PlayerM extends Phaser.Physics.Matter.Sprite {
+export class PlayerT extends Phaser.Physics.Matter.Sprite {
 
 
     constructor(scene, x, y, w = 50, h = 37, scale = 2){
@@ -67,6 +67,8 @@ export class PlayerM extends Phaser.Physics.Matter.Sprite {
             context: this
         })
         this.scene.matter.world.on("beforeupdate", this.resetTouching, this);
+        this.setCollisionCategory(collisionData.group.noplayer);
+        this.scene.events.on('update', this.update, this);
         console.log('---end sprite---');
     }
 
@@ -93,6 +95,13 @@ export class PlayerM extends Phaser.Physics.Matter.Sprite {
           this.isTouching.top = true;
         } else if (bodyA === this.sensors.nearbottom){
           this.isTouching.nearground = true;
+        }
+    }
+
+    update() {
+        this.scene.room.state.players.onChange = (change, key) => {
+            this.setCollidesWith(change.collisionData);
+            this.setPosition(change.x, change.y);
         }
     }
 

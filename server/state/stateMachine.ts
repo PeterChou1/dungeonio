@@ -54,20 +54,23 @@ export class IdleState extends State {
   execute(player){
       //const cursors = scene.input.keyboard.createCursorKeys();
       const playerconfig = player.data.get(playerStateMap.playerprop);
+      const clientinput = player.data.get(playerStateMap.clientinput);
       //console.log('idle state');
-      if (playerconfig.left){
+      if (clientinput.left_keydown){
           //console.log('left');
           playerconfig.flipX = true;
           this.stateMachine.transition('run');
           return;
-      } else if (playerconfig.right) {
+      } else if (clientinput.right_keydown) {
           //console.log('right');
           playerconfig.flipX = false;
           this.stateMachine.transition('run');
           return;
       } 
-
-      if (playerconfig.up && player.isTouching.ground) {
+      //console.log('can i jump?');
+      //console.log(clientinput.up);
+      //console.log(player.isTouching.ground);
+      if (clientinput.up_keydown && player.isTouching.ground) {
           //console.log('jump');
           if (player.onPlatform) {
               player.collideswith = [collisionData.category.hard]
@@ -77,7 +80,7 @@ export class IdleState extends State {
           this.stateMachine.transition('jump');
           return;
       }
-      if (playerconfig.down && player.onPlatform){
+      if (clientinput.down_keydown && player.onPlatform){
           // reset player to only collide with hard platform
           player.collideswith = [collisionData.category.hard]
           player.setCollidesWith(player.collideswith)
@@ -98,15 +101,16 @@ export class RunState extends State {
   execute(player) {
       ////console.log(player.direction);
       const playerconfig = player.data.get(playerStateMap.playerprop);
+      const clientinput = player.data.get(playerStateMap.clientinput);
       if (playerconfig.flipX) {
-          //console.log('going left');
+          console.log('going left');
           player.setVelocityX(-playerConfig.groundspeed)
       } else {
-          //console.log('going right');
+          console.log('going right');
           player.setVelocityX(playerConfig.groundspeed)
       }
 
-      if (playerconfig.up && player.isTouching.ground){
+      if (clientinput.up_keydown && player.isTouching.ground){
           if (player.onPlatform) {
               player.setCollidesWith([collisionData.category.hard])
               player.onPlatform = false;
@@ -118,7 +122,7 @@ export class RunState extends State {
           return;
       }
       
-      if (playerconfig.down && player.onPlatform){
+      if (clientinput.down_keydown && player.onPlatform){
           // reset player to only collide with hard platform
           player.setCollidesWith([collisionData.category.hard])
           player.onPlatform = false;
@@ -126,10 +130,10 @@ export class RunState extends State {
           return;
       }
       // transition to idle if left and right key are not pressed
-      ////console.log(scene.keys);
-      ////console.log(scene.keys.isUp && scene.keys.isUp);
-      if (playerconfig.right.isUp && playerconfig.left){
-          //console.log('transition to idle');
+      //console.log('----keys-----');
+      //console.log(playerconfig.right_keyup && playerconfig.left_keyup);
+      if (clientinput.right_keyup && clientinput.left_keyup){
+          console.log('transition to idle');
           this.stateMachine.transition('idle');
           return;
       }
@@ -144,10 +148,10 @@ export class FallState extends State {
     playerconfig.state = 'fall';
   }
   execute(player) {
-      const playerconfig = player.data.get(playerStateMap.playerprop);
-      if (playerconfig.right){
+      const clientinput = player.data.get(playerStateMap.clientinput);
+      if (clientinput.right_keydown){
           player.setVelocityX(playerConfig.airspeed);
-      } else if (playerconfig.keys.left.isDown) {
+      } else if (clientinput.left) {
           player.setVelocityX(-playerConfig.airspeed);
       }
       if (player.isTouching.ground){

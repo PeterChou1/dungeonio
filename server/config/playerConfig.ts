@@ -8,9 +8,7 @@ export const playerConfig = {
     airspeed: 5,
     jumpheight: 10,
     state: 'idle',
-    flipX: false,
-    x: null,
-    y: null
+    flipX: false
 }
 
 // list mapping to track player state 
