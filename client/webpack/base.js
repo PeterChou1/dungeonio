@@ -15,6 +15,13 @@ module.exports = {
         }
       },
       {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "ts-loader"
+        }
+      },
+      {
         test: [/\.vert$/, /\.frag$/],
         use: "raw-loader"
       },

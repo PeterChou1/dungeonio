@@ -1,31 +1,23 @@
 import Phaser from 'phaser';
 //@ts-ignore
-import {collisionData, gameConfig} from '../../common/globalConfig.ts';
+import {collisionData, messageType, gameConfig} from '../../common/globalConfig.ts';
 //@ts-ignore
-import { playerStateMap } from '../config/playerConfig.ts';
+import { playerStateMap, playerConfig } from '../config/playerConfig.ts';
 //@ts-ignore
-import { StateMachine, IdleState, RunState, JumpState, FallState } from '../state/stateMachine.ts';
+import { playerState, StateMachine } from '../state/stateMachine.ts';
 
 
 // @ts-ignore: Property 'Matter' exist but retarded typescript will not see it'.
 const {Body, Bodies} = Phaser.Physics.Matter.Matter;
 
-export class Player extends Phaser.Physics.Matter.Sprite {
-    isTouching;
-    sensors;
-    scene;
-    collideswith;
-    onPlatform : boolean;
-    stateMachine: StateMachine;
-    mainBody;
-    allcollisionlistener;
-    private _clientid;
+export class PlayerTest extends Phaser.Physics.Matter.Sprite {
 
 
     constructor(scene, x, y, clientid, w = 50, h = 75, scale = 1){
         super(scene.matter.world, x, y, '')
         // give sprite data manager
         this.setDataEnabled();
+        // find msPer frame
         this.scene = scene;
         this._clientid = clientid;
         this.isTouching = {left: false, right: false, ground: false, top: false, nearground: false};
@@ -42,14 +34,6 @@ export class Player extends Phaser.Physics.Matter.Sprite {
             up_keyup: true,
             down_keyup: true
         })
-        // default player config
-        const playerConfig = {
-            groundspeed: 5,
-            airspeed: 5,
-            jumpheight: 10,
-            state: 'idle',
-            flipX: false
-        }
         // data mapping for player properties
         const config = new Proxy(
             playerConfig, {
@@ -60,18 +44,9 @@ export class Player extends Phaser.Physics.Matter.Sprite {
                 }.bind(this)
             }
         )
-        console.log('---default config----');
-        console.log(playerConfig);
-        console.log(config);
         this.data.set(playerStateMap.playerprop, config);
-        
         // set proxy for player collision
-        const playerState = {
-            idle: new IdleState(),
-            run: new RunState(),
-            jump: new JumpState(),
-            fall: new FallState(),
-        }
+
         this.stateMachine = new StateMachine(
             'idle',
             playerState,
@@ -80,7 +55,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         this.mainBody = Bodies.rectangle(0, 0, w * 0.6, h * scale, { chamfer: {radius: 5}});
         this.sensors = {
             nearbottom: Bodies.rectangle(0, h - 15, w, 50, {isSensor: true}),
-            bottom: Bodies.rectangle(0, h - 38, w, 4, {isSensor: true}),
+            bottom: Bodies.rectangle(0, h - 40, w, 2, {isSensor: true}),
             left: Bodies.rectangle(-w * 0.35, 0, 2, h * 0.5,  {isSensor: true}),
             right: Bodies.rectangle(w * 0.35, 0, 2, h * 0.5, {isSensor: true}), 
             top: Bodies.rectangle(0, -h + 38, w, 2, {isSensor: true}),
@@ -106,62 +81,51 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         this.setFixedRotation()
         this.setPosition(x, y)
             //.setCollidesWith([collisionData.category.hard]);
-        this.allcollisionlistener = [
-            this.scene.matterCollision.addOnCollideStart({
-                objectA: [this.mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom],
-                callback: this.onSensorCollide,
-                context: this
-            }),
-            this.scene.matterCollision.addOnCollideActive({
-                objectA: [this.mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom],
-                objectB: this.scene.objectgroup.hard,
-                callback: this.onSensorCollide,
-                context: this
-            }),
-            this.scene.matterCollision.addOnCollideStart({
-                objectA: this.sensors.bottom,
-                objectB: this.scene.objectgroup.soft,
-                callback: () => {
-                    this.onPlatform = true;
-                    this.collideswith = [collisionData.category.hard, collisionData.category.soft]
-                    this.setCollidesWith(this.collideswith)
-                    this.sensors.ground = true;
-                    this.sensors.nearground = true;
-                },
-                context: this
-            }),
-            this.scene.matterCollision.addOnCollideActive({
-                objectA: this.sensors.bottom,
-                objectB: this.scene.objectgroup.soft,
-                callback: () => {
-                    this.collideswith = [collisionData.category.hard, collisionData.category.soft]
-                    this.isTouching.ground = true;
-                    this.isTouching.nearground = true;
-                },
-                context: this
-            }),
-            this.scene.matterCollision.addOnCollideEnd({
-                objectA: this.sensors.bottom,
-                objectB: this.scene.objectgroup.soft,
-                callback: () => {
-                    this.onPlatform = false;
-                    this.collideswith = [collisionData.category.hard]
-                    this.setCollidesWith(this.collideswith)
-                },
-                context: this
-            })
-        ]
+
+        this.scene.matterCollision.addOnCollideStart({
+            objectA: [this.mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom],
+            callback: this.onSensorCollide,
+            context: this
+        });
+        this.scene.matterCollision.addOnCollideActive({
+            objectA: [this.mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom],
+            objectB: this.scene.objectgroup.hard,
+            callback: this.onSensorCollide,
+            context: this
+        });
+        this.scene.matterCollision.addOnCollideStart({
+            objectA: this.sensors.bottom,
+            objectB: this.scene.objectgroup.soft,
+            callback: () => {
+                this.onPlatform = true;
+                this.collideswith = [collisionData.category.hard, collisionData.category.soft]
+                this.setCollidesWith(this.collideswith)
+            },
+            context: this
+        })
+        this.scene.matterCollision.addOnCollideEnd({
+            objectA: this.sensors.bottom,
+            objectB: this.scene.objectgroup.soft,
+            callback: () => {
+                this.onPlatform = false;
+                this.collideswith = [collisionData.category.hard]
+                this.setCollidesWith(this.collideswith)
+            },
+            context: this
+        })
         this.world.on("beforeupdate", this.resetTouching, this);
         this.scene.events.on("update", this.update, this);
+
         if (!gameConfig.networkdebug) {
             // setup callbacks for client input
+            this.handleClientInput();
             // add player to room state
             this.scene.room.state.addPlayer(clientid, x, y);
         }
     }
 
 
-    setdebugBody(body, addToWorld?)
+    setdebugBody(body, addToWorld)
     {
         if (addToWorld === undefined) { addToWorld = true; }
         if (this.body)
@@ -186,10 +150,17 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         return this;
     }
 
-    handleClientInput(playerinput) {
-        console.log(`handle player input ${this.clientid}`);
-        this.data.set(playerStateMap.clientinput, playerinput)
+    handleClientInput() {
+        this.scene.room.onMessage(messageType.playerinput, (client, playerinput)=> {
+            console.log(`${client.sessionId} sent player input`);
+            console.log(playerinput);
+            if (client.sessionId === this.clientid) {
+                //console.log('recieved correctly');
+                this.data.set(playerStateMap.clientinput, playerinput);
+            }
+        })
     }
+
 
     resetTouching() {
         this.isTouching.left = false;
@@ -230,26 +201,13 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         }
     }
 
-
-    destroyPlayer() {
-        // unsubscribe from all collision listeners
-        console.log(`shutting down player ${this.clientid}`);
-        this.allcollisionlistener.forEach(
-            listenerUnsubcribe => {
-                listenerUnsubcribe();
-            }
-        )
-        // unsubscribe all matter events
-        this.world.off('beforeupdate', this.resetTouching, this);
-        // unsubscribe to scene events
-        this.scene.events.off('update', this.update, this);
-        this.scene.room.state.removePlayer(this.clientid);
+    destroy(){
         this.destroy();
     }
 
+
     update(){
         this.stateMachine.step();
-        //console.log(`-----${this.clientid}-----`);
         //console.log(`state: ${this.stateMachine.state}`);
         //console.log(this.data.get(playerStateMap.playerprop));
         //console.log(`position x: ${this.x}, y: ${this.y}`);
@@ -257,16 +215,19 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         //console.log('is Touching ?');
         //console.log(this.isTouching);
         //console.log(`on Platform: ${this.onPlatform}`);
+        //console.log('player input set');
         const playerconfig = this.data.get(playerStateMap.playerprop);
-        this.scene.room.state.updatePlayer(this.clientid, {
-            x: this.x,
-            y: this.y,
-            flipX: playerconfig.flipX,
-            collisionData: this.collideswith,
-            state: playerconfig.state,
-            isTouching: gameConfig.debug ? Object.values(this.isTouching) : null,
-            onPlatform: gameConfig.debug ? this.onPlatform : null,
-        })
+        if (gameConfig.networkdebug){
+            this.scene.room.state.updatePlayer(this.clientid, {
+                x: this.x,
+                y: this.y,
+                flipX: playerconfig.flipX,
+                collisionData: this.collideswith,
+                state: playerconfig.state,
+                isTouching: gameConfig.debug ? Object.values(this.isTouching) : null,
+                onPlatform: gameConfig.debug ? this.onPlatform : null,
+            })
+        }
     }
 
 

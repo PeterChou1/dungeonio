@@ -359,7 +359,6 @@ export default class MatterCollisionPlugin extends Phaser.Plugins.ScenePlugin {
       }
       console.log('subscribed matter event');
       matter.world.on("collisionstart", this.onCollisionStart);
-      matter.world.on('collisionstart', () => {console.log('something collided')});
       matter.world.on("collisionactive", this.onCollisionActive);
       matter.world.on("collisionend", this.onCollisionEnd);
     }

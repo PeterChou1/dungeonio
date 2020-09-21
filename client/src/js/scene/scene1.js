@@ -1,7 +1,6 @@
 import Phaser from "phaser";
 import Player from "../entity/player"; 
 import {gameConfig, collisionData, messageType, serverport} from '../../../../common/globalConfig.ts';
-import { PlayerGroup } from '../entity/testplayerGroup'; 
 import { PlayerT } from '../entity/testplayer'; 
 import { playerAnims } from '../config/playerconfig';
 import { createanims } from '../utils/utils';
@@ -15,7 +14,7 @@ export class StartLevel extends Phaser.Scene {
             physics: {
                 default:'matter',
                 matter: {
-                    gravity: { y: 1 } // This is the default value, so we could omit this
+                    gravity: { y: 0 } // This is the default value, so we could omit this
                 }
             }
         })
@@ -33,7 +32,6 @@ export class StartLevel extends Phaser.Scene {
         const websocket = `ws://localhost:${serverport}`;
         console.log(`connected to web socket protocol ${websocket} `)
         const client = new Colyseus.Client(websocket)
-        console.log('joined room');
         return await client.joinOrCreate('game');
     }
 
@@ -48,14 +46,9 @@ export class StartLevel extends Phaser.Scene {
 
     async create(){
         this.room = await this.connect();
+        this.sessionId = this.room.sessionId;
+        console.log('joined room with sessionId ', this.sessionId);
         this.keys = this.input.keyboard.createCursorKeys();
-        this.map = this.add.tilemap("map");
-        this.tileset = this.map.addTilesetImage("mainlevbuild", "tiles");
-        this.ground = this.map.createDynamicLayer("ground", this.tileset, 0, 0);
-        this.objectgroup = { 
-            soft: [],// soft tiles 
-            hard: this.ground.filterTiles((tile) => !tile.properties.soft)
-        };
         // create player animations;
         createanims(this, playerAnims);
         this.map = this.add.tilemap("map");
@@ -87,7 +80,6 @@ export class StartLevel extends Phaser.Scene {
              const changed = value !== playerinput[prop];
              playerinput[prop] = value
              if (changed && this.room) {
-                console.log('changed input');
                 playerinput[prop] = value
                 this.room.send(messageType.playerinput, this.playerinput);
              }
@@ -103,9 +95,7 @@ export class StartLevel extends Phaser.Scene {
             hard: this.gamelayer.ground.filterTiles((tile) => !tile.properties.soft)
         };
         
-        const platforms = this.map.getObjectLayer('platform')
-        console.log('--softplatform--');
-        console.log(platforms);
+        const platforms = this.map.getObjectLayer('platform');
         platforms.objects.forEach( 
             rect => {
                 this.objectgroup.soft.push(
@@ -122,7 +112,6 @@ export class StartLevel extends Phaser.Scene {
                 )
             }
         )
-        
         this.gamelayer.ground.forEachTile( 
             (tile)=> {
                 if (tile.properties.collides){
@@ -133,9 +122,32 @@ export class StartLevel extends Phaser.Scene {
                     } else {
                         mattertile.setCollisionCategory(collisionData.category.hard);
                     }
+                    if (tile.properties.debug && gameConfig.debug){
+                        console.log(`x: ${tile.pixelX} y: ${tile.pixelY}`);
+                    }
                 }
             }
         )
+        // track all players in game
+        this.allplayers = {};
+        //this.room.onStateChange.once((gamestate) => {
+        //    // get initial state of everything
+        //    console.log("initial state", gamestate);
+        //    console.log('all players');
+        //    const playerid = Object.keys(gamestate.players);
+        //    playerid.forEach( 
+        //        sessionId => {
+        //            this.allplayers[sessionId] = new PlayerT(
+        //                                                this,
+        //                                                gamestate.players[sessionId].x,
+        //                                                gamestate.players[sessionId].y,
+        //                                                sessionId
+        //                                        )
+        //
+        //        }
+        //    )
+        //});
+        
         //console.log(this.objectgroup);
         //const image = this.matter.add.image(100, 100, "circle");
         //image.setCircle( image.width / 2, { restitution: 1, friction: 0.25});
@@ -179,15 +191,54 @@ export class StartLevel extends Phaser.Scene {
         }
         // listen for state updates
         if (this.room){
-            this.room.state.players.onAdd = (change, key) => {
-                    console.log('--Player added--');
-                    console.log(change);
-                    console.log(key);
-                    console.log('----------------');
-                    this.playerT = new PlayerT(this, change.x, change.y);
-                    this.player = new Player(this, change.x, change.y, 2);
+            this.room.state.players.onAdd = (player, key) => {
+                    // check if player is added already
+                    console.log(`---${key}---`)
+                    if (!(key in this.allplayers)){
+                        console.log(`--Player added with id: ${key}--`);
+                        if (gameConfig.debug){
+                            this.allplayers[key] = new PlayerT(this, player.x, player.y, this.sessionId);
+                        } else {
+                            this.allplayers[key] = new Player(this, player.x, player.y, 2);
+                        }
+                    }
             }
-            
+            this.room.state.players.onChange = (change, key) => {
+                console.log(`player id: ${key} send changes`);
+                if (gameConfig.debug){ 
+                    this.allplayers[key].setCollidesWith(change.collisionData);
+                    this.allplayers[key].setPosition(change.x, change.y);
+                    if ( this.sessionId === key) {
+                        //console.log('debug');
+                        this.allplayers[key].debugUpdate(
+                            {
+                                x : change.x,
+                                y: change.y,
+                                flipX: change.flipX,
+                                collisionData: change.collisionData,
+                                state: change.state,
+                                isTouching: change.isTouching,
+                                onPlatform: change.onPlatform
+                            }
+                        )
+                    }
+                } else {
+                    this.allplayers[key].updatePlayer(
+                        {
+                            x: change.x,
+                            y: change.y,
+                            flipX: change.flipX,
+                            collisionData: change.collisionData,
+                            state: change.state
+                        }
+                    )
+                }
+            }
+
+            this.room.state.players.onRemove = (player, key) =>  {
+                console.log(`player id ${key} was removed`);
+                this.allplayers[key].destroy();
+            }
         }
     }
 

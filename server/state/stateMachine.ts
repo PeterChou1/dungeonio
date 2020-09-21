@@ -1,6 +1,8 @@
 interface PossibleStates { [key: string]: State; }
-import { collisionData } from '../../common/globalConfig';
-import { playerConfig, playerStateMap } from '../config/playerConfig';
+//@ts-ignore
+import { collisionData } from '../../common/globalConfig.ts';
+//@ts-ignore
+import { playerStateMap } from '../config/playerConfig.ts';
 
 export class StateMachine {
     initialState;
@@ -55,6 +57,13 @@ export class IdleState extends State {
       //const cursors = scene.input.keyboard.createCursorKeys();
       const playerconfig = player.data.get(playerStateMap.playerprop);
       const clientinput = player.data.get(playerStateMap.clientinput);
+      //console.log(player.isTouching.ground);
+      if (!player.isTouching.ground) {
+        console.log('idle player not touching ground transitioning');
+        this.stateMachine.transition('fall');
+        return;
+
+      }
       //console.log('idle state');
       if (clientinput.left_keydown){
           //console.log('left');
@@ -104,10 +113,10 @@ export class RunState extends State {
       const clientinput = player.data.get(playerStateMap.clientinput);
       if (playerconfig.flipX) {
           console.log('going left');
-          player.setVelocityX(-playerConfig.groundspeed)
+          player.setVelocityX(-playerconfig.groundspeed)
       } else {
           console.log('going right');
-          player.setVelocityX(playerConfig.groundspeed)
+          player.setVelocityX(playerconfig.groundspeed)
       }
 
       if (clientinput.up_keydown && player.isTouching.ground){
@@ -149,10 +158,11 @@ export class FallState extends State {
   }
   execute(player) {
       const clientinput = player.data.get(playerStateMap.clientinput);
+      const playerconfig = player.data.get(playerStateMap.playerprop);
       if (clientinput.right_keydown){
-          player.setVelocityX(playerConfig.airspeed);
-      } else if (clientinput.left) {
-          player.setVelocityX(-playerConfig.airspeed);
+          player.setVelocityX(playerconfig.airspeed);
+      } else if (clientinput.left_keydown) {
+          player.setVelocityX(-playerconfig.airspeed);
       }
       if (player.isTouching.ground){
           ////console.log(player.body.onFloor());
@@ -166,7 +176,7 @@ export class JumpState extends State {
   enter(player) {
       const playerconfig = player.data.get(playerStateMap.playerprop);
       playerconfig.state = 'jump';
-      player.setVelocityY(-playerConfig.jumpheight);
+      player.setVelocityY(-playerconfig.jumpheight);
       // jump animation cost 3 seconds;
       setTimeout(() => {
           this.stateMachine.transition('fall')

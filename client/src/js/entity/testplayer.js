@@ -1,27 +1,26 @@
 import Phaser from 'phaser';
-import {collisionData} from '../../../../common/globalConfig.ts';
-//import * as MatterJS from 'matter-js';
-//MatterJS = Phaser.Physics.Matter.Matter;
+import {collisionData, gameConfig} from '../../../../common/globalConfig.ts';
 const {Body, Bodies} = Phaser.Physics.Matter.Matter;
 
 
 export class PlayerT extends Phaser.Physics.Matter.Sprite {
 
 
-    constructor(scene, x, y, w = 50, h = 37, scale = 2){
+    constructor(scene, x, y, playerId, w = 50, h = 75, scale = 1){
         super(scene.matter.world, x, y, '')
+        this.playerId = playerId;
         this.scene = scene;
         this.isTouching = {left: false, right: false, ground: false, top: false, nearground: false};
         this.onPlatform = false;
         this.FlipX = false;
         const mainBody = Bodies.rectangle(0, 0, w * 0.6, h * scale, { chamfer: {radius: 5}});
         this.sensors = {
-            nearbottom: Bodies.rectangle(0, h + 25, w, 50, {isSensor: true}),
-            bottom: Bodies.rectangle(0, h , w  , 2, {isSensor: true}),
-            left: Bodies.rectangle(-w * 0.35, 0, 2, h ,  {isSensor: true}),
-            right: Bodies.rectangle(w * 0.35, 0, 2, h , {isSensor: true}), 
-            top: Bodies.rectangle(0, -h, w, 2, {isSensor: true}),
-            neartop: Bodies.rectangle(0, -h - 25, w, 50, {isSensor: true})
+            nearbottom: Bodies.rectangle(0, h - 15, w, 50, {isSensor: true}),
+            bottom: Bodies.rectangle(0, h - 38, w, 4, {isSensor: true}),
+            left: Bodies.rectangle(-w * 0.35, 0, 2, h * 0.5,  {isSensor: true}),
+            right: Bodies.rectangle(w * 0.35, 0, 2, h * 0.5, {isSensor: true}), 
+            top: Bodies.rectangle(0, -h + 38, w, 2, {isSensor: true}),
+            neartop: Bodies.rectangle(0, -h + 13, w, 50, {isSensor: true})
         };
         const compoundBody = Body.create({
             parts: [mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom, this.sensors.neartop],
@@ -36,40 +35,11 @@ export class PlayerT extends Phaser.Physics.Matter.Sprite {
         //this.setScale(scale)
         this.setFixedRotation()
         this.setPosition(x, y);
-        this.scene.matterCollision.addOnCollideStart({
-            objectA: [this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom],
-            callback: this.onSensorCollide,
-            context: this
-        });
-        this.scene.matterCollision.addOnCollideActive({
-            objectA: [this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom],
-            callback: this.onSensorCollide,
-            context: this
-        });
-        this.scene.matterCollision.addOnCollideStart({
-            objectA: this.sensors.bottom,
-            objectB: this.scene.objectgroup.soft,
-            callback: () => {
-                this.onPlatform = true;
-                this.collideswith = [collisionData.category.hard, collisionData.category.soft]
-                this.setCollidesWith(this.collideswith)
-            },
-            context: this
-        })
-        this.scene.matterCollision.addOnCollideEnd({
-            objectA: this.sensors.bottom,
-            objectB: this.scene.objectgroup.soft,
-            callback: () => {
-                this.onPlatform = false;
-                this.collideswith = [collisionData.category.hard]
-                this.setCollidesWith(this.collideswith)
-            },
-            context: this
-        })
-        this.scene.matter.world.on("beforeupdate", this.resetTouching, this);
+        //this.scene.matter.world.on("beforeupdate", this.resetTouching, this);
         this.setCollisionCategory(collisionData.group.noplayer);
-        this.scene.events.on('update', this.update, this);
-        console.log('---end sprite---');
+        if (gameConfig.debug){
+            this.debug()
+        }
     }
 
 
@@ -99,14 +69,16 @@ export class PlayerT extends Phaser.Physics.Matter.Sprite {
     }
 
     update() {
-        this.scene.room.state.players.onChange = (change, key) => {
-            this.setCollidesWith(change.collisionData);
-            this.setPosition(change.x, change.y);
-        }
     }
 
-    destroy() {
-        this.sprite.destroy();
+    debug() {
+        this.playerdebug = this.scene.add.text(10, 100, '',  { font: '"Times"', fontSize: '32px' });
     }
+
+    debugUpdate({x, y, flipX, collisionData, state, isTouching, onPlatform}){
+        this.playerdebug.setText(` clientId: ${this.playerId} state: ${state} onPlatform: ${onPlatform} \n x: ${x}, y: ${y} \n isTouching {left: ${isTouching[0]}, right: ${isTouching[1]}, ground: ${isTouching[2]}, top: ${isTouching[3]}, nearbottom: ${isTouching[4]}} \n collision data: ${collisionData} \n flipX : ${flipX}`,   
+                                             { font: '"Times"', fontSize: '32px' });
+    }
+
 
 }

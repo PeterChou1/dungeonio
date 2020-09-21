@@ -1,7 +1,8 @@
 export const serverport = 4000;
 
 export const gameConfig = {
-    debug: true
+    debug: false,
+    networkdebug: false
 }
 
 // collision

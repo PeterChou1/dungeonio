@@ -15,9 +15,9 @@ export class GameRoom extends Room<GameState> {
             }
         }
         this.game = new Phaser.Game(config);
-        console.log('game started');
         this.scene = this.game.scene.getScene('start');
         this.setState(new GameState());
+        console.log('game started');
         console.log('---scene---');
         console.log(`width: ${this.scene.scale.width} height: ${this.scene.scale.height}`);
         //this.onMessage(messageType.playerinput, (client, data) => {
@@ -36,10 +36,11 @@ export class GameRoom extends Room<GameState> {
         console.log(`client with id (${client.sessionId}) left`)
         //@ts-ignore
         this.scene.removePlayer(client.sessionId);
-
     }
 
     onDispose(){
-
+        console.log('destory game');
+        this.game.destroy(true)
+        //throw Error('disposed of game');
     }
 }

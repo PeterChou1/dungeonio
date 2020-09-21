@@ -1,8 +1,8 @@
 import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
 import { State } from './stateMachine';
-import { collisionData } from '../../common/globalConfig';
-import { playerConfig } from '../config/playerConfig';
+import { collisionData, gameConfig } from '../../common/globalConfig';
 // player state
+
 export class Player extends Schema {
     @type('number')
     x : Number = 0;
@@ -14,6 +14,12 @@ export class Player extends Schema {
     collisionData = new ArraySchema<number>(); // what the play can and can't collide with
     @type('string')
     state: String = 'idle';
+
+    // only avaliable if gameConfig.debug = true
+    @type('boolean') 
+    onPlatform : Boolean =  false;
+    @type(['boolean'])
+    isTouching = new ArraySchema<Boolean>();
 }
 
 // General game state in a scene
@@ -33,15 +39,27 @@ export class GameState extends Schema {
     }
 
 
-    updatePlayer(id, {x, y, flipX, collisionData, state}){
-        console.log(x, y, flipX, collisionData, state);
-        this.players[id].x = x;
-        this.players[id].y = y;
+    removePlayer(id){
+       delete this.players[id];
+    }
+
+
+    updatePlayer(id, {x, y, flipX, collisionData, state, isTouching, onPlatform}){
+        //console.log(x, y, flipX, collisionData, state);
+        this.players[id].x = Math.trunc( x );
+        this.players[id].y = Math.trunc( y );
         this.players[id].flipX = flipX;
         this.players[id].collisionData.splice(0, this.players[id].collisionData.length);
         this.players[id].collisionData.push(...collisionData);
         //collisionData.forEach( data => this.players[id].collisionData.push(data));
         this.players[id].state = state;
+        if (gameConfig.debug) {
+            //console.log(isTouching);
+            //console.log(onPlatform);
+            this.players[id].isTouching.splice(0, this.players[id].isTouching.length);
+            this.players[id].isTouching.push(...isTouching);
+            this.players[id].onPlatform = onPlatform;
+        }
     }
 }
 

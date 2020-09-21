@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
-import { Player } from './player'
+import { gameConfig } from '../../common/globalConfig';
+//@ts-ignore
+import { Player } from  './player.ts';
 
 export class PlayerGroup extends Phaser.GameObjects.Group {
 
@@ -18,7 +20,12 @@ export class PlayerGroup extends Phaser.GameObjects.Group {
         const inactive : Player = this.getFirstDead(false, x, 370);
 
         if(inactive === null){
-            const player = new Player(this.scene, x, 370, clientid);
+            let player;
+            if (gameConfig.networkdebug){
+                player = new Player(this.scene, 300, 100, clientid);
+            } else {
+                player = new Player(this.scene, x, 370, clientid);
+            }
             this.add(player)
             console.log('added player to server id: ' , clientid);
             return player;
@@ -33,10 +40,11 @@ export class PlayerGroup extends Phaser.GameObjects.Group {
 
     despawn(clientid){
         const player : Player = this.getPlayer(clientid);
-        player.setActive(false);
-        player.setVisible(false);
-        player.removeInteractive();
-        player.world.remove(player.body, false);
+        //player.setActive(false);
+        //player.setVisible(false);
+        //player.removeInteractive();
+        //player.world.remove(player.body, false);
+        player.destroyPlayer();
         console.log('despawn player with id ', clientid);
     }
 
@@ -52,8 +60,12 @@ export class PlayerGroup extends Phaser.GameObjects.Group {
     }
 
 
-    updatePlayerState(){
-
+    updatePlayerInput(clientid, playerinput){
+        const player : Player = this.getPlayer(clientid);
+        if (player !== null){
+            console.log(`successfully handle client input id: ${clientid}`);
+            player.handleClientInput(playerinput);
+        }
     }
 
 
