@@ -3,7 +3,7 @@ Multiplayer Dungeon IO game
 
 ## Setup
 
-cd phaser3-project-template
+cd phaser3-project-template 
 npm install
 cd client
 npm install
