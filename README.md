@@ -3,14 +3,14 @@ Multiplayer Dungeon IO game
 
 ## Setup
 
-cd phaser3-project-template 
-npm install
-cd client
-npm install
-cd ..
-npm run dev
-cd client
-npm run start
+cd phaser3-project-template \
+npm install \
+cd client \
+npm install \
+cd .. \
+npm run dev \
+cd client \
+npm run start \
 
 Created from phaser3 project template
 
