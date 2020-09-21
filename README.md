@@ -10,7 +10,9 @@ npm install \
 cd .. \
 npm run dev \
 cd client \
-npm run start \
+npm run start 
+
+## Phaser 3 Template
 
 Created from phaser3 project template
 
