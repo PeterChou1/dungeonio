@@ -10,7 +10,7 @@ npm install \
 cd .. \
 npm run dev \
 cd client \
-npm run start \
+npm run start 
 
 game instance runs on localhost:8080
 
