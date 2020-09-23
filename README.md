@@ -1,4 +1,22 @@
-# Phaser 3 Webpack Project Template
+# Dungeon.IO 
+Multiplayer Dungeon IO game
+
+## Setup
+
+cd phaser3-project-template \
+npm install \
+cd client \
+npm install \
+cd .. \
+npm run dev \
+cd client \
+npm run start 
+
+game instance runs on localhost:8080
+
+## Phaser 3 Template
+
+Created from phaser3 project template
 
 A Phaser 3 project template with ES6 support via [Babel 7](https://babeljs.io/) and [Webpack 4](https://webpack.js.org/)
 that includes hot-reloading for development and production-ready builds.
