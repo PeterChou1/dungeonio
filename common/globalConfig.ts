@@ -1,8 +1,8 @@
 export const serverport = 4000;
 
 export const gameConfig = {
-    debug: false,
-    networkdebug: false
+    debug: false, // enable debug graphics
+    networkdebug: false // inject server player instance into client side
 }
 
 // collision
@@ -13,7 +13,7 @@ export const collisionData = {
     }, 
     group : {
         player: 1,  // any object with group id 1 can interact with the player
-        noplayer: 2 // any object with group id -1 can not interact with player
+        noplayer: 2 // any object with group id 2 can not interact with player
     }
 }
 

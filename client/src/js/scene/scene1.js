@@ -14,6 +14,7 @@ export class StartLevel extends Phaser.Scene {
             physics: {
                 default:'matter',
                 matter: {
+                    debug: gameConfig.debug,
                     gravity: { y: 0 } // This is the default value, so we could omit this
                 }
             }
@@ -168,6 +169,7 @@ export class StartLevel extends Phaser.Scene {
         //}, 2000)
 
         if (gameConfig.debug){
+           console.log('---game debug mode---');
            this.matter.world.createDebugGraphic();
         }
     }

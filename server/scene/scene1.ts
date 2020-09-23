@@ -1,6 +1,5 @@
 import Phaser from "phaser";
 import { collisionData } from "../../common/globalConfig";
-import { Player } from '../entities/player';
 import { PlayerGroup } from '../entities/playerGroup';
 import { messageType } from '../../common/globalConfig';
 import PhaserMatterCollisionPlugin from "../utils/matterCollision";
@@ -39,6 +38,7 @@ export class StartLevel extends Phaser.Scene {
         console.log('preload');
         this.load.image('tiles', '../../../../common/assets/tilemaps/tilesetImage/mainlevbuild.png');
         this.load.tilemapTiledJSON('map', '../../../../common/assets/tilemaps/json/level1.json');
+        this.load.spritesheet('player', '../../../../common/assets/spritesheet/adventurer-Sheet.png', {frameWidth: 50, frameHeight: 37 });
     }
 
     create(){
@@ -90,7 +90,12 @@ export class StartLevel extends Phaser.Scene {
     }
 
     addPlayer(clientid){
-        this.events.once('update', () => { this.playergroup.spawn(clientid)});
+        this.events.once('update', () => {
+            if (this.playergroup === undefined){
+                this.playergroup = new PlayerGroup(this);
+            }
+            this.playergroup.spawn(clientid)
+        });
     }
 
     removePlayer(clientid){

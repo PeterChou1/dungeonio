@@ -6,21 +6,31 @@ const {Body, Bodies} = Phaser.Physics.Matter.Matter;
 export class PlayerT extends Phaser.Physics.Matter.Sprite {
 
 
-    constructor(scene, x, y, playerId, w = 50, h = 75, scale = 1){
-        super(scene.matter.world, x, y, '')
+    constructor(scene, x, y, playerId, scale = 2) {// w = 50, h = 75, scale = 1){
+        super(scene.matter.world, x, y, 'player', 0)
+        const {width : w, height: h} = this;
+        console.log('---test player ---')
+        console.log(w, h)
         this.playerId = playerId;
         this.scene = scene;
         this.isTouching = {left: false, right: false, ground: false, top: false, nearground: false};
         this.onPlatform = false;
         this.FlipX = false;
         const mainBody = Bodies.rectangle(0, 0, w * 0.6, h * scale, { chamfer: {radius: 5}});
+        
         this.sensors = {
-            nearbottom: Bodies.rectangle(0, h - 15, w, 50, {isSensor: true}),
-            bottom: Bodies.rectangle(0, h - 38, w, 4, {isSensor: true}),
-            left: Bodies.rectangle(-w * 0.35, 0, 2, h * 0.5,  {isSensor: true}),
-            right: Bodies.rectangle(w * 0.35, 0, 2, h * 0.5, {isSensor: true}), 
-            top: Bodies.rectangle(0, -h + 38, w, 2, {isSensor: true}),
-            neartop: Bodies.rectangle(0, -h + 13, w, 50, {isSensor: true})
+          nearbottom: Bodies.rectangle(0, h + 25, w, 50, {isSensor: true}),
+          bottom: Bodies.rectangle(0, h , w, 2, {isSensor: true}),
+          left: Bodies.rectangle(-w * 0.35, 0, 2, h ,  {isSensor: true}),
+          right: Bodies.rectangle(w * 0.35, 0, 2, h , {isSensor: true}), 
+          top: Bodies.rectangle(0, -h, w, 2, {isSensor: true}),
+          neartop: Bodies.rectangle(0, -h - 25, w, 50, {isSensor: true})
+          //nearbottom: Bodies.rectangle(0, h - 15, w, 50, {isSensor: true}),
+          //bottom: Bodies.rectangle(0, h - 38, w, 4, {isSensor: true}),
+          //left: Bodies.rectangle(-w * 0.35, 0, 2, h * 0.5,  {isSensor: true}),
+          //right: Bodies.rectangle(w * 0.35, 0, 2, h * 0.5, {isSensor: true}), 
+          //top: Bodies.rectangle(0, -h + 38, w, 2, {isSensor: true}),
+          //neartop: Bodies.rectangle(0, -h + 13, w, 50, {isSensor: true})
         };
         const compoundBody = Body.create({
             parts: [mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom, this.sensors.neartop],

@@ -1,13 +1,42 @@
 import { StateMachine } from '../state/stateMachine';
 import { playerState }  from '../state/playerState';
-import { gameConfig, messageType } from '../../../../common/globalConfig.ts';
+import { gameConfig, messageType, collisionData } from '../../../../common/globalConfig.ts';
 import { PlayerPhysics } from '../physics/playerPhysics';
 
+const {Body, Bodies} = Phaser.Physics.Matter.Matter;
 export default class Player {
     constructor(scene, x, y, scale) {
         this.scene = scene;
-        this.sprite = scene.matter.add.sprite(x, y, "player", 0);
+        this.sprite = scene.matter.add.sprite(0, 0, "player", 0);
+        const {width : w, height: h} = this.sprite;
+        console.log('---actual player ---')
+        console.log(w, h);
+
+        const mainBody = Bodies.rectangle(0, 0, w * 0.35, h, { chamfer: {radius: 5}});
+        //console.log(mainBody.bounds);
+        //this.sensors = {
+        //    nearbottom: Bodies.rectangle(0, h + 25, w, 50, {isSensor: true}),
+        //    bottom: Bodies.rectangle(0, h , w, 2, {isSensor: true}),
+        //    left: Bodies.rectangle(-w * 0.35, 0, 2, h ,  {isSensor: true}),
+        //    right: Bodies.rectangle(w * 0.35, 0, 2, h , {isSensor: true}), 
+        //    top: Bodies.rectangle(0, -h, w, 2, {isSensor: true}),
+        //    neartop: Bodies.rectangle(0, -h - 25, w, 50, {isSensor: true})
+        //}
+        // create main body
+        const compoundBody = Body.create({
+            parts: [mainBody ], // this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom, this.sensors.neartop],
+            frictionStatic: 0,
+            frictionAir: 0.02,
+            friction: 0.1,
+            collisionFilter: {
+                mask: collisionData.category.hard,
+            }
+        })
+        this.sprite.setExistingBody(compoundBody);
         this.sprite.setScale(scale);
+        this.sprite.setPosition(x, y);
+        this.sprite.setFixedRotation();
+
         // initialize player state machine
         //this.stateMachine = new StateMachine(
         //    'idle',

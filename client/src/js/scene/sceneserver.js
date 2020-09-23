@@ -1,9 +1,10 @@
 import Phaser from "phaser";
 import {gameConfig, collisionData} from '../../../../common/globalConfig.ts';
-import { PlayerTest } from '../../../../server/entities/playerT';
+import { Player } from '../../../../server/entities/player.ts';
 //import { messageType } from '../../common/globalConfig';
 import PhaserMatterCollisionPlugin from "../../../../server/utils/matterCollision.ts";
 import { PlayerT } from "../entity/testplayer";
+import PlayerA from '../entity/player';
 
 export class ServerLevel extends Phaser.Scene {
     constructor(){
@@ -12,6 +13,7 @@ export class ServerLevel extends Phaser.Scene {
             physics: {
                 default:'matter',
                 matter: {
+                    debug: gameConfig.debug,
                     gravity: { y: 1 } // This is the default value, so we could omit this
                 }
             }
@@ -31,6 +33,7 @@ export class ServerLevel extends Phaser.Scene {
         console.log('preload');
         this.load.image('tiles',  'public/tilemaps/tilesetImage/mainlevbuild.png')//'../../../../common/assets/tilemaps/tilesetImage/mainlevbuild.png');
         this.load.tilemapTiledJSON('map', 'public/tilemaps/json/level1.json')//'../../../../common/assets/tilemaps/json/level1.json');
+        this.load.spritesheet('player', 'public/spritesheet/adventurer-Sheet.png', {frameWidth: 50, frameHeight: 37 });
     }
 
     create(){
@@ -92,7 +95,9 @@ export class ServerLevel extends Phaser.Scene {
             this.matter.world.createDebugGraphic();
         }
         this.player = new PlayerT(this, 250, 100);
-        this.player2 = new PlayerTest(this, 300, 100, 'testplayer');
+        this.player2 = new Player(this, 300, 100, 'testplayer');
+        this.player3 = new PlayerA(this, 350, 100, 2);
+
         //this.addPlayer('testplayer');
 
     }
