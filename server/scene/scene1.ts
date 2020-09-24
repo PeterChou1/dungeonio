@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { collisionData } from "../../common/globalConfig";
 import { PlayerGroup } from '../entities/playerGroup';
 import { messageType } from '../../common/globalConfig';
+import { ActionQueue } from '../utils/utils';
 import PhaserMatterCollisionPlugin from "../utils/matterCollision";
 
 export class StartLevel extends Phaser.Scene {
@@ -10,6 +11,7 @@ export class StartLevel extends Phaser.Scene {
     ground: Phaser.Tilemaps.DynamicTilemapLayer;
     playergroup : PlayerGroup;
     objectgroup; // map collision data
+    eventQueue : ActionQueue;
     room;
 
 
@@ -31,6 +33,7 @@ export class StartLevel extends Phaser.Scene {
         this.room = this.game.config.preBoot();
         this.plugins.removeScenePlugin('matterCollision');
         this.plugins.installScenePlugin('matterCollision', PhaserMatterCollisionPlugin, 'matterCollision', this);
+        this.eventQueue = new ActionQueue();
         console.log('---- init ----');
     }
 
@@ -42,11 +45,15 @@ export class StartLevel extends Phaser.Scene {
     }
 
     create(){
+        console.log('---start creation---');
         //@ts-ignore playergroups
         this.playergroup = new PlayerGroup(this);
         this.map = this.add.tilemap("map");
         this.tileset = this.map.addTilesetImage("mainlevbuild", "tiles");
         this.ground = this.map.createDynamicLayer("ground", this.tileset, 0, 0);
+        const height = this.ground.height;
+        const width = this.ground.width;
+        this.matter.world.setBounds(0, 0, width, height);
         this.objectgroup = { 
             soft: [],// soft tiles 
             hard: this.ground.filterTiles((tile) => !tile.properties.soft)
@@ -87,15 +94,18 @@ export class StartLevel extends Phaser.Scene {
             }
         )
         this.handlePlayerInput();
+        console.log('---end creation---');
     }
 
     addPlayer(clientid){
-        this.events.once('update', () => {
-            if (this.playergroup === undefined){
-                this.playergroup = new PlayerGroup(this);
+        this.eventQueue.enqueue(
+            {
+                callback: (clientid) => {
+                    this.playergroup.spawn(clientid)
+                },
+                args: [clientid]
             }
-            this.playergroup.spawn(clientid)
-        });
+        )
     }
 
     removePlayer(clientid){
@@ -108,5 +118,7 @@ export class StartLevel extends Phaser.Scene {
             this.playergroup.updatePlayerInput(client.sessionId, playerinput);
         });
     }
-    update(){}
+    update(){
+        this.eventQueue.executeActions();
+    }
 }

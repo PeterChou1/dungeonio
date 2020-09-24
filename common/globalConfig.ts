@@ -2,7 +2,11 @@ export const serverport = 4000;
 
 export const gameConfig = {
     debug: false, // enable debug graphics
-    networkdebug: false // inject server player instance into client side
+    networkdebug: false, // inject server player instance into client side
+    size : {
+        width: 600,
+        height: 800
+    }
 }
 
 // collision

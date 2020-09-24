@@ -15,7 +15,7 @@ export class StartLevel extends Phaser.Scene {
                 default:'matter',
                 matter: {
                     debug: gameConfig.debug,
-                    gravity: { y: 0 } // This is the default value, so we could omit this
+                    gravity: { y: 0 } // disable gravity
                 }
             }
         })
@@ -65,6 +65,7 @@ export class StartLevel extends Phaser.Scene {
             'ground' :  this.map.createDynamicLayer("ground", this.gametile.mainlev, 0, 0)
         }
         // data for groups of object for collision
+
         
         this.playerinput = new Proxy({
             left_keydown: this.keys.left.isDown,
@@ -202,11 +203,21 @@ export class StartLevel extends Phaser.Scene {
                             this.allplayers[key] = new PlayerT(this, player.x, player.y, this.sessionId);
                         } else {
                             this.allplayers[key] = new Player(this, player.x, player.y, 2);
+                            if (key === this.sessionId){
+                                // follow player
+                                console.log('camera followed player');
+                                const height = this.gamelayer.ground.height;
+                                const width = this.gamelayer.ground.width
+                                this.matter.world.setBounds(0, 0, width, height);
+                                this.cameras.main.setBounds(0, 0, width, height);
+                    
+                                this.cameras.main.startFollow(this.allplayers[key].sprite);
+                            }
                         }
                     }
             }
             this.room.state.players.onChange = (change, key) => {
-                console.log(`player id: ${key} send changes`);
+                //console.log(`player id: ${key} send changes`);
                 if (gameConfig.debug){ 
                     this.allplayers[key].setCollidesWith(change.collisionData);
                     this.allplayers[key].setPosition(change.x, change.y);
