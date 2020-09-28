@@ -2,6 +2,7 @@ import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
 import { State } from './stateMachine';
 import { collisionData, gameConfig } from '../../common/globalConfig';
 // player state
+import { randomInteger } from '../utils/utils';
 
 export class Player extends Schema {
     @type('number')
@@ -43,7 +44,7 @@ export class GameState extends Schema {
        delete this.players[id];
     }
 
-
+    @simulatelatency
     updatePlayer(id, {x, y, flipX, collisionData, state, isTouching, onPlatform}){
         //console.log(x, y, flipX, collisionData, state);
         this.players[id].x = Math.trunc( x );
@@ -59,6 +60,22 @@ export class GameState extends Schema {
             this.players[id].isTouching.splice(0, this.players[id].isTouching.length);
             this.players[id].isTouching.push(...isTouching);
             this.players[id].onPlatform = onPlatform;
+        }
+    }
+}
+
+
+function simulatelatency(target: any, propertyKey: string, descriptor: any){
+    const orgfunc = descriptor.value;
+    descriptor.value = function (...args: any[]) {
+        if (gameConfig.simulatelatency){
+            const randlatency = randomInteger(0, 500);
+            console.log(`simulating server latency with ${randlatency}`);
+            setTimeout(() => {
+                orgfunc.apply(this, args);
+            }, randlatency)
+        } else {
+            orgfunc.apply(this, args);
         }
     }
 }

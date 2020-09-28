@@ -1,9 +1,9 @@
 import Phaser from "phaser";
 import Player from "../entity/player"; 
-import {gameConfig, collisionData, messageType, serverport} from '../../../../common/globalConfig.ts';
+import { gameConfig, collisionData, messageType, serverport} from '../../../../common/globalConfig.ts';
 import { PlayerT } from '../entity/testplayer'; 
 import { playerAnims } from '../config/playerconfig';
-import { createanims } from '../utils/utils';
+import { createanims, randomInteger } from '../utils/utils';
 const Colyseus = require("colyseus.js");
 
 
@@ -33,6 +33,7 @@ export class StartLevel extends Phaser.Scene {
         const websocket = `ws://localhost:${serverport}`;
         console.log(`connected to web socket protocol ${websocket} `)
         const client = new Colyseus.Client(websocket)
+        // joined defined room
         return await client.joinOrCreate('game');
     }
 
@@ -82,8 +83,18 @@ export class StartLevel extends Phaser.Scene {
              const changed = value !== playerinput[prop];
              playerinput[prop] = value
              if (changed && this.room) {
-                playerinput[prop] = value
-                this.room.send(messageType.playerinput, this.playerinput);
+                playerinput[prop] = value;
+                if (gameConfig.simulatelatency){
+                    const randlatency = randomInteger(0, 500)
+                    console.log(`set simulated network latency to ${randlatency}`);
+                    setTimeout(() => {
+                        this.room.send(messageType.playerinput, this.playerinput);
+                    },
+                    randlatency)
+
+                } else {
+                    this.room.send(messageType.playerinput, this.playerinput);
+                }
              }
              return true;
          }
@@ -132,43 +143,6 @@ export class StartLevel extends Phaser.Scene {
         )
         // track all players in game
         this.allplayers = {};
-        //this.room.onStateChange.once((gamestate) => {
-        //    // get initial state of everything
-        //    console.log("initial state", gamestate);
-        //    console.log('all players');
-        //    const playerid = Object.keys(gamestate.players);
-        //    playerid.forEach( 
-        //        sessionId => {
-        //            this.allplayers[sessionId] = new PlayerT(
-        //                                                this,
-        //                                                gamestate.players[sessionId].x,
-        //                                                gamestate.players[sessionId].y,
-        //                                                sessionId
-        //                                        )
-        //
-        //        }
-        //    )
-        //});
-        
-        //console.log(this.objectgroup);
-        //const image = this.matter.add.image(100, 100, "circle");
-        //image.setCircle( image.width / 2, { restitution: 1, friction: 0.25});
-        //image.setScale(0.5);
-        //image.setCollidesWith([collisionData.category.soft, collisionData.category.hard]);
-        //this.player2 = new Player(this, 32, 368, 2, this.room);
-        //this.playergroup = this.add.existing(new PlayerGroup(this));//new PlayerM(this, 32, 300);
-        //this.player = this.playergroup.spawn();
-        //console.log('done');
-        //console.log(this.playergroup.getChildren());
-        //
-        //setTimeout(()=> {
-        //    this.playergroup.despawn(this.player)
-        //}, 1000);
-        //
-        //setTimeout(() => {
-        //    this.playergroup.spawn();
-        //}, 2000)
-
         if (gameConfig.debug){
            console.log('---game debug mode---');
            this.matter.world.createDebugGraphic();
@@ -210,7 +184,6 @@ export class StartLevel extends Phaser.Scene {
                                 const width = this.gamelayer.ground.width
                                 this.matter.world.setBounds(0, 0, width, height);
                                 this.cameras.main.setBounds(0, 0, width, height);
-                    
                                 this.cameras.main.startFollow(this.allplayers[key].sprite);
                             }
                         }

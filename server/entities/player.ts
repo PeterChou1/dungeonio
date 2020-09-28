@@ -15,6 +15,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     sensors;
     scene;
     collideswith;
+    platformFall : boolean; // whether or not player is in a platform fall state
     onPlatform : boolean;
     stateMachine: StateMachine;
     mainBody;
@@ -124,11 +125,13 @@ export class Player extends Phaser.Physics.Matter.Sprite {
                     objectA: this.sensors.bottom,
                     objectB: this.scene.objectgroup.soft,
                     callback: () => {
-                        this.onPlatform = true;
-                        this.collideswith = [collisionData.category.hard, collisionData.category.soft]
-                        this.setCollidesWith(this.collideswith)
-                        this.sensors.ground = true;
-                        this.sensors.nearground = true;
+                        if (!this.platformFall) {
+                            this.onPlatform = true;
+                            this.collideswith = [collisionData.category.hard, collisionData.category.soft]
+                            this.setCollidesWith(this.collideswith)
+                            this.sensors.ground = true;
+                            this.sensors.nearground = true;
+                        }
                     },
                     context: this
                 }),
@@ -136,9 +139,10 @@ export class Player extends Phaser.Physics.Matter.Sprite {
                     objectA: this.sensors.bottom,
                     objectB: this.scene.objectgroup.soft,
                     callback: () => {
-                        this.collideswith = [collisionData.category.hard, collisionData.category.soft]
-                        this.isTouching.ground = true;
-                        this.isTouching.nearground = true;
+                        if (!this.platformFall) {
+                            this.isTouching.ground = true;
+                            this.isTouching.nearground = true;
+                        }
                     },
                     context: this
                 }),
@@ -146,6 +150,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
                     objectA: this.sensors.bottom,
                     objectB: this.scene.objectgroup.soft,
                     callback: () => {
+                        this.platformFall = false;
                         this.onPlatform = false;
                         this.collideswith = [collisionData.category.hard]
                         this.setCollidesWith(this.collideswith)

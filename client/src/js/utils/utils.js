@@ -8,3 +8,8 @@ export const createanims = (scene, anims) => {
         console.log('msPerFrame', anims.msPerFrame);
     })
 }
+
+
+export function randomInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}

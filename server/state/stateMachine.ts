@@ -94,6 +94,7 @@ export class IdleState extends State {
           player.collideswith = [collisionData.category.hard]
           player.setCollidesWith(player.collideswith)
           player.onPlatform = false;
+          player.platformFall = true;
           this.stateMachine.transition('fall');
           return;
       }
