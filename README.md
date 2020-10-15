@@ -1,6 +1,29 @@
 # Dungeon.IO 
 Multiplayer Dungeon IO game
 
+
+## Overview
+
+Multiplayer IO game built on Node.JS, colyseus.JS, and Phaser
+
+colyseus.JS is networking library used for communicating between client and server built ontop of websocket protocall
+Phaser is the client side game engine used to render 
+
+
+
+## Roadmap
+
+Completed features
+ - Basic Movement 
+ - Authorative Servers 
+
+Planned Features 
+ - Client side prediction (in progress)
+ - Basic User Interface
+ - Basic AI 
+ - Equipment system (weapons)
+    - daggers, bows, spears
+    
 ## Setup
 
 cd phaser3-project-template \
@@ -38,13 +61,14 @@ Loading images via JavaScript module `import` is also supported.
 ## Writing Code
 
 After cloning the repo, run `npm install` from your project directory. Then, you can start the local development
-server by running `npm start`.
+server by running `npm start`. Next go into client directories and run `npm install`
 
 
 After starting the development server with `npm start`, you can edit any files in the `src` folder
 and webpack will automatically recompile and reload your server (available at `http://localhost:8080`
 by default).
 
+To start client server run 
 ## Customizing Template
 
 ### Babel
