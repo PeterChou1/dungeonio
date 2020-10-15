@@ -6,7 +6,7 @@ Multiplayer Dungeon IO game
 
 Multiplayer IO game built on Node.JS, colyseus.JS, and Phaser
 
-colyseus.JS is networking library used for communicating between client and server built ontop of websocket protocall
+colyseus.JS is networking library used for communicating between client and server built ontop of websocket protocol
 Phaser is the client side game engine used to render 
 
 
