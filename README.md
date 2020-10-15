@@ -20,7 +20,7 @@ Completed features
 
 Planned Features 
  - Client side prediction (in progress)
- - server lockstep
+ - Server timestep
  - interest management
  - Basic User Interface
  - Basic AI 
