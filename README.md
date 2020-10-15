@@ -68,7 +68,6 @@ After starting the development server with `npm start`, you can edit any files i
 and webpack will automatically recompile and reload your server (available at `http://localhost:8080`
 by default).
 
-To start client server run 
 ## Customizing Template
 
 ### Babel
