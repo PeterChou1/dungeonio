@@ -20,6 +20,8 @@ Completed features
 
 Planned Features 
  - Client side prediction (in progress)
+ - server lockstep
+ - interest management
  - Basic User Interface
  - Basic AI 
  - Equipment system (weapons)
