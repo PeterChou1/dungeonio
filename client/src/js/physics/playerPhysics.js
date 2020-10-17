@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import {collisionData} from '../../../../common/globalConfig.ts';
-const {Body, Bodies} = Phaser.Physics.Matter.Matter;
+const {Body, Bodies, Query} = Phaser.Physics.Matter.Matter;
 /*
  Encapsulate all physics behaviour for player
 */
@@ -77,6 +77,17 @@ export class PlayerPhysics {
         this.scene.matter.world.on("beforeupdate", this.resetTouching, this);
     }
 
+    simulatePhysics(){
+        const hardbodies = this.scene.objectgroup
+                                     .hard
+                                     .filter( tile => tile.physics.matterBody !== undefined)
+                                     .map( tile => tile.physics.matterBody.body )
+        const softbodies = this.scene.objectgroup.soft;
+
+
+    }
+
+
 
     resetTouching() {
         this.isTouching.left = false;
@@ -102,15 +113,15 @@ export class PlayerPhysics {
           this.isTouching.nearground = true;
         } else if (bodyA === this.mainBody) {
             //console.log(bodyA.vertices);
-            console.log('---------');
-            console.log(`ground x: ${bodyB.position.x} y: ${bodyB.position.y}`);
-            const  getbottom = this.sprite.getBottomCenter();
-            console.log(getbottom);
-            console.log(`ground difference ${getbottom.y - bodyB.position.y}`)
-            console.log(`body x: ${bodyA.position.x} y: ${bodyA.position.y}`); 
-            const bounds = this.sprite.getBounds();
-            console.log(bounds)
-            console.log('--------');
+            //console.log('---------');
+            //console.log(`ground x: ${bodyB.position.x} y: ${bodyB.position.y}`);
+            //const  getbottom = this.sprite.getBottomCenter();
+            //console.log(getbottom);
+            //console.log(`ground difference ${getbottom.y - bodyB.position.y}`)
+            //console.log(`body x: ${bodyA.position.x} y: ${bodyA.position.y}`); 
+            //const bounds = this.sprite.getBounds();
+            //console.log(bounds)
+            //console.log('--------');
             //console.log(this.sprite.getBounds());
             //console.log(bodyA);
         }

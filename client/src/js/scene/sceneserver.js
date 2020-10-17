@@ -83,20 +83,13 @@ export class ServerLevel extends Phaser.Scene {
             }
         )
 
-        const ground = this.map.getObjectLayer('ground')
-
-        ground.objects.forEach(
-            rect => {
-                console.log(`rect x: ${rect.x} y: ${rect.y}`);
-            }
-        )
 
         if (gameConfig.debug){
             this.matter.world.createDebugGraphic();
         }
         this.player = new PlayerT(this, 250, 100);
         this.player2 = new Player(this, 300, 100, 'testplayer');
-        this.player3 = new PlayerA(this, 350, 100, 2);
+        this.player3 = new PlayerA(this, 350, 100, 2, 'testplayer2');
 
         //this.addPlayer('testplayer');
 

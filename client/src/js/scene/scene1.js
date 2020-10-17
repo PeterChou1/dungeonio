@@ -2,8 +2,11 @@ import Phaser from "phaser";
 import Player from "../entity/player"; 
 import { gameConfig, collisionData, messageType, serverport} from '../../../../common/globalConfig.ts';
 import { PlayerT } from '../entity/testplayer'; 
+import { LocalPlayer } from '../entity/localplayer';
 import { playerAnims } from '../config/playerconfig';
 import { createanims, randomInteger } from '../utils/utils';
+import { RequestQueue } from '../state/playerSimulation';
+import { v4 as uuidv4 } from 'uuid';
 const Colyseus = require("colyseus.js");
 
 
@@ -15,13 +18,13 @@ export class StartLevel extends Phaser.Scene {
                 default:'matter',
                 matter: {
                     debug: gameConfig.debug,
-                    gravity: { y: 0 } // disable gravity
+                    gravity: { y: 1 } // set 0 to disable gravity
                 }
             }
         })
 
         //this.socket = io();
-        //console.log(this.socket);
+        ////console.log(this.socket);
     }
 
     /*
@@ -31,7 +34,7 @@ export class StartLevel extends Phaser.Scene {
         //const host = window.document.location.host.replace(/:.*/, '');
         //TODO: replace later
         const websocket = `ws://localhost:${serverport}`;
-        console.log(`connected to web socket protocol ${websocket} `)
+        //console.log(`connected to web socket protocol ${websocket} `)
         const client = new Colyseus.Client(websocket)
         // joined defined room
         return await client.joinOrCreate('game');
@@ -48,9 +51,30 @@ export class StartLevel extends Phaser.Scene {
 
     async create(){
         this.room = await this.connect();
+        // history to track request
+        this.clientpredictNUM = 0;
+        // random number generated for network latency test
+        this.randlatency = 20//randomInteger(0, 500);
+        console.log('random latency (client) ' , this.randlatency);
         this.sessionId = this.room.sessionId;
-        console.log('joined room with sessionId ', this.sessionId);
+        // request queue to keep track of last request acknowledeged by server
+        this.requestQueue = new RequestQueue();
+        //console.log('joined room with sessionId ', this.sessionId);
         this.keys = this.input.keyboard.createCursorKeys();
+        this.clientpredictNUM = 0;
+
+        // attach listener to keyboard inputs 
+        // TODO: detach listener on destruction
+        for (var prop in this.keys){
+            if (Object.prototype.hasOwnProperty.call(this.keys, prop)){
+                this.keys[prop].on('down', () => {
+                    this.updatePlayerInput();
+                })
+                this.keys[prop].on('up', () => {
+                    this.updatePlayerInput();
+                })
+            }
+        }
         // create player animations;
         createanims(this, playerAnims);
         this.map = this.add.tilemap("map");
@@ -58,51 +82,16 @@ export class StartLevel extends Phaser.Scene {
             mainlev : this.map.addTilesetImage("mainlevbuild", "tiles"),
             background : this.map.addTilesetImage("background_obj", "background")
         }
-        
+
         this.gamelayer = {
             'background3' :  this.map.createStaticLayer("background3", this.gametile.background, 0, 0),
             'background2' :  this.map.createStaticLayer("background2", this.gametile.background, 0, 0),
             'background1' :  this.map.createStaticLayer("background1", this.gametile.background, 0, 0),
             'ground' :  this.map.createDynamicLayer("ground", this.gametile.mainlev, 0, 0)
         }
-        // data for groups of object for collision
 
         
-        this.playerinput = new Proxy({
-            left_keydown: this.keys.left.isDown,
-            right_keydown: this.keys.right.isDown,
-            up_keydown: this.keys.up.isDown,
-            down_keydown: this.keys.down.isDown,
-            left_keyup: this.keys.left.isUp,
-            right_keyup: this.keys.right.isUp,
-            up_keyup: this.keys.up.isUp,
-            down_keyup: this.keys.up.isUp
-        },  {
-         set: (playerinput, prop, value) => {
-             // if any key change send the input
-             const changed = value !== playerinput[prop];
-             playerinput[prop] = value
-             if (changed && this.room) {
-                playerinput[prop] = value;
-                if (gameConfig.simulatelatency){
-                    const randlatency = randomInteger(0, 500)
-                    console.log(`set simulated network latency to ${randlatency}`);
-                    setTimeout(() => {
-                        this.room.send(messageType.playerinput, this.playerinput);
-                    },
-                    randlatency)
-
-                } else {
-                    this.room.send(messageType.playerinput, this.playerinput);
-                }
-             }
-             return true;
-         }
-        }) 
-        //this.gamelayer.ground.setCollisionByProperty({collides: true});
-        //const convertedlayer = this.matter.world.convertTilemapLayer(this.gamelayer.ground);
-        
-        //console.log(convertedlayer);
+        ////console.log(convertedlayer);
         this.objectgroup = { 
             soft: [],// soft tiles 
             hard: this.gamelayer.ground.filterTiles((tile) => !tile.properties.soft)
@@ -129,14 +118,14 @@ export class StartLevel extends Phaser.Scene {
             (tile)=> {
                 if (tile.properties.collides){
                     const mattertile = new Phaser.Physics.Matter.TileBody(this.matter.world, tile);
-                    //console.log(mattertile);
+                    ////console.log(mattertile);
                     if (tile.properties.soft){
                         mattertile.setCollisionCategory(collisionData.category.soft);
                     } else {
                         mattertile.setCollisionCategory(collisionData.category.hard);
                     }
                     if (tile.properties.debug && gameConfig.debug){
-                        console.log(`x: ${tile.pixelX} y: ${tile.pixelY}`);
+                        //console.log(`x: ${tile.pixelX} y: ${tile.pixelY}`);
                     }
                 }
             }
@@ -144,88 +133,179 @@ export class StartLevel extends Phaser.Scene {
         // track all players in game
         this.allplayers = {};
         if (gameConfig.debug){
-           console.log('---game debug mode---');
+           //console.log('---game debug mode---');
            this.matter.world.createDebugGraphic();
+        }
+        // set initial input
+        this.updatePlayerInput();
+        this.setupnetwork();
+    }
+
+    setupnetwork() {
+        this.room.state.players.onAdd = (player, key) => {
+            // check if player is added already
+            //console.log(`---${key}---`)
+            if (!(key in this.allplayers)){
+                //console.log(`--Player added with id: ${key}--`);
+                if (gameConfig.debug){
+                    this.allplayers[key] = new PlayerT(this, player.x, player.y, key);
+                } else {
+                    this.allplayers[key] = new Player(this, player.x, player.y, 2, key);
+                    //this.localplayer = new LocalPlayer(this, player.x, player.y, 2);
+                }
+                if (key === this.sessionId){
+                    // follow player
+                    //console.log('camera followed player');
+                    const height = this.gamelayer.ground.height;
+                    const width = this.gamelayer.ground.width
+                    this.matter.world.setBounds(0, 0, width, height);
+                    this.cameras.main.setBounds(0, 0, width, height);
+                    this.cameras.main.startFollow(this.allplayers[key].sprite);
+                }
+            }
+        }
+        this.room.state.players.onChange = (change, key) => {
+            if (this.sessionId === key){
+                //console.log(change.ackreqIds);
+                //console.log('request queue :', this.requestQueue.unackReq.map(x => x.id));
+                this.requestQueue.dequeue(change.ackreqIds);
+                this.requestQueue.setcurrentrequest(change.elaspsedTime);
+                // simulate player input NOTE: simulation will not run if player is 
+                // within 20 (x or y) direction of server coordinates
+                if (this.clientpredictNUM === 2) {
+                    this.allplayers[key].simulateinput(
+                        {
+                            x : change.x,
+                            y: change.y,
+                            velocityX : change.velocityX,
+                            velocityY : change.velocityY,
+                            stateTime : change.stateTime,
+                            flipX: change.flipX,
+                            collisionData: change.collisionData,
+                            state: change.state,
+                        },
+                        this.requestQueue.getinputs()
+                    )
+                    this.clientpredictNUM = 0;
+                }
+                this.clientpredictNUM += 1;
+                //console.log('---unacknowledged request---')
+                //console.log(this.requestQueue.getinputs());
+                //if (this.clientpredictNUM === 2) {
+                //    this.clientpredictNUM = 0;
+                //}
+                // this.clientpredictNUM += 1;
+                //const lastitem = this.history[this.history.length - 1];
+                //if (lastitem !== change.lastackreqId && change.lastackreqId !== ''){
+                //    //console.log('history :', this.history);
+                //    //console.log('request queue :', this.requestQueue.unackReq.map(x => x.id));
+                //}
+            } else {
+                this.allplayers[key].updatePlayer(
+                    {
+                        x: change.x,
+                        y: change.y,
+                        flipX: change.flipX,
+                        collisionData: change.collisionData,
+                        state: change.state
+                    }
+                )
+            }
+            //if (gameConfig.debug){ 
+            //    this.allplayers[key].setCollidesWith(change.collisionData);
+            //    this.allplayers[key].setPosition(change.x, change.y);
+            //    if ( this.sessionId === key) {
+            //        ////console.log('debug');
+            //        this.allplayers[key].debugUpdate(
+            //            {
+            //                x : change.x,
+            //                y: change.y,
+            //                flipX: change.flipX,
+            //                collisionData: change.collisionData,
+            //                state: change.state,
+            //                isTouching: change.isTouching,
+            //                onPlatform: change.onPlatform
+            //            }
+            //        )
+            //    }
+            //} else {
+            // TEST TODO: remove later
+            //    this.allplayers[key].updatePlayer(
+            //    {
+            //        x: change.x,
+            //        y: change.y,
+            //        flipX: change.flipX,
+            //        collisionData: change.collisionData,
+            //        state: change.state
+            //    }
+            //)
+            //    console.log('---set local player---')
+            //    this.localplayer.updatePlayer(
+            //        {
+            //            x: change.x,
+            //            y: change.y,
+            //            flipX: change.flipX,
+            //            collisionData: change.collisionData,
+            //            state: change.state
+            //        }
+            //    )
+            //}
+        }
+
+        this.room.state.players.onRemove = (player, key) =>  {
+            //console.log(`player id ${key} was removed`);
+            this.allplayers[key].destroy();
         }
     }
 
 
     updatePlayerInput() {
-        this.playerinput.left_keydown = this.keys.left.isDown;
-        this.playerinput.right_keydown = this.keys.right.isDown;
-        this.playerinput.up_keydown = this.keys.up.isDown;
-        this.playerinput.down_keydown = this.keys.down.isDown;
-        this.playerinput.left_keyup = this.keys.left.isUp;
-        this.playerinput.right_keyup = this.keys.right.isUp;
-        this.playerinput.up_keyup = this.keys.up.isUp;
-        this.playerinput.down_keyup = this.keys.down.isUp;
+        const uniqueid = uuidv4();
+        const req = { 
+            left_keydown: this.keys.left.isDown,
+            right_keydown: this.keys.right.isDown,
+            up_keydown: this.keys.up.isDown,
+            down_keydown: this.keys.down.isDown,
+            left_keyup: this.keys.left.isUp,
+            right_keyup: this.keys.right.isUp,
+            up_keyup: this.keys.up.isUp,
+            down_keyup: this.keys.down.isUp,
+            id : uniqueid
+        }
+        this.requestQueue.enqueue(
+            {
+                ...req,
+                // when was the request created
+                created : new Date().getTime(),
+                // last time server processed your request from clients perspective
+                serveradjusted : new Date().getTime(),
+                // how many ms is left of time the server did process the current request
+                elapsed : 0
+            }
+        )
+        ////console.log(req);
+        if (gameConfig.simulatelatency){
+            setTimeout(
+                () => {
+                    this.room.send(messageType.playerinput, req);
+                },
+                this.randlatency
+            )
+        } else {
+            this.room.send(messageType.playerinput, req);
+        }
     }
 
 
     update() {
-        if (this.playerinput){
-            this.updatePlayerInput();
-        }
+        ////console.log('delta time: ', delta);
         // listen for state updates
         if (this.room){
-            this.room.state.players.onAdd = (player, key) => {
-                    // check if player is added already
-                    console.log(`---${key}---`)
-                    if (!(key in this.allplayers)){
-                        console.log(`--Player added with id: ${key}--`);
-                        if (gameConfig.debug){
-                            this.allplayers[key] = new PlayerT(this, player.x, player.y, this.sessionId);
-                        } else {
-                            this.allplayers[key] = new Player(this, player.x, player.y, 2);
-                            if (key === this.sessionId){
-                                // follow player
-                                console.log('camera followed player');
-                                const height = this.gamelayer.ground.height;
-                                const width = this.gamelayer.ground.width
-                                this.matter.world.setBounds(0, 0, width, height);
-                                this.cameras.main.setBounds(0, 0, width, height);
-                                this.cameras.main.startFollow(this.allplayers[key].sprite);
-                            }
-                        }
-                    }
-            }
-            this.room.state.players.onChange = (change, key) => {
-                //console.log(`player id: ${key} send changes`);
-                if (gameConfig.debug){ 
-                    this.allplayers[key].setCollidesWith(change.collisionData);
-                    this.allplayers[key].setPosition(change.x, change.y);
-                    if ( this.sessionId === key) {
-                        //console.log('debug');
-                        this.allplayers[key].debugUpdate(
-                            {
-                                x : change.x,
-                                y: change.y,
-                                flipX: change.flipX,
-                                collisionData: change.collisionData,
-                                state: change.state,
-                                isTouching: change.isTouching,
-                                onPlatform: change.onPlatform
-                            }
-                        )
-                    }
-                } else {
-                    this.allplayers[key].updatePlayer(
-                        {
-                            x: change.x,
-                            y: change.y,
-                            flipX: change.flipX,
-                            collisionData: change.collisionData,
-                            state: change.state
-                        }
-                    )
-                }
-            }
-
-            this.room.state.players.onRemove = (player, key) =>  {
-                console.log(`player id ${key} was removed`);
-                this.allplayers[key].destroy();
-            }
+            
+        }
+        if (this.requestQueue) {
+            //this.requestQueue.setcurrentrequest();
+            //console.log(`unacknowledged request:  ${this.requestQueue.unackReq.length}`)
         }
     }
-
 }
