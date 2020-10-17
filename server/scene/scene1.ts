@@ -46,6 +46,7 @@ export class StartLevel extends Phaser.Scene {
 
     create(){
         console.log('---start creation---');
+        
         //@ts-ignore playergroups
         this.playergroup = new PlayerGroup(this);
         this.map = this.add.tilemap("map");
@@ -114,7 +115,6 @@ export class StartLevel extends Phaser.Scene {
 
     handlePlayerInput(){
         this.room.onMessage(messageType.playerinput, (client, playerinput) => {
-            console.log(`client with id: ${client.sessionId} sends input`);
             this.playergroup.updatePlayerInput(client.sessionId, playerinput);
         });
     }

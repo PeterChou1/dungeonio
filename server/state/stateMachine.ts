@@ -48,14 +48,15 @@ export abstract class State {
 export class IdleState extends State {
   
   enter(player){
+    player.resetEnterState();
     player.setVelocity(0);
     const playerconfig = player.data.get(playerStateMap.playerprop);
     playerconfig.state = 'idle'
   }
 
   execute(player){
+      player.setStateTime();
       //const cursors = scene.input.keyboard.createCursorKeys();
-      const playerconfig = player.data.get(playerStateMap.playerprop);
       const clientinput = player.data.get(playerStateMap.clientinput);
       //console.log(player.isTouching.ground);
       if (!player.isTouching.ground) {
@@ -65,17 +66,11 @@ export class IdleState extends State {
 
       }
       //console.log('idle state');
-      if (clientinput.left_keydown){
+      if (clientinput.left_keydown || clientinput.right_keydown){
           //console.log('left');
-          playerconfig.flipX = true;
           this.stateMachine.transition('run');
           return;
-      } else if (clientinput.right_keydown) {
-          //console.log('right');
-          playerconfig.flipX = false;
-          this.stateMachine.transition('run');
-          return;
-      } 
+      }
       //console.log('can i jump?');
       //console.log(clientinput.up);
       //console.log(player.isTouching.ground);
@@ -105,18 +100,22 @@ export class IdleState extends State {
 export class RunState extends State {
 
   enter(player){
+    player.resetEnterState();
     const playerconfig = player.data.get(playerStateMap.playerprop);
     playerconfig.state = 'run'
   }
   execute(player) {
+      player.setStateTime();
       ////console.log(player.direction);
       const playerconfig = player.data.get(playerStateMap.playerprop);
       const clientinput = player.data.get(playerStateMap.clientinput);
-      if (playerconfig.flipX) {
+      if (clientinput.left_keydown) {
           console.log('going left');
+          playerconfig.flipX = true;
           player.setVelocityX(-playerconfig.groundspeed)
-      } else {
+      } else if (clientinput.right_keydown) {
           console.log('going right');
+          playerconfig.flipX = false;
           player.setVelocityX(playerconfig.groundspeed)
       }
 
@@ -154,10 +153,12 @@ export class RunState extends State {
 export class FallState extends State {
 
   enter(player) {
+    player.resetEnterState();
     const playerconfig = player.data.get(playerStateMap.playerprop);
     playerconfig.state = 'fall';
   }
   execute(player) {
+      player.setStateTime();
       const clientinput = player.data.get(playerStateMap.clientinput);
       const playerconfig = player.data.get(playerStateMap.playerprop);
       if (clientinput.right_keydown){
@@ -175,6 +176,7 @@ export class FallState extends State {
 
 export class JumpState extends State {
   enter(player) {
+      player.resetEnterState();
       const playerconfig = player.data.get(playerStateMap.playerprop);
       playerconfig.state = 'jump';
       player.setVelocityY(-playerconfig.jumpheight);
@@ -184,8 +186,9 @@ export class JumpState extends State {
           return;
       }, 300)
   }
-
-  execute(scene, player){}
+  execute(player){
+    player.setStateTime();
+  }
 }
 
 export const playerState = {

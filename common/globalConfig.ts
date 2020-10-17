@@ -15,6 +15,9 @@ export const collisionData = {
     category : {
         hard : 0x0001, // hard platform
         soft : 0x0002, // soft platform
+        player : 0x0003, // player category
+        noplayer : 0x0004 // cannot collide with player category
+
     }, 
     group : {
         player: 1,  // any object with group id 1 can interact with the player

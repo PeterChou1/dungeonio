@@ -18,8 +18,13 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     platformFall : boolean; // whether or not player is in a platform fall state
     onPlatform : boolean;
     stateMachine: StateMachine;
+    lastsentclientinput : number; // the time of the last sent client input
+    lastTimeEnterNewState : number; // keep track of when we enter a new state
+    stateTime : number;// keep track of how long we are in each state
+    
     mainBody;
     allcollisionlistener;
+    //currentreqId : String;
     private _clientid;
 
 
@@ -36,6 +41,9 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         this.isTouching = {left: false, right: false, ground: false, top: false, nearground: false};
         this.onPlatform = false;
         this.collideswith = [collisionData.category.hard];
+        this.lastsentclientinput = new Date().getTime();
+        this.lastTimeEnterNewState = new Date().getTime();
+        this.stateTime = 0;
         // data mapping for player input
         this.data.set(playerStateMap.clientinput, {
             left_keydown: false,
@@ -166,10 +174,37 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         }
     }
 
+    resetEnterState() {
+        this.lastTimeEnterNewState = new Date().getTime();
+    }
+
+    setStateTime() {
+        this.stateTime = new Date().getTime() - this.lastTimeEnterNewState;
+    }
+
 
     handleClientInput(playerinput) {
-        console.log(`handle player input ${this.clientid}`);
-        this.data.set(playerStateMap.clientinput, playerinput)
+        //console.log(`handle player input ${this.clientid}`);
+
+        const playerconfig = this.data.get(playerStateMap.playerprop);
+        // sent out acknowledgment 
+        this.scene.room.state.updatePlayer(this.clientid, {
+            x: this.x,
+            y: this.y,
+            velocityX : this.body.velocity.x,
+            velocityY : this.body.velocity.y,
+            stateTime : this.stateTime,
+            flipX: playerconfig.flipX,
+            collisionData: this.collideswith,
+            state: playerconfig.state,
+            isTouching: gameConfig.debug ? Object.values(this.isTouching) : null,
+            onPlatform: gameConfig.debug ? this.onPlatform : null,
+            reqId:  playerinput.id,
+            elaspsedTime: 0
+        })
+        // set last sent client input
+        this.lastsentclientinput = new Date().getTime();
+        this.data.set(playerStateMap.clientinput, playerinput);
     }
 
     resetTouching() {
@@ -242,12 +277,17 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         this.scene.room.state.updatePlayer(this.clientid, {
             x: this.x,
             y: this.y,
+            velocityX : this.body.velocity.x,
+            velocityY : this.body.velocity.y,
+            stateTime : this.stateTime,
             flipX: playerconfig.flipX,
             collisionData: this.collideswith,
             state: playerconfig.state,
             isTouching: gameConfig.debug ? Object.values(this.isTouching) : null,
             onPlatform: gameConfig.debug ? this.onPlatform : null,
+            elaspsedTime : new Date().getTime() - this.lastsentclientinput
         })
+
     }
 
 
