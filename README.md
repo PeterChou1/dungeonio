@@ -21,7 +21,7 @@ Completed features
 
 Planned Features 
  - Server timestep / Entity Interplation / Time Synchronization
- - interest management (probably not possible with colyseus.JS
+ - interest management (probably not possible with colyseus.JS)
  - Basic User Interface
  - Basic AI 
  - Equipment system (weapons)
