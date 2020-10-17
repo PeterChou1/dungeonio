@@ -17,11 +17,11 @@ Phaser is the client side game engine used to render graphics
 Completed features
  - Basic Movement 
  - Authorative Servers 
+ - Client Side prediction
 
 Planned Features 
- - Client side prediction (in progress)
- - Server timestep
- - interest management
+ - Server timestep / Entity Interplation / Time Synchronization
+ - interest management (probably not possible with colyseus.JS
  - Basic User Interface
  - Basic AI 
  - Equipment system (weapons)
