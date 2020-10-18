@@ -70,6 +70,7 @@ npm run start
 --------------------------------------------------------------------
 
 game instance runs on localhost
+
 colyseus monitoring portal instance runs on localhost/colyseus
 
 
