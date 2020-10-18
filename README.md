@@ -38,7 +38,11 @@ npm run dev \
 cd client \
 npm run start 
 
-game instance runs on localhost:8080
+game instance runs on localhost:80
+
+colyseus monitoring portal instance runs on localhost:80/colyseus
+
+
 
 ## Phaser 3 Template
 
