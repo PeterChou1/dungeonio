@@ -7,8 +7,6 @@ import { monitor } from "@colyseus/monitor";
 import * as path from 'path';
 
 const env = process.env.NODE_ENV || 'development';
-
-const gameserverport = Number(process.env.GAMEPORT || 4000);
 const port = Number(process.env.PORT || 80);
 
 
@@ -37,10 +35,11 @@ const gameServer = new Server({
 
 gameServer.define('game', GameRoom)
           .enableRealtimeListing();
-gameServer.listen(gameserverport);
-console.log(`Game Server Listening on http://localhost:${ gameserverport }`);
+gameServer.listen(port);
+gameServer.onShutdown(function(){
+    console.log(`game server is going down.`);
+});
+console.log(`Server listening on port: ${ port }`);
 console.log('using environment ', env)
 
-app.listen(port, function(){
-    console.log(`Monitor Server Listening on http://localhost:${ port }/colyseus`);
-})
+
