@@ -21,7 +21,7 @@ if (env === 'production'){
     console.log(path.resolve(__dirname, '../common/assets'));
     console.log(path.resolve(__dirname, '../client/dist'));
     app.use("/public", express.static(path.resolve(__dirname, '../common/assets')));
-    app.use("/", express.static(path.resolve(__dirname, '../client/dist')));
+    app.use("/game", express.static(path.resolve(__dirname, '../client/dist')));
 }
 
 
