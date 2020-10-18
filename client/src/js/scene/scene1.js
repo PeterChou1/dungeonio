@@ -32,9 +32,10 @@ export class StartLevel extends Phaser.Scene {
      */
     async connect(){
         //const host = window.document.location.host.replace(/:.*/, '');
-        //TODO: replace later
-        const websocket = `ws://localhost:${serverport}`;
-        //console.log(`connected to web socket protocol ${websocket} `)
+        var host = window.document.location.host.replace(/:.*/, '');
+        // game server is located on port 4000
+        var websocket =  location.protocol.replace("http", "ws") + "//" + host + ':4000';
+        console.log(`connected to web socket protocol ${websocket} `)
         const client = new Colyseus.Client(websocket)
         // joined defined room
         return await client.joinOrCreate('game');
