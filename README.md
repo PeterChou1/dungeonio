@@ -43,17 +43,17 @@ npm run start
 game instance runs on localhost
 colyseus monitoring portal instance runs on localhost/colyseus
 
-To setup production environment
+To setup production environment \
 
-set NODE_ENV to production
+set NODE_ENV to production \
 
-cd phaser3-project-template
-npm install
-cd client 
-npm install
-npm run build 
-cd ..
-npm run start
+cd phaser3-project-template \
+npm install \
+cd client \
+npm install \
+npm run build \ 
+cd .. \
+npm run start \
 
 
 
