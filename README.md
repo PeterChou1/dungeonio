@@ -29,18 +29,31 @@ Planned Features
     
 ## Setup
 
+To setup the development environment \
+
 cd phaser3-project-template \
 npm install \
 cd client \
 npm install \
 cd .. \
-npm run dev \
+npm run start \
 cd client \
 npm run start 
 
-game instance runs on localhost:80
+game instance runs on localhost
+colyseus monitoring portal instance runs on localhost/colyseus
 
-colyseus monitoring portal instance runs on localhost:80/colyseus
+To setup production environment
+
+set NODE_ENV to production
+
+cd phaser3-project-template
+npm install
+cd client 
+npm install
+npm run build 
+cd ..
+npm run start
 
 
 
@@ -59,11 +72,20 @@ Loading images via JavaScript module `import` is also supported.
 
 ## Available Commands
 
+In client folder
 | Command | Description |
 |---------|-------------|
 | `npm install` | Install project dependencies |
 | `npm start` | Build project and open web server running project |
 | `npm run build` | Builds code bundle with production settings (minification, uglification, etc..) |
+
+In root folder
+| Command | Description |
+|---------|-------------|
+| `npm install` | Install project dependencies |
+| `npm run start` | Run server code |
+| `npm run dev` | Runs development server code |
+| `npm run postinstall`| cd into client folder and runs a build |
 
 
 ## Customizing Template
@@ -87,8 +109,5 @@ modify the `webpack/base.js` file for cross-project changes, or you can modify a
 new configuration files and target them in specific npm tasks inside of `package.json'.
 
 ## Deploying Code
-After you run the `npm run build` command, your code will be built into a single bundle located at 
-`dist/bundle.min.js` along with any other assets you project depended. 
+The staging branch of this github repository is linked to heroku app located https://game-dungeonio-test.herokuapp.com/ whenever you push to the staging branch it will be automatically deployed on the app. 
 
-If you put the contents of the `dist` folder in a publicly-accessible location (say something like `http://mycoolserver.com`), 
-you should be able to open `http://mycoolserver.com/index.html` and play your game.
