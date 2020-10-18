@@ -1,0 +1,1 @@
+$Env:NODE_ENV = "production"

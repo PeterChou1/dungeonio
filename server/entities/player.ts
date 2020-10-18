@@ -290,7 +290,6 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
     }
 
-
     set clientid (clientid){
         this._clientid = clientid
     }
