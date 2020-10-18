@@ -3,7 +3,7 @@ import { State } from './stateMachine';
 import { collisionData, gameConfig } from '../../common/globalConfig';
 // player state
 import { randomInteger } from '../utils/utils';
-const randlatency = 20//randomInteger(0, 500);
+const randlatency = 1000//randomInteger(0, 500);
 const maxlength = 10;
 
 console.log(`simulating server latency with ${randlatency}`);

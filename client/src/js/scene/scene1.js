@@ -64,7 +64,7 @@ export class StartLevel extends Phaser.Scene {
         // history to track request
         this.clientpredictNUM = 0;
         // random number generated for network latency test
-        this.randlatency = 20//randomInteger(0, 500);
+        this.randlatency = 1000//randomInteger(0, 500);
         console.log('random latency (client) ' , this.randlatency);
         this.sessionId = this.room.sessionId;
         // request queue to keep track of last request acknowledeged by server
