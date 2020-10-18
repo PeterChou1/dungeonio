@@ -8,8 +8,8 @@ import * as path from 'path';
 
 const env = process.env.NODE_ENV || 'development';
 
-const gameserverport = Number(process.env.GamePort || 4000);
-const port = Number(process.env.Port || 80);
+const gameserverport = Number(process.env.GAMEPORT || 4000);
+const port = Number(process.env.PORT || 80);
 
 
 const app = express();

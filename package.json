@@ -49,5 +49,8 @@
     "phaser-matter-collision-plugin": "^0.10.2",
     "socket.io": "^2.3.0"
   },
-  "homepage": "https://github.com/PeterChou1/phaser3-project-template#readme"
+  "homepage": "https://github.com/PeterChou1/phaser3-project-template#readme",
+  "engines": {
+    "node": "12.18.3"
+  }
 }
