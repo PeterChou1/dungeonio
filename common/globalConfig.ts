@@ -10,7 +10,7 @@ export const gameConfig = {
     }
 }
 
-// collision
+// collision detection
 export const collisionData = {
     category : {
         hard : 0x0001, // hard platform
