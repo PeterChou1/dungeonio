@@ -6,14 +6,13 @@ const {Body, Bodies, Query} = Phaser.Physics.Matter.Matter;
 */
 export class PlayerPhysics {
 
-    constructor(scene, sprite, stateMachine, x, y, scale){
+    constructor(scene, sprite, x, y, scale, key){
         this.sprite = sprite;
         const {width : w, height: h} = this.sprite;
         console.log('sprite physics');
         console.log(sprite.width);
         console.log(sprite.height)
         this.scene = scene;
-        this.stateMachine = stateMachine;
         this.isTouching = {left: false, right: false, ground: false, top: false, nearground: false};
         this.onPlatform = false;
         this.sprite.setScale(scale);
@@ -28,6 +27,7 @@ export class PlayerPhysics {
             top: Bodies.rectangle(0, -h, w, 2, {isSensor: true}),
             neartop: Bodies.rectangle(0, -h - 25, w, 50, {isSensor: true})
         };
+
         const compoundBody = Body.create({
             parts: [this.mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom, this.sensors.neartop],
             frictionStatic: 0,
@@ -43,50 +43,45 @@ export class PlayerPhysics {
             .setExistingBody(compoundBody)
             .setScale(scale)
             .setFixedRotation()
-            .setPosition(x, y);
+            .setPosition(x, y)
+    
 
-        this.scene.matterCollision.addOnCollideStart({
-            objectA: [this.mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom],
-            callback: this.onSensorCollide,
-            context: this
-        });
-        this.scene.matterCollision.addOnCollideActive({
-            objectA: [this.mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom],
-            callback: this.onSensorCollide,
-            context: this
-        });
-        this.scene.matterCollision.addOnCollideStart({
-            objectA: this.sensors.bottom,
-            objectB: this.scene.objectgroup.soft,
-            callback: () => {
-                this.onPlatform = true;
-                this.sprite.setCollidesWith([collisionData.category.hard, collisionData.category.soft])
-            },
-            context: this
-        })
-        this.scene.matterCollision.addOnCollideEnd({
-            objectA: this.sensors.bottom,
-            objectB: this.scene.objectgroup.soft,
-            callback: () => {
-                console.log('platform end collide');
-                this.onPlatform = false;
-                this.sprite.setCollidesWith([collisionData.category.hard])
-            },
-            context: this
-        })
-        this.scene.matter.world.on("beforeupdate", this.resetTouching, this);
-    }
 
-    simulatePhysics(){
-        const hardbodies = this.scene.objectgroup
-                                     .hard
-                                     .filter( tile => tile.physics.matterBody !== undefined)
-                                     .map( tile => tile.physics.matterBody.body )
-        const softbodies = this.scene.objectgroup.soft;
-
+        if (this.scene.sessionId === key) {
+            this.sprite.setCollisionCategory(collisionData.category.player);
+            this.scene.matterCollision.addOnCollideStart({
+                objectA: [this.mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom],
+                callback: this.onSensorCollide,
+                context: this
+            });
+            this.scene.matterCollision.addOnCollideActive({
+                objectA: [this.mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom],
+                callback: this.onSensorCollide,
+                context: this
+            });
+            this.scene.matterCollision.addOnCollideStart({
+                objectA: this.sensors.bottom,
+                objectB: this.scene.objectgroup.soft,
+                callback: () => {
+                    this.onPlatform = true;
+                    this.sprite.setCollidesWith([collisionData.category.hard, collisionData.category.soft])
+                },
+                context: this
+            })
+            this.scene.matterCollision.addOnCollideEnd({
+                objectA: this.sensors.bottom,
+                objectB: this.scene.objectgroup.soft,
+                callback: () => {
+                    console.log('platform end collide');
+                    this.onPlatform = false;
+                    this.sprite.setCollidesWith([collisionData.category.hard])
+                },
+                context: this
+            })
+            this.scene.matter.world.on("beforeupdate", this.resetTouching, this);
+        }
 
     }
-
 
 
     resetTouching() {
@@ -98,13 +93,30 @@ export class PlayerPhysics {
     }
 
     onSensorCollide({ bodyA, bodyB, pair }) {
-        if (bodyB.isSensor) return; 
+        if (bodyB.isSensor) return;
         if (bodyA === this.sensors.left) {
           this.isTouching.left = true;
-          if (pair.separation > 0.5) this.sprite.x += pair.separation - 1;
+          // if other object is player seperate both players
+          if (pair.separation > 0.5) {
+            //if (bodyB.gameObject instanceof Phaser.Physics.Matter.Sprite) {
+            //    //console.log('collided with a phaser sprite')
+            //    //bodyB.gameObject.x -= (pair.separation - 0.5);
+            //    this.sprite.x += (pair.separation + 0.5);
+            //} else {
+            this.sprite.x += (pair.separation - 0.5);
+            //}
+          } 
         } else if (bodyA === this.sensors.right) {
           this.isTouching.right = true;
-          if (pair.separation > 0.5) this.sprite.x -= pair.separation - 1;
+          if (pair.separation > 0.5) {
+            //if (bodyB.gameObject instanceof Phaser.Physics.Matter.Sprite) {
+            //    //console.log('collided with a phaser sprite')
+            //    //bodyB.gameObject.x += (pair.separation - 0.5);
+            //    this.sprite.x -= (pair.separation + 0.5);
+            //} else {
+            this.sprite.x -= (pair.separation - 0.5);
+            //}
+          }
         } else if (bodyA === this.sensors.bottom) {
           this.isTouching.ground = true;
         } else if (bodyA === this.sensors.top) {
@@ -112,6 +124,8 @@ export class PlayerPhysics {
         } else if (bodyA === this.sensors.nearbottom){
           this.isTouching.nearground = true;
         } else if (bodyA === this.mainBody) {
+
+
             //console.log(bodyA.vertices);
             //console.log('---------');
             //console.log(`ground x: ${bodyB.position.x} y: ${bodyB.position.y}`);

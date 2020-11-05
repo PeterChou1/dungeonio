@@ -34,7 +34,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         const {width : w, height: h} = this;
 
         console.log(`spawn player with width: ${w}  height: ${h}`)
-        
+        this.setCollisionCategory(collisionData.category.player);
         this.setDataEnabled();
         this.scene = scene;
         this._clientid = clientid;
@@ -125,7 +125,6 @@ export class Player extends Phaser.Physics.Matter.Sprite {
                 }),
                 this.scene.matterCollision.addOnCollideActive({
                     objectA: [this.mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom],
-                    objectB: this.scene.objectgroup.hard,
                     callback: this.onSensorCollide,
                     context: this
                 }),
@@ -219,17 +218,27 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         //console.log('sensor collide???')
         if (bodyB.isSensor) return; 
         if (bodyA === this.sensors.left) {
-          this.isTouching.left = true;
-          if (pair.separation > 0.5) this.x += pair.separation - 1;
+            this.isTouching.left = true;
+            //if (bodyB.gameObject instanceof Phaser.Physics.Matter.Sprite) {
+            //    //bodyB.gameObject.x -= (pair.separation - 0.5);
+            //    this.x += (pair.separation + 0.5)
+            //} else {
+            if (pair.separation > 0.5) this.x += pair.separation - 0.5;
+            //}
         } else if (bodyA === this.sensors.right) {
-          this.isTouching.right = true;
-          if (pair.separation > 0.5) this.x -= pair.separation - 1;
+            this.isTouching.right = true;
+            //if (bodyB.gameObject instanceof Phaser.Physics.Matter.Sprite) {
+            //    //bodyB.gameObject.x += (pair.separation - 0.5);
+            //    this.x -= (pair.separation + 0.5)
+            //} else {
+            if (pair.separation > 0.5) this.x -= pair.separation - 0.5;
+            //}
         } else if (bodyA === this.sensors.bottom) {
-          this.isTouching.ground = true;
+            this.isTouching.ground = true;
         } else if (bodyA === this.sensors.top) {
-          this.isTouching.top = true;
+            this.isTouching.top = true;
         } else if (bodyA === this.sensors.nearbottom){
-          this.isTouching.nearground = true;
+            this.isTouching.nearground = true;
         } else if (bodyA === this.mainBody) {
           //console.log(bodyA.vertices);
           //console.log('--------')
@@ -275,6 +284,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         //console.log(`on Platform: ${this.onPlatform}`);
         const playerconfig = this.data.get(playerStateMap.playerprop);
         this.scene.room.state.updatePlayer(this.clientid, {
+            timestamp : new Date().getTime(),
             x: this.x,
             y: this.y,
             velocityX : this.body.velocity.x,

@@ -65,8 +65,8 @@ export class RequestQueue {
         if (!this.isEmpty()){
             const lastrequest = this.unackReq[this.unackReq.length - 1];
             let elapsedTime = request.created - lastrequest.serveradjusted;
-            console.log('----- elaspsed ------');
-            console.log(elapsedTime);
+            //console.log('----- elaspsed ------');
+            //console.log(elapsedTime);
             lastrequest.elapsed = elapsedTime;
         }
         this.unackReq.push(request);
@@ -82,15 +82,18 @@ export class RequestQueue {
                 }
             }
         }
-        console.log('------')
-        console.log(`unacknowledged request:  ${this.unackReq.length}`);
-        console.log(this.unackReq);
+        //console.log('------')
+        //console.log(`unacknowledged request:  ${this.unackReq.length}`);
+        //console.log(this.unackReq);
     }
 
     isEmpty() {
         return this.unackReq.length === 0;
     }
 
+    clearRequestQueue() {
+        this.unackReq = [];
+    }
 
     getinputs() {
         return _.cloneDeep(this.unackReq);

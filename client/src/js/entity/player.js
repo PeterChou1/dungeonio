@@ -10,67 +10,44 @@ export default class Player {
         this.scene = scene;
         this.sprite = scene.matter.add.sprite(0, 0, "player", 0);
         this.playerId = key;
-        this.simcount = 0;
-        // const {width : w, height: h} = this.sprite;
-        // console.log('---actual player ---')
-        // console.log(w, h);
-        // const mainBody = Bodies.rectangle(0, 0, w * 0.35, h, { chamfer: {radius: 5}});
-        // console.log(mainBody.bounds);
-        // this.sensors = {
-        //     nearbottom: Bodies.rectangle(0, h + 25, w, 50, {isSensor: true}),
-        //     bottom: Bodies.rectangle(0, h , w, 2, {isSensor: true}),
-        //     left: Bodies.rectangle(-w * 0.35, 0, 2, h ,  {isSensor: true}),
-        //     right: Bodies.rectangle(w * 0.35, 0, 2, h , {isSensor: true}), 
-        //     top: Bodies.rectangle(0, -h, w, 2, {isSensor: true}),
-        //     neartop: Bodies.rectangle(0, -h - 25, w, 50, {isSensor: true})
-        // }
-        // // create main body
-        // const compoundBody = Body.create({
-        //     parts: [mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right, this.sensors.top, this.sensors.nearbottom, this.sensors.neartop],
-        //     frictionStatic: 0,
-        //     frictionAir: 0.02,
-        //     friction: 0.1,
-        //     collisionFilter: {
-        //         mask: collisionData.category.hard,
-        //     }
-        // })
-        // this.sprite.setExistingBody(compoundBody);
-        // this.sprite.setScale(scale);
-        // this.sprite.setPosition(x, y);
-        // this.sprite.setFixedRotation();
-        // //this.sprite.setCollisionGroup(collisionData.group.player);
-        // this.sprite.setCollisionCategory(collisionData.category.player);
-        // initialize player state machine for client prediction
-        this.stateMachine = new StateMachine(
-            'idle',
-            getplayerstate(),
-            [scene, this]
-        )
-        this.physics = new PlayerPhysics(scene, this.sprite, this.stateMachine, x, y, scale);
-        // default state of player values are set by server
-        this.playerstate = {
-            x : x,
-            y : y,
-            flipX : false,
-            state : 'idle'
-        }
+
+        this.buffer_size = 60; 
+        //  keeps track of server updates positions by server for interpolation purposes
+        this.server_updates = []
+        this.physics = new PlayerPhysics(scene, this.sprite, x, y, scale, key);
+        // default state of player values is idle
+        this.playerstate = 'idle'
 
         if (this.scene.sessionId === this.playerId) {
+            this.stateMachine = new StateMachine(
+                'idle',
+                getplayerstate(),
+                [scene, this]
+            )
             this.simStateMachine = new SimulatedStateMachine(
                 scene,
                 'idle',
                 getsimplayerState(),
                 [this]
             )
-            // only client predict for current player
+            // only client predict for local client player
             this.scene.events.on("update", this.clientpredict, this);
         } else {
             // player default animation
-            this.playanimation(this.playerstate.state);
-            this.sprite.world.on('beforeupdate', this.disablegravity, this);
+            this.playanimation(this.playerstate);
+            this.disablegravity();
         }
+
         // diasable gravity for server control object
         // this.sprite.world.on('beforeupdate', this.disablegravity, this);
+    }
+
+    pushupdates(updates) {
+        this.server_updates.push(updates);
+        console.log(this.server_updates);
+        if (this.server_updates.length >= this.buffer_size){
+            this.server_updates.shift();
+        }
     }
 
     simulateinput(serverstate, inputs) {
@@ -79,23 +56,35 @@ export default class Player {
         //console.log(inputs);
         // compare server state to client state
         // set position
-        const deltaY = Math.abs(serverstate.x - this.playerstate.x);
-        const deltaX = Math.abs(serverstate.y - this.playerstate.y);
-
-        if (deltaY >= 10 || deltaX > 10) {
+        const deltaY = Math.abs(serverstate.x - this.sprite.x);
+        const deltaX = Math.abs(serverstate.y - this.sprite.y);
+        if (deltaY > 5 || deltaX > 5) {
+            let startpos = {
+                x: this.sprite.x,
+                y: this.sprite.y
+            }
             this.sprite.setPosition(
                 serverstate.x,
                 serverstate.y
             )
+            //console.log('simulating inputs ', inputs);
             this.sprite.setVelocity(
                 serverstate.velocityX,
                 serverstate.velocityY
             )
-            this.simStateMachine.simulateInput(
+            let interpolated = this.simStateMachine.simulateInput(
+                this.sprite,
                 serverstate.stateTime,
                 serverstate.state,
                 inputs
             )
+            //console.log('interpolated:  ', interpolated);
+            let endpos = interpolated[interpolated.length - 1];
+            const predX = Math.abs(endpos.x - startpos.x);
+            const predY = Math.abs(endpos.y - startpos.y);
+            if (predX > 5 || predY > 5) {
+            
+            }
         }
     }
 
@@ -106,27 +95,15 @@ export default class Player {
     updatePlayer({x, y, flipX, collisionData, state}) {
         //console.log('update player');
         //console.log({x, y, flipX, collisionData, state});
-        this.sprite.setPosition(x, y);
+        const deltaX = Math.abs(x - this.sprite.x);
         this.sprite.setFlipX(flipX);
+        this.sprite.setPosition(x, y);
         this.sprite.setCollidesWith(collisionData);
-        if (this.playerstate.state !== state){
+        if (this.playerstate !== state){
             this.playanimation(state);
         }
-        this.playerstate = {
-            x : x,
-            y : y,
-            flipX : flipX,
-            state : state
-        }
-    }
+        this.playerstate = state;
 
-    setplayerstate(){
-        this.playerstate = {
-            x : this.sprite.x,
-            y : this.sprite.y,
-            flipX : this.sprite.flipX,
-            state : this.stateMachine.state
-        }
     }
 
     getPlayerState() {
@@ -135,10 +112,17 @@ export default class Player {
 
     clientpredict() {
        this.stateMachine.step();
-       this.setplayerstate();
     }
 
     disablegravity() {
+        this.sprite.world.on('beforeupdate', this.cancelgravity, this);
+    }
+
+    enablegravity() {
+        this.sprite.world.off('beforeupdate', this.cancelgravity, this);
+    }
+
+    cancelgravity() {
         var gravity = this.sprite.world.localWorld.gravity;
         var body = this.sprite.body;
         Body.applyForce(body, body.position, {
@@ -162,7 +146,7 @@ export default class Player {
         if (this.scene.sessionId === this.key) {
             this.scene.events.off('update', this.clientpredict, this);
         } else {
-            this.sprite.world.off('beforeupdate', this.disablegravity, this);
+            this.sprite.world.off('beforeupdate', this.cancelgravity, this);
         }
     }
 }

@@ -68,8 +68,8 @@ export class PlayerGroup extends Phaser.GameObjects.Group {
         }
     }
 
-
-    update(){
+    getPlayers() {
+        return this.getChildren();
     }
 
 }

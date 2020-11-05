@@ -46,34 +46,52 @@ export class SimulatedStateMachine extends StateMachine {
     this.possibleStates[playerstate].enter(...this.stateArgs, stateTime);
 
   }
+  /*
+   Simulates input for server recouncilation 
+   returns positions for the start and end 
+   */
+  simulateInput(player, stateTime, playerstate, inputs) {
 
-  simulateInput(stateTime, playerstate, inputs) {
-    console.log('SIM START');
-    console.log('---syncing to player state---')
-    console.log(`state time: ${stateTime} playerstate: ${playerstate}`);
+
+    // by default all non-client players have gravity disable enable gravity for duration
+    // of simulation
+    Object.keys(this.scene.allplayers).map(playerId => {
+      if (this.scene.sessionId !== playerId) {
+        this.scene.allplayers[playerId].enablegravity()
+      }
+    });
+    let interpolated = [];
     this.syncState(stateTime, playerstate);
-    let index = 0
-    let current_input;
-    while (index < inputs.length){
-      current_input = inputs[index];
+    for (const current_input of inputs){
       this.simInputs = current_input;
-      console.log('----processing inputs----');
-      console.log(current_input);
+      //console.log('----processing inputs----');
+      //console.log(current_input);
       let inputtime = current_input.elapsed
-      console.log('----processed input time---')
-      console.log(inputtime);
+      //console.log('----processed input time---')
+      //console.log(inputtime);
       while ( inputtime >= 0 ) {
         // every step is 16.6 ms by default 60fps
-        console.log('x : ', this.stateArgs[0].sprite.x);
-        console.log('y : ', this.stateArgs[0].sprite.y);
-        console.log('state: ', this.state);
+        //console.log('x : ', this.stateArgs[0].sprite.x);
+        //console.log('y : ', this.stateArgs[0].sprite.y);
+        //console.log('state: ', this.state);
         inputtime -= 16.66;
         this.scene.matter.step();
         this.step();
+        interpolated.push({
+          x : player.x,
+          y : player.y,
+          flipX : player.flipX,
+          collisionData : player.body.collisionFilter.mask,
+          state : this.state
+        })
       }
-      index += 1
     }
-  }
-
-  
+    // disable gravity again
+    Object.keys(this.scene.allplayers).map(playerId => {
+      if (this.scene.sessionId !== playerId) {
+        this.scene.allplayers[playerId].disablegravity()
+      }
+    });
+    return interpolated;
+  }  
 }

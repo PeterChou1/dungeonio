@@ -46,8 +46,6 @@ export class StartLevel extends Phaser.Scene {
 
     create(){
         console.log('---start creation---');
-        
-        //@ts-ignore playergroups
         this.playergroup = new PlayerGroup(this);
         this.map = this.add.tilemap("map");
         this.tileset = this.map.addTilesetImage("mainlevbuild", "tiles");

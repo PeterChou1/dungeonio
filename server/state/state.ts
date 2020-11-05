@@ -3,13 +3,15 @@ import { State } from './stateMachine';
 import { collisionData, gameConfig } from '../../common/globalConfig';
 // player state
 import { randomInteger } from '../utils/utils';
-const randlatency = 1000//randomInteger(0, 500);
+const randlatency = 50//randomInteger(0, 500);
 const maxlength = 10;
-
-console.log(`simulating server latency with ${randlatency}`);
 
 export class Player extends Schema {
 
+
+    // time stamp of last sent request
+    @type('number')
+    timestamp : Number = new Date().getTime();
     @type('number')
     velocityX : Number = 0;
     @type('number')
@@ -27,11 +29,11 @@ export class Player extends Schema {
     @type('string')
     state: String = 'idle';
     // last acknowledged movement request by client stores [maxlength] request
-    @type(['string'])
-    ackreqIds = new ArraySchema<String>();
+    @type(['number'])
+    ackreqIds = new ArraySchema<number>();
     // current request being processed will not switch until another request is sent
-    @type('string')
-    curreqId = null;
+    @type('number')
+    curreqId : number = 0;
     @type('boolean') 
     onPlatform : Boolean =  false;
     @type(['boolean'])
@@ -42,7 +44,6 @@ export class Player extends Schema {
     // how long the player has been in present state
     @type('number')
     stateTime : number = 0;
-
 
     enqueueRequestId(reqId){
         if (this.curreqId !== null){
@@ -80,7 +81,9 @@ export class GameState extends Schema {
     }
 
     @simulatelatency(gameConfig.simulatelatency, randlatency)
-    updatePlayer(id, {x, 
+    updatePlayer(id, {
+                      timestamp,
+                      x, 
                       y, 
                       velocityX,
                       velocityY,
@@ -131,6 +134,7 @@ function simulatelatency(setlatency : Boolean, randlatency: number){
         descriptor.value = function (...args: any[]) {
             if (setlatency){
                 //console.log(`simulate latency ${randlatency}`);
+                console.log(`simulating server latency with ${randlatency}`);
                 setTimeout(() => {
                     orgfunc.apply(this, args);
                 }, randlatency)

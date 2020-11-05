@@ -8,6 +8,7 @@ export class GameRoom extends Room<GameState> {
     game : Phaser.Game
     scene : Phaser.Scene
     onCreate (options) {
+        this.setPatchRate(100);
         // inject game room into game instance
         config.callbacks = {
             preBoot: () => {
