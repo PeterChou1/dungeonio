@@ -4,7 +4,6 @@ import { gameConfig, collisionData, messageType} from '../../../../common/global
 import { PlayerT } from '../entity/testplayer'; 
 import { playerAnims } from '../config/playerconfig';
 import { createanims, randomInteger } from '../utils/utils';
-import { RequestQueue } from '../state/playerSimulation';
 const Colyseus = require("colyseus.js");
 
 
@@ -65,8 +64,6 @@ export class StartLevel extends Phaser.Scene {
         this.randlatency = 50//randomInteger(0, 500);
         console.log('random latency (client) ' , this.randlatency);
         this.sessionId = this.room.sessionId;
-        // request queue to keep track of last request acknowledeged by server
-        this.requestQueue = new RequestQueue();
         //console.log('joined room with sessionId ', this.sessionId);
         this.keys = this.input.keyboard.createCursorKeys();
         // limit client prediction (decrease cpu usage rates)
@@ -176,51 +173,16 @@ export class StartLevel extends Phaser.Scene {
             }
         }
         this.room.state.players.onChange = (change, key) => {
-            //this.requestNum++;
-            //console.log(this.requestNum);
-            if (this.sessionId === key){
-                //console.log(change.ackreqIds);
-                //console.log('request queue :', this.requestQueue.unackReq.map(x => x.id));
-                this.requestQueue.dequeue(change.ackreqIds);
-                this.requestQueue.setcurrentrequest(change.elaspsedTime);
-                // simulate player input NOTE: simulation will not run if player is 
-                // within 20 (x or y) direction of server coordinates
-                //console.log('---unacknowledged request---')
-                //console.log(this.requestQueue.getinputs());
-                if (this.clientpredictNUM === 0) {
-                    this.clientpredictNUM = 0;
-                    this.allplayers[key].simulateinput(
-                        {
-                            x : change.x,
-                            y: change.y,
-                            velocityX : change.velocityX,
-                            velocityY : change.velocityY,
-                            stateTime : change.stateTime,
-                            flipX: change.flipX,
-                            collisionData: change.collisionData,
-                            state: change.state,
-                        },
-                        this.requestQueue.getinputs()
-                    )
+            this.allplayers[key].updatePlayer(
+                {
+                    x: change.x,
+                    y: change.y,
+                    flipX: change.flipX,
+                    collisionData: change.collisionData,
+                    state: change.state
                 }
-                 this.clientpredictNUM += 0;
-                //const lastitem = this.history[this.history.length - 1];
-                //if (lastitem !== change.lastackreqId && change.lastackreqId !== ''){
-                //    //console.log('history :', this.history);
-                //    //console.log('request queue :', this.requestQueue.unackReq.map(x => x.id));
-                //}
-            } else {
-                //this.allplayers[key].pushupdates(change);
-                this.allplayers[key].updatePlayer(
-                    {
-                        x: change.x,
-                        y: change.y,
-                        flipX: change.flipX,
-                        collisionData: change.collisionData,
-                        state: change.state
-                    }
-                )
-            }
+            )
+            
         }
 
         this.room.state.players.onRemove = (player, key) =>  {
@@ -242,17 +204,6 @@ export class StartLevel extends Phaser.Scene {
             down_keyup: this.keys.down.isUp,
             id : this.curreqId
         }
-        this.requestQueue.enqueue(
-            {
-                ...req,
-                // when was the request created
-                created : new Date().getTime(),
-                // last time server processed your request from clients perspective
-                serveradjusted : new Date().getTime(),
-                // how many ms is left of time the server did process the current request
-                elapsed : 0
-            }
-        )
         // increment curr req Id for next request
         this.curreqId++;
         if (gameConfig.simulatelatency){
@@ -267,14 +218,6 @@ export class StartLevel extends Phaser.Scene {
         }
     }
 
-
     update() {
-        ////console.log('delta time: ', delta);
-        // listen for state updates
-        //if (this.requestQueue && document.visibilityState == "hidden"){
-        //    //clear request queue
-        //    console.log('---clearing request queue---');
-        //    this.requestQueue.clearRequestQueue();
-        //}
     }
 }

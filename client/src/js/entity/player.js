@@ -17,27 +17,9 @@ export default class Player {
         this.physics = new PlayerPhysics(scene, this.sprite, x, y, scale, key);
         // default state of player values is idle
         this.playerstate = 'idle'
-
-        if (this.scene.sessionId === this.playerId) {
-            this.stateMachine = new StateMachine(
-                'idle',
-                getplayerstate(),
-                [scene, this]
-            )
-            this.simStateMachine = new SimulatedStateMachine(
-                scene,
-                'idle',
-                getsimplayerState(),
-                [this]
-            )
-            // only client predict for local client player
-            this.scene.events.on("update", this.clientpredict, this);
-        } else {
-            // player default animation
-            this.playanimation(this.playerstate);
-            this.disablegravity();
-        }
-
+        this.playanimation(this.playerstate);
+        this.disablegravity();
+        
         // diasable gravity for server control object
         // this.sprite.world.on('beforeupdate', this.disablegravity, this);
     }
@@ -47,44 +29,6 @@ export default class Player {
         console.log(this.server_updates);
         if (this.server_updates.length >= this.buffer_size){
             this.server_updates.shift();
-        }
-    }
-
-    simulateinput(serverstate, inputs) {
-        //console.log('-------simulating inputs----------')
-        //console.log(inputs);
-        //console.log(inputs);
-        // compare server state to client state
-        // set position
-        const deltaY = Math.abs(serverstate.x - this.sprite.x);
-        const deltaX = Math.abs(serverstate.y - this.sprite.y);
-        if (deltaY > 5 || deltaX > 5) {
-            let startpos = {
-                x: this.sprite.x,
-                y: this.sprite.y
-            }
-            this.sprite.setPosition(
-                serverstate.x,
-                serverstate.y
-            )
-            //console.log('simulating inputs ', inputs);
-            this.sprite.setVelocity(
-                serverstate.velocityX,
-                serverstate.velocityY
-            )
-            let interpolated = this.simStateMachine.simulateInput(
-                this.sprite,
-                serverstate.stateTime,
-                serverstate.state,
-                inputs
-            )
-            //console.log('interpolated:  ', interpolated);
-            let endpos = interpolated[interpolated.length - 1];
-            const predX = Math.abs(endpos.x - startpos.x);
-            const predY = Math.abs(endpos.y - startpos.y);
-            if (predX > 5 || predY > 5) {
-            
-            }
         }
     }
 
@@ -108,10 +52,6 @@ export default class Player {
 
     getPlayerState() {
         return this.playerstate;
-    }
-
-    clientpredict() {
-       this.stateMachine.step();
     }
 
     disablegravity() {

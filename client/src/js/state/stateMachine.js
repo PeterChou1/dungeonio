@@ -49,6 +49,7 @@ export class SimulatedStateMachine extends StateMachine {
   /*
    Simulates input for server recouncilation 
    returns positions for the start and end 
+   (Not used currently due to complexity it brings possibly a future feature)
    */
   simulateInput(player, stateTime, playerstate, inputs) {
 
