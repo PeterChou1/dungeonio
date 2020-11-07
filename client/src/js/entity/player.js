@@ -19,9 +19,6 @@ export default class Player {
         this.playerstate = 'idle'
         this.playanimation(this.playerstate);
         this.disablegravity();
-        
-        // diasable gravity for server control object
-        // this.sprite.world.on('beforeupdate', this.disablegravity, this);
     }
 
     pushupdates(updates) {
@@ -30,6 +27,7 @@ export default class Player {
         if (this.server_updates.length >= this.buffer_size){
             this.server_updates.shift();
         }
+        
     }
 
     playanimation(anims) {
@@ -47,6 +45,9 @@ export default class Player {
             this.playanimation(state);
         }
         this.playerstate = state;
+    }
+
+    entityinterpolate(){
 
     }
 
