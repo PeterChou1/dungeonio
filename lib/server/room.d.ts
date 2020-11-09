@@ -6,7 +6,7 @@ export declare class GameRoom extends Room<GameState> {
     game: Phaser.Game;
     scene: Phaser.Scene;
     onCreate(options: any): void;
-    onJoin(client: any): void;
+    onJoin(client: any, options: any): void;
     onLeave(client: any): void;
     onDispose(): void;
 }

@@ -8,6 +8,9 @@ export class GameRoom extends Room<GameState> {
     game : Phaser.Game
     scene : Phaser.Scene
     onCreate (options) {
+        // how many client each room can hold
+        this.maxClients = 50;
+        // every 100ms send an update to all clients
         this.setPatchRate(100);
         // inject game room into game instance
         config.callbacks = {
@@ -21,16 +24,15 @@ export class GameRoom extends Room<GameState> {
         console.log('game started');
         console.log('---scene---');
         console.log(`width: ${this.scene.scale.width} height: ${this.scene.scale.height}`);
-        //this.onMessage(messageType.playerinput, (client, data) => {
-        //    console.log("StateHandlerRoom received message from", client.sessionId, ":", data);
-        //})
-
     }
 
-    onJoin (client) {
+    onJoin (client, options) {
         console.log(`client with id: (${client.sessionId}) joined`);
+        console.log(options);
+        console.log('------');
+
         //@ts-ignore add player custom method
-        this.scene.addPlayer(client.sessionId);
+        this.scene.addPlayer(client.sessionId, options.playerName);
     }
 
     onLeave (client){

@@ -14,7 +14,6 @@ export class StartLevel extends Phaser.Scene {
     eventQueue : ActionQueue;
     room;
 
-
     constructor(){
         super({
             key: 'start',
@@ -96,13 +95,13 @@ export class StartLevel extends Phaser.Scene {
         console.log('---end creation---');
     }
 
-    addPlayer(clientid){
+    addPlayer(clientid, playerName){
         this.eventQueue.enqueue(
             {
-                callback: (clientid) => {
-                    this.playergroup.spawn(clientid)
+                callback: (clientid, playerName) => {
+                    this.playergroup.spawn(clientid, playerName)
                 },
-                args: [clientid]
+                args: [clientid, playerName]
             }
         )
     }
@@ -116,6 +115,7 @@ export class StartLevel extends Phaser.Scene {
             this.playergroup.updatePlayerInput(client.sessionId, playerinput);
         });
     }
+
     update(){
         this.eventQueue.executeActions();
     }

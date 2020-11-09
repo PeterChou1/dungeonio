@@ -11,10 +11,11 @@ export declare class Player extends Phaser.Physics.Matter.Sprite {
     lastsentclientinput: number;
     lastTimeEnterNewState: number;
     stateTime: number;
+    playerName: string;
     mainBody: any;
     allcollisionlistener: any;
     private _clientid;
-    constructor(scene: any, x: any, y: any, clientid: any, scale?: number);
+    constructor(scene: any, x: any, y: any, clientid: any, playerName: any, scale?: number);
     resetEnterState(): void;
     setStateTime(): void;
     handleClientInput(playerinput: any): void;

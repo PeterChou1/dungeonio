@@ -1,5 +1,7 @@
 import { Schema, MapSchema, ArraySchema } from "@colyseus/schema";
 export declare class Player extends Schema {
+    playerName: String;
+    timestamp: Number;
     velocityX: Number;
     velocityY: Number;
     x: Number;
@@ -7,8 +9,8 @@ export declare class Player extends Schema {
     flipX: Boolean;
     collisionData: ArraySchema<number>;
     state: String;
-    ackreqIds: ArraySchema<String>;
-    curreqId: any;
+    ackreqIds: ArraySchema<number>;
+    curreqId: number;
     onPlatform: Boolean;
     isTouching: ArraySchema<Boolean>;
     elaspsedTime: number;
@@ -17,9 +19,10 @@ export declare class Player extends Schema {
 }
 export declare class GameState extends Schema {
     players: MapSchema<Player>;
-    addPlayer(id: any, x: any, y: any): void;
+    addPlayer(id: any, name: any, x: any, y: any): void;
     removePlayer(id: any): void;
-    updatePlayer(id: any, { x, y, velocityX, velocityY, stateTime, flipX, collisionData, state, isTouching, onPlatform, reqId, elaspsedTime, }: {
+    updatePlayer(id: any, { timestamp, x, y, velocityX, velocityY, stateTime, flipX, collisionData, state, isTouching, onPlatform, reqId, elaspsedTime, }: {
+        timestamp: any;
         x: any;
         y: any;
         velocityX: any;

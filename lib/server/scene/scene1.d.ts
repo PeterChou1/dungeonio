@@ -13,7 +13,7 @@ export declare class StartLevel extends Phaser.Scene {
     init(): void;
     preload(): void;
     create(): void;
-    addPlayer(clientid: any): void;
+    addPlayer(clientid: any, playerName: any): void;
     removePlayer(clientid: any): void;
     handlePlayerInput(): void;
     update(): void;

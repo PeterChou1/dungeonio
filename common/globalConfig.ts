@@ -5,8 +5,8 @@ export const gameConfig = {
     networkdebug: false, // inject server player instance into client side
     simulatelatency:  false,// simulate latency for testing client side prediction
     size : {
-        width: 600,
-        height: 800
+        width: 1024,
+        height: 768
     }
 }
 

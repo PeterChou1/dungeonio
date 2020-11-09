@@ -8,7 +8,8 @@ const maxlength = 10;
 
 export class Player extends Schema {
 
-
+    @type('string')
+    playerName : String = '';
     // time stamp of last sent request
     @type('number')
     timestamp : Number = new Date().getTime();
@@ -65,8 +66,9 @@ export class GameState extends Schema {
     players = new MapSchema<Player>();
 
 
-    addPlayer(id, x, y){
+    addPlayer(id, name, x, y){
         this.players[id] = new Player();
+        this.players[id].playerName = name;
         this.players[id].x = x;
         this.players[id].y = y;
         this.players[id].collisionData.push(collisionData.category.hard);
@@ -99,6 +101,7 @@ export class GameState extends Schema {
     }){
         // check if player exist
         if (this.players[id]){
+            this.players[id].timestamp = timestamp;
             this.players[id].x = Math.trunc( x );
             this.players[id].y = Math.trunc( y );
             this.players[id].velocityX = velocityX;

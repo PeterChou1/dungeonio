@@ -15,27 +15,18 @@ export class PlayerGroup extends Phaser.GameObjects.Group {
         //@ts-ignore add colyseues js room instance
     }
     
-    spawn(clientid){
+    spawn(clientid, playerName){
+        // set random coordinates for player to spawn into
         const x = Phaser.Math.Between(0, this.scene.scale.width);
-        const inactive : Player = this.getFirstDead(false, x, 370);
-
-        if(inactive === null){
-            let player;
-            if (gameConfig.networkdebug){
-                player = new Player(this.scene, 300, 100, clientid);
-            } else {
-                player = new Player(this.scene, x, 370, clientid);
-            }
-            this.add(player)
-            console.log('added player to server id: ' , clientid);
-            return player;
+        let player;
+        if (gameConfig.networkdebug){
+            player = new Player(this.scene, 300, 100, clientid, playerName);
+        } else {
+            player = new Player(this.scene, x, 370, clientid, playerName);
         }
-        inactive.clientid = clientid;
-        inactive.setActive(true);
-        inactive.setVisible(true);
-        inactive.world.add(inactive.body);
-        return inactive;
-
+        this.add(player)
+        console.log('added player to server id: ' , clientid);
+        return player;
     }
 
     despawn(clientid){
