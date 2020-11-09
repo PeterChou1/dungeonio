@@ -6,10 +6,10 @@ import PhaserMatterCollisionPlugin from "../../../../server/utils/matterCollisio
 import { PlayerT } from "../entity/testplayer";
 import PlayerA from '../entity/player';
 
-export class ServerLevel extends Phaser.Scene {
+export class debugLevel extends Phaser.Scene {
     constructor(){
         super({
-            key: 'start',
+            key: 'startLevel',
             physics: {
                 default:'matter',
                 matter: {
@@ -89,10 +89,9 @@ export class ServerLevel extends Phaser.Scene {
         }
         this.player = new PlayerT(this, 250, 100);
         this.player2 = new Player(this, 300, 100, 'testplayer');
-        this.player3 = new PlayerA(this, 350, 100, 2, 'testplayer2');
+        this.player3 = new PlayerA(this, 350, 100, 2, 'testplayer2', 'unnamed warrior');
 
         //this.addPlayer('testplayer');
-
     }
 
     addPlayer(clientid){

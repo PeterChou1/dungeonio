@@ -6,29 +6,21 @@ const { Body } = Phaser.Physics.Matter.Matter;
 
 
 export default class Player {
-    constructor(scene, x, y, scale, key) {
+    constructor(scene, x, y, scale, key, playerName) {
+        console.log(`player name: ${playerName} joined`);
         this.scene = scene;
-        this.sprite = scene.matter.add.sprite(0, 0, "player", 0);
+        this.sprite = scene.matter.add.sprite(x, y, "player", 0);
         this.playerId = key;
-
-        this.buffer_size = 60; 
         //  keeps track of server updates positions by server for interpolation purposes
-        this.server_updates = []
-        this.physics = new PlayerPhysics(scene, this.sprite, x, y, scale, key);
+        this.serverInterpolation = []
+        this.physics = new PlayerPhysics(scene, this.sprite, x, y, scale, playerName);
         // default state of player values is idle
         this.playerstate = 'idle'
         this.playanimation(this.playerstate);
         this.disablegravity();
+        this.scene.events.on('update', this.entityinterpolate, this);
     }
 
-    pushupdates(updates) {
-        this.server_updates.push(updates);
-        console.log(this.server_updates);
-        if (this.server_updates.length >= this.buffer_size){
-            this.server_updates.shift();
-        }
-        
-    }
 
     playanimation(anims) {
         this.sprite.anims.play(anims);
@@ -37,9 +29,22 @@ export default class Player {
     updatePlayer({x, y, flipX, collisionData, state}) {
         //console.log('update player');
         //console.log({x, y, flipX, collisionData, state});
-        const deltaX = Math.abs(x - this.sprite.x);
+        // interpolate from old to new
+        let serverInterpolation = [];
+        for (let i = 0;  i <= 1; i += 0.25){
+            let xInterp = Phaser.Math.Interpolation.Linear([this.sprite.x, x], i);
+            let yInterp = Phaser.Math.Interpolation.Linear([this.sprite.y, y], i);
+            //console.log(`coordinates x:${x}  y:${y}`);
+            serverInterpolation.push(
+                {
+                    x: xInterp,
+                    y: yInterp
+                }
+            )
+        }
+        console.log(serverInterpolation);
+        this.serverInterpolation = serverInterpolation;
         this.sprite.setFlipX(flipX);
-        this.sprite.setPosition(x, y);
         this.sprite.setCollidesWith(collisionData);
         if (this.playerstate !== state){
             this.playanimation(state);
@@ -48,7 +53,14 @@ export default class Player {
     }
 
     entityinterpolate(){
-
+        // interpolate between new and older positions
+        if (this.serverInterpolation.length > 0 && this.physics) {
+            const coord = this.serverInterpolation.shift();
+            this.sprite.setPosition(
+                coord.x,
+                coord.y
+            )
+        }
     }
 
     getPlayerState() {
@@ -84,10 +96,8 @@ export default class Player {
     
     destroy() {
         this.sprite.destroy();
-        if (this.scene.sessionId === this.key) {
-            this.scene.events.off('update', this.clientpredict, this);
-        } else {
-            this.sprite.world.off('beforeupdate', this.cancelgravity, this);
-        }
+        this.physics.destroy();
+        this.sprite.world.off('beforeupdate', this.cancelgravity, this);
+        this.scene.events.off('update', this.entityinterpolate, this);
     }
 }

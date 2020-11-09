@@ -6,11 +6,10 @@ import { playerAnims } from '../config/playerconfig';
 import { createanims, randomInteger } from '../utils/utils';
 const Colyseus = require("colyseus.js");
 
-
-export class StartLevel extends Phaser.Scene {
+export class startLevel extends Phaser.Scene {
     constructor(){
         super({
-            key: 'Scene2',
+            key: 'startLevel',
             physics: {
                 default:'matter',
                 matter: {
@@ -24,9 +23,13 @@ export class StartLevel extends Phaser.Scene {
         ////console.log(this.socket);
     }
 
-    /*
-     handle network logic
-     */
+
+    init(data) {
+        console.log(data);
+        // get name recieved from start menu
+        this.playerName = data.playerName;
+    }
+
     async connect(){
         //const host = window.document.location.host.replace(/:.*/, '');
         var host = window.document.location.host.replace(/:.*/, '');
@@ -39,25 +42,27 @@ export class StartLevel extends Phaser.Scene {
             port = '';
         }
         var websocket = location.protocol.replace('http', 'ws')  + "//" + host + port;
-
         console.log(location);
         console.log(`connected to web socket protocol ${websocket}`)
         const client = new Colyseus.Client(websocket)
         // joined defined room
-        return await client.joinOrCreate('game');
+        try {
+            return await client.joinOrCreate('game', {
+                playerName: this.playerName
+            });
+        } catch (e) {
+            // if there is an error redirect user back to main menu with error msg
+            // TODO : not implemented
+            this.scene.start('mainMenu', {
+                error : e  
+            })
+
+        }
     }
 
-    preload(){
-        this.load.image('tiles', 'public/tilemaps/tilesetImage/mainlevbuild.png');
-        this.load.image('background', 'public/tilemaps/tilesetImage/background_obj.png');
-        this.load.tilemapTiledJSON('map', 'public/tilemaps/json/level1.json');
-        this.load.image('circle', 'public/spritesheet/circle.png');
-        this.load.spritesheet('player', 'public/spritesheet/adventurer-Sheet.png', {frameWidth: 50, frameHeight: 37 });
-    }
-
-
-    async create(){
+    async create() {
         this.room = await this.connect();
+        this.setupnetwork();
         // track request numbers
         this.requestNum = 0;
         // random number generated for network latency test
@@ -66,8 +71,6 @@ export class StartLevel extends Phaser.Scene {
         this.sessionId = this.room.sessionId;
         //console.log('joined room with sessionId ', this.sessionId);
         this.keys = this.input.keyboard.createCursorKeys();
-        // limit client prediction (decrease cpu usage rates)
-        this.clientpredictNUM = 0;
         // request Id of the last request sent to server
         this.curreqId = 0;
 
@@ -139,26 +142,27 @@ export class StartLevel extends Phaser.Scene {
             }
         )
         // track all players in game
-        this.allplayers = {};
+    
         if (gameConfig.debug){
            //console.log('---game debug mode---');
            this.matter.world.createDebugGraphic();
         }
         // set initial input
         this.updatePlayerInput();
-        this.setupnetwork();
     }
     
     setupnetwork() {
+        this.allplayers = {};
         this.room.state.players.onAdd = (player, key) => {
             // check if player is added already
             //console.log(`---${key}---`)
             if (!(key in this.allplayers)){
-                //console.log(`--Player added with id: ${key}--`);
+                console.log(`--Player added with id: ${key}--`);
                 if (gameConfig.debug){
                     this.allplayers[key] = new PlayerT(this, player.x, player.y, key);
                 } else {
-                    this.allplayers[key] = new Player(this, player.x, player.y, 2, key);
+                    this.allplayers[key] = new Player(this, player.x, player.y, 2, key, player.playerName);
+                    
                     //this.localplayer = new LocalPlayer(this, player.x, player.y, 2);
                 }
                 if (key === this.sessionId){
@@ -173,16 +177,17 @@ export class StartLevel extends Phaser.Scene {
             }
         }
         this.room.state.players.onChange = (change, key) => {
-            this.allplayers[key].updatePlayer(
-                {
-                    x: change.x,
-                    y: change.y,
-                    flipX: change.flipX,
-                    collisionData: change.collisionData,
-                    state: change.state
-                }
-            )
-            
+            if (key in this.allplayers) {
+                this.allplayers[key].updatePlayer(
+                    {
+                        x: change.x,
+                        y: change.y,
+                        flipX: change.flipX,
+                        collisionData: change.collisionData,
+                        state: change.state
+                    }
+                )
+            }
         }
 
         this.room.state.players.onRemove = (player, key) =>  {
