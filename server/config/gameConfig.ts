@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import {StartLevel} from '../scene/scene1';
 //@ts-ignore
 import {gameConfig} from '../../common/globalConfig.ts';
+
 export const config = {
     type: Phaser.HEADLESS,
     parent: "phaser-example",

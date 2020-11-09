@@ -1,5 +1,5 @@
 
-import {StartMenu} from '../components/startMenu.components.jsx';
+import {StartMenu} from '../components/startMenu.components.js';
 import * as React from 'jsx-dom';
 
 export class mainMenu extends Phaser.Scene {
