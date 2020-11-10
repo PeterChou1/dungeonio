@@ -31,14 +31,26 @@ export default class Player {
         //console.log({x, y, flipX, collisionData, state});
         // interpolate from old to new
         let serverInterpolation = [];
-        for (let i = 0;  i <= 1; i += 0.25){
-            let xInterp = Phaser.Math.Interpolation.Linear([this.sprite.x, x], i);
-            let yInterp = Phaser.Math.Interpolation.Linear([this.sprite.y, y], i);
-            //console.log(`coordinates x:${x}  y:${y}`);
+        if (!document.hidden) {
+            // do what you need
+            for (let i = 0;  i <= 1; i += 0.25){
+                let xInterp = Phaser.Math.Interpolation.Linear([this.sprite.x, x], i);
+                let yInterp = Phaser.Math.Interpolation.Linear([this.sprite.y, y], i);
+                //console.log(`coordinates x:${x}  y:${y}`);
+                serverInterpolation.push(
+                    {
+                        x: xInterp,
+                        y: yInterp
+                    }
+                )
+            }
+        } else {
+            // when browser is hidden don't interpolate update immediately
+            console.log('----console hidden update immediately---');
             serverInterpolation.push(
                 {
-                    x: xInterp,
-                    y: yInterp
+                    x: x,
+                    y: y
                 }
             )
         }

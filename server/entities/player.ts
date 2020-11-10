@@ -60,9 +60,9 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         })
         // default player config
         const playerConfig = {
-            groundspeed: 7,
-            airspeed: 7,
-            jumpheight: 15,
+            groundspeed: 5,
+            airspeed: 5,
+            jumpheight: 11.5,
             state: 'idle',
             flipX: false
         }
