@@ -117,3 +117,11 @@ export class RequestQueue {
 
 }
 
+
+
+export class GameNetwork {
+    constructor(){
+        
+    }
+}
+

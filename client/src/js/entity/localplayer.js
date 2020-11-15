@@ -25,13 +25,7 @@ export class LocalPlayer {
             state : 'idle'
         }
         this.physics = new PlayerPhysics(scene, this.sprite, this.stateMachine, x, y, scale);
-        //this.sprite.setCollisionGroup(collisionData.group.noplayer);
-        this.sprite.setCollisionCategory(collisionData.category.noplayer);
-        // default state of player values are set by server
-        //this.scene.events.on("update", this.clientpredict, this);
-        //testSimulate(this);
-        //this.scene.events.on("update", this.testSimulate, this);
-        this.sprite.world.on('beforeupdate', this.disablegravity, this);
+
     }
 
 
@@ -84,65 +78,4 @@ export class LocalPlayer {
         this.sprite.destroy();
         this.scene.events.off('update', this.clientpredict, this);
     }
-}
-
-function testSimulate(player) {
-    // apply jump 
-    player.sprite.setVelocityY(-10);
-    // clear body forces
-    //player.sprite.body.force.y = 0
-    //var gravity = player.sprite.world.localWorld.gravity;
-    //var body = player.sprite.body;
-    //var gravX = gravity.x * gravity.scale * body.mass;
-    //var gravY = gravity.y * gravity.scale * body.mass;
-    //Body.applyForce(body, body.position, {
-    //    x: gravX,
-    //    y: gravY
-    //});
-    //// simulate using engine step
-    for (let i = 0; i < 100; i++){
-        player.scene.matter.step();
-        console.log('---forces---');
-        console.log(player.sprite.body.force);
-        console.log('---velocity---');
-        console.log(player.sprite.body.velocity);
-        console.log(`body postion x:${player.sprite.body.position.x} y:${player.sprite.body.position.y}`);
-        console.log('--- player physics ---');
-        console.log(player.physics.isTouching.ground);
-    }
-    //const hardobject = player.scene
-    //                         .objectgroup
-    //                         .hard
-    //                         .filter( tile => tile.physics.matterBody !== undefined )
-    //                         .map( tile => tile.physics.matterBody.body);
-    //console.log('---hard---');
-    //console.log(hardobject);
-    //console.log('---soft---');
-    //console.log(player.scene.objectgroup.soft);
-    //console.log('gravity');
-    //console.log(gravY);
-    //for (let i = 0; i < 200; i++){
-    //    //player.sprite.body.force.y = player.sprite.body.mass * gravity.y * gravity.scale;
-    //    Body.update(player.sprite.body, 16.5, 1, 1);
-    //    console.log('---forces---');
-    //    console.log(player.sprite.body.force);
-    //    console.log('---velocity---');
-    //    console.log(player.sprite.body.velocity);
-    //    console.log(`body postion x:${player.sprite.body.position.x} y:${player.sprite.body.position.y}`);
-    //    console.log('---collisions---')
-    //    console.log(player.sprite.body);
-    //    let collide = Query.collides(
-    //        player.physics.sensors.nearbottom, 
-    //        hardobject
-    //    )
-    //    console.log(collide);
-    //    if (collide.length > 0 && !ground){
-    //        Body.applyForce(body, body.position, {
-    //            x: -gravX,
-    //            y: -gravY
-    //        });
-    //        player.sprite.setVelocityY(0);
-    //        ground = true;
-    //    }
-    //}
 }

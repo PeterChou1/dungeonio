@@ -34,6 +34,9 @@ export class debugLevel extends Phaser.Scene {
         this.load.image('tiles',  'public/tilemaps/tilesetImage/mainlevbuild.png')//'../../../../common/assets/tilemaps/tilesetImage/mainlevbuild.png');
         this.load.tilemapTiledJSON('map', 'public/tilemaps/json/level1.json')//'../../../../common/assets/tilemaps/json/level1.json');
         this.load.spritesheet('player', 'public/spritesheet/adventurer-Sheet.png', {frameWidth: 50, frameHeight: 37 });
+        this.load.multiatlas('mainchar', 'public/spritesheet/json/mainchar.json', 'public/spritesheet');
+
+        
     }
 
     create(){

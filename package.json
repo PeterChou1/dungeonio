@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node server/server.ts",
+    "client" : "cd client && npm start",
     "dev": "ts-node-dev server/server.ts",
-    "postinstall" : "cd client && npm install && npm run build"
+    "all" : "concurrently \"npm run dev \" \"npm run client\"",
+    "postinstall": "cd client && npm install && npm run build"
   },
   "repository": {
     "type": "git",
@@ -41,6 +43,7 @@
     "@geckos.io/phaser-on-nodejs": "^1.2.3",
     "colyseus": "^0.13.7",
     "colyseus.js": "^0.13.2",
+    "concurrently": "^5.3.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "matter-js": "^0.14.2",

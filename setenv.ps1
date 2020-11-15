@@ -1,1 +1,1 @@
-$Env:NODE_ENV = "production"
+$Env:NODE_ENV = "development"
