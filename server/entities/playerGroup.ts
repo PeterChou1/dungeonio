@@ -41,6 +41,7 @@ export class PlayerGroup extends Phaser.GameObjects.Group {
   }
 
   getPlayer(clientid): Player {
+    //@ts-ignore
     const player: Array<Player> = this.getChildren().filter(
       //@ts-ignore get player with player id then despawn player for later use
       (player) => player.clientid === clientid
