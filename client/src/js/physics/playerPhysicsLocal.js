@@ -42,22 +42,22 @@ export class PlayerPhysics {
     const w = (this.hitbox.bounds.max.x - this.hitbox.bounds.min.x) * scale;
     const h = (this.hitbox.bounds.max.y - this.hitbox.bounds.min.y) * scale;
     this.sensors = {
-      nearbottom: Bodies.rectangle(0, h / 2 + 25, w, 50, {
+      nearbottom: Bodies.rectangle(0, h / 2 + 20, w, 50, {
         isSensor: true,
       }),
-      bottom: Bodies.rectangle(0, h / 2 - 3, w * 0.8, 10, {
+      bottom: Bodies.rectangle(0, h / 2 - 10, w * 0.8, 20, {
         isSensor: true,
       }),
-      left: Bodies.rectangle(-w / 2 - 10, 0, 2, h * 0.5, {
+      left: Bodies.rectangle(-w / 2, 0, 5, h * 0.5, {
         isSensor: true,
       }),
-      right: Bodies.rectangle(w / 2 + 10, 0, 2, h * 0.5, {
+      right: Bodies.rectangle(w / 2, 0, 5, h * 0.5, {
         isSensor: true,
       }),
-      top: Bodies.rectangle(0, -h / 2 + 3, w * 0.8, 10, {
+      top: Bodies.rectangle(0, -h / 2 + 10, w * 0.8, 20, {
         isSensor: true,
       }),
-      neartop: Bodies.rectangle(0, -h / 2 - 25, w, 50, {
+      neartop: Bodies.rectangle(0, -h / 2 - 20, w, 50, {
         isSensor: true,
       }),
     };

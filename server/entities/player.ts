@@ -70,9 +70,9 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     });
     // default player config
     const playerConfig = {
-      groundspeed: 10,
-      airspeed: 10,
-      jumpheight: 17,
+      groundspeed: 5,
+      airspeed: 5,
+      jumpheight: 12,
       state: "idle",
       flipX: false,
     };
@@ -101,16 +101,16 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       nearbottom: Bodies.rectangle(0, h / 2 + 20, w, 50, {
         isSensor: true,
       }),
-      bottom: Bodies.rectangle(0, h / 2 - 15, w * 0.8, 20, {
+      bottom: Bodies.rectangle(0, h / 2 - 10, w * 0.8, 20, {
         isSensor: true,
       }),
-      left: Bodies.rectangle(-w / 2, 0, 2, h * 0.25, {
+      left: Bodies.rectangle(-w / 2, 0, 5, h * 0.25, {
         isSensor: true,
       }),
-      right: Bodies.rectangle(w / 2, 0, 2, h * 0.25, {
+      right: Bodies.rectangle(w / 2, 0, 5, h * 0.25, {
         isSensor: true,
       }),
-      top: Bodies.rectangle(0, -h / 2 + 15, w * 0.8, 20, {
+      top: Bodies.rectangle(0, -h / 2 + 10, w * 0.8, 20, {
         isSensor: true,
       }),
       neartop: Bodies.rectangle(0, -h / 2 - 20, w, 50, {
