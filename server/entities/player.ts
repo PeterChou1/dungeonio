@@ -70,8 +70,8 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     });
     // default player config
     const playerConfig = {
-      groundspeed: 5,
-      airspeed: 5,
+      groundspeed: 7,
+      airspeed: 7,
       jumpheight: 12,
       state: "idle",
       flipX: false,
@@ -172,7 +172,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         objectB: this.scene.objectgroup.soft,
         callback: () => {
           if (!this.platformFall) {
-            console.log("collision platform start");
+            //console.log("collision platform start");
             this.onPlatform = true;
             this.collideswith = [
               collisionData.category.hard,
@@ -190,7 +190,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         objectB: this.scene.objectgroup.soft,
         callback: () => {
           if (!this.platformFall) {
-            console.log("collision platform active");
+            //console.log("collision platform active");
             this.isTouching.ground = true;
             this.isTouching.nearground = true;
             this.collideswith = [
@@ -206,7 +206,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         objectA: this.sensors.bottom,
         objectB: this.scene.objectgroup.soft,
         callback: () => {
-          console.log("collision platform end");
+          //console.log("collision platform end");
           this.platformFall = false;
           this.onPlatform = false;
           this.collideswith = [collisionData.category.hard];
@@ -340,7 +340,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
   destroyPlayer() {
     // unsubscribe from all collision listeners
-    console.log(`shutting down player ${this.clientid}`);
+    //console.log(`shutting down player ${this.clientid}`);
     this.allcollisionlistener.forEach((listenerUnsubcribe) => {
       listenerUnsubcribe();
     });
