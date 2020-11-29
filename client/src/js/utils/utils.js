@@ -3,11 +3,11 @@ import _ from "lodash"
 
 export const createanims = (scene, anims) => {
     anims.forEach((anim) => {
-        anim.frames = scene.anims.generateFrameNumbers(...anim.frames)
-        const anims = scene.anims.create(anim);
-        console.log('msPerFrame', anims.msPerFrame);
+        anim.frames = scene.anims.generateFrameNames(...anim.frames);
+        scene.anims.create(anim);
     })
 }
+
 
 
 export function randomInteger(min, max) {

@@ -42,10 +42,11 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@geckos.io/phaser-on-nodejs": "^1.2.3",
     "@babel/preset-react": "^7.12.5",
+    "@geckos.io/phaser-on-nodejs": "^1.2.3",
     "colyseus": "^0.13.7",
     "colyseus.js": "^0.13.2",
+    "deep-object-diff": "^1.1.0",
     "jsx-dom": "^6.4.23",
     "lodash": "^4.17.20",
     "matter-js": "^0.14.2",

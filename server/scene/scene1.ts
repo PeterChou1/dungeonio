@@ -2,7 +2,8 @@ import Phaser from "phaser";
 import { collisionData } from "../../common/globalConfig";
 import { PlayerGroup } from '../entities/playerGroup';
 import { messageType } from '../../common/globalConfig';
-import { ActionQueue } from '../utils/utils';
+import { ActionQueue, createanims } from '../utils/utils';
+import { playerAnims } from '../config/playerConfig';
 import PhaserMatterCollisionPlugin from "../utils/matterCollision";
 
 export class StartLevel extends Phaser.Scene {
@@ -13,6 +14,7 @@ export class StartLevel extends Phaser.Scene {
     objectgroup; // map collision data
     eventQueue : ActionQueue;
     room;
+    frameData;
 
     constructor(){
         super({
@@ -41,10 +43,14 @@ export class StartLevel extends Phaser.Scene {
         this.load.image('tiles', '../../../../common/assets/tilemaps/tilesetImage/mainlevbuild.png');
         this.load.tilemapTiledJSON('map', '../../../../common/assets/tilemaps/json/level1.json');
         this.load.spritesheet('player', '../../../../common/assets/spritesheet/adventurer-Sheet.png', {frameWidth: 50, frameHeight: 37 });
+        this.load.multiatlas('mainchar', '../../../../common/assets/spritesheet/json/mainchar.json', '../../../../common/assets/spritesheet');
+        this.load.json('frameData', '../../../../common/assets/frameData.json');
     }
 
     create(){
         console.log('---start creation---');
+        createanims(this, playerAnims);
+        this.frameData = this.cache.json.get('frameData');
         this.playergroup = new PlayerGroup(this);
         this.map = this.add.tilemap("map");
         this.tileset = this.map.addTilesetImage("mainlevbuild", "tiles");

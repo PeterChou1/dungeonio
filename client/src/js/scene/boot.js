@@ -20,6 +20,8 @@ export class bootScene extends Phaser.Scene {
         this.load.tilemapTiledJSON('map', 'public/tilemaps/json/level1.json');
         this.load.image('circle', 'public/spritesheet/circle.png');
         this.load.spritesheet('player', 'public/spritesheet/adventurer-Sheet.png', {frameWidth: 50, frameHeight: 37 });
+        this.load.multiatlas('mainchar', 'public/spritesheet/json/mainchar.json', 'public/spritesheet');
+        this.load.json('frameData', 'public/frameData.json');
         
     }
 

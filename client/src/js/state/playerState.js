@@ -7,6 +7,7 @@ import {collisionData} from '../../../../common/globalConfig.ts';
 export class IdleState extends State {
   
     enter(scene, player){
+        console.log('idle');
         player.sprite.setVelocity(0);
         player.sprite.anims.play('idle');
     }
@@ -19,6 +20,11 @@ export class IdleState extends State {
         }
         if (scene.keys.left.isDown || scene.keys.right.isDown){
             this.stateMachine.transition('run');
+            return;
+        }
+
+        if (scene.input.activePointer.leftButtonDown()) {
+            this.stateMachine.transition('attack');
             return;
         }
 
@@ -36,6 +42,8 @@ export class IdleState extends State {
             // reset player to only collide with hard platform
             player.sprite.setCollidesWith([collisionData.category.hard])
             player.physics.onPlatform = false;
+            player.physics.platformFall = true;
+            console.log('platform fall');
             this.stateMachine.transition('fall');
             return;
         }
@@ -126,12 +134,26 @@ export class JumpState extends State {
     execute(scene, player){}
 }
 
+
+export class AttackState extends State {
+    enter(scene, player) {
+        player.sprite.anims.play('attack1');
+        player.sprite.once('animationcomplete', () => {
+            this.stateMachine.transition('idle');
+            return;            
+        });
+    }
+    execute(scene, player){
+    }
+}
+
 export const getplayerstate = () => {
     const playerState = {
         idle: new IdleState(),
         run: new RunState(),
         jump: new JumpState(),
         fall: new FallState(),
+        attack: new AttackState()
     }
     return playerState;
 }

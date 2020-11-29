@@ -3,13 +3,13 @@ import { getplayerstate,  getsimplayerState }  from '../state/playerState';
 import { gameConfig, messageType, collisionData } from '../../../../common/globalConfig.ts';
 import { PlayerPhysics } from '../physics/playerPhysics';
 const { Body } = Phaser.Physics.Matter.Matter; 
-
+const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
 
 export default class Player {
     constructor(scene, x, y, scale, key, playerName) {
         console.log(`player name: ${playerName} joined`);
         this.scene = scene;
-        this.sprite = scene.matter.add.sprite(x, y, "player", 0);
+        this.sprite = scene.matter.add.sprite(x, y, "mainchar", "adventure-idle");
         this.playerId = key;
         //  keeps track of server updates positions by server for interpolation purposes
         this.serverInterpolation = []
@@ -19,6 +19,11 @@ export default class Player {
         this.playanimation(this.playerstate);
         this.disablegravity();
         this.scene.events.on('update', this.entityinterpolate, this);
+        // debug text
+
+        if (gameConfig.debug) {
+            this.debugtext = scene.add.text(10, 100, '');
+        }
     }
 
 
@@ -26,7 +31,8 @@ export default class Player {
         this.sprite.anims.play(anims);
     }
 
-    updatePlayer({x, y, flipX, collisionData, state}) {
+
+    updatePlayer({x, y, flipX, collisionData, state, misc}) {
         //console.log('update player');
         //console.log({x, y, flipX, collisionData, state});
         // interpolate from old to new
@@ -46,7 +52,7 @@ export default class Player {
             }
         } else {
             // when browser is hidden don't interpolate update immediately
-            console.log('----console hidden update immediately---');
+            //console.log('----console hidden update immediately---');
             serverInterpolation.push(
                 {
                     x: x,
@@ -54,7 +60,7 @@ export default class Player {
                 }
             )
         }
-        console.log(serverInterpolation);
+        //console.log(serverInterpolation);
         this.serverInterpolation = serverInterpolation;
         this.sprite.setFlipX(flipX);
         this.sprite.setCollidesWith(collisionData);
@@ -62,11 +68,35 @@ export default class Player {
             this.playanimation(state);
         }
         this.playerstate = state;
+
+        if (gameConfig.debug) {
+            console.log(misc);
+            this.debugtext.setText(`left: ${misc.isTouching[0]} right: ${misc.isTouching[1]} ground: ${misc.isTouching[2]} top: ${misc.isTouching[3]} nearground: ${misc.isTouching[4]} \n platform: ${misc.onPlatform} state: ${misc.state}`);
+        }
+
     }
 
     entityinterpolate(){
         // interpolate between new and older positions
         if (this.serverInterpolation.length > 0 && this.physics) {
+            if (this.sprite.anims.currentFrame) {
+                const hitbox = PhysicsEditorParser.parseBody(0, 0, this.scene.frameData[this.sprite.anims.currentFrame.textureFrame]);
+                //console.log(`x: ${this.sprite.x} y: ${this.sprite.y}`);
+                const collideswith = this.sprite.body.collisionFilter.mask;
+                this.sprite.setScale(1)
+                           .setExistingBody(hitbox)
+                           .setScale(2)
+                           .setFixedRotation()
+                           .setCollisionCategory(collisionData.category.player)
+                           .setCollidesWith(collideswith);
+                //console.log(collideswith);
+    
+                if (this.sprite.flipX) {
+                    Body.scale(hitbox, -1, 1);
+                    //this.sprite.setOriginFromFrame();
+                    this.sprite.setOrigin(1 - this.sprite.originX, this.sprite.originY);
+                }
+            }
             const coord = this.serverInterpolation.shift();
             this.sprite.setPosition(
                 coord.x,

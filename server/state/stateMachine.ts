@@ -52,6 +52,7 @@ export class IdleState extends State {
     player.setVelocity(0);
     const playerconfig = player.data.get(playerStateMap.playerprop);
     playerconfig.state = 'idle'
+    player.anims.play('idle');
   }
 
   execute(player){
@@ -103,6 +104,7 @@ export class RunState extends State {
     player.resetEnterState();
     const playerconfig = player.data.get(playerStateMap.playerprop);
     playerconfig.state = 'run'
+    player.anims.play('run');
   }
   execute(player) {
       player.setStateTime();
@@ -156,6 +158,7 @@ export class FallState extends State {
     player.resetEnterState();
     const playerconfig = player.data.get(playerStateMap.playerprop);
     playerconfig.state = 'fall';
+    player.anims.play('fall')
   }
   execute(player) {
       player.setStateTime();
@@ -180,20 +183,14 @@ export class JumpState extends State {
       const playerconfig = player.data.get(playerStateMap.playerprop);
       playerconfig.state = 'jump';
       player.setVelocityY(-playerconfig.jumpheight);
-      // jump animation cost 3 seconds;
-      setTimeout(() => {
-          this.stateMachine.transition('fall')
-          return;
-      }, 300)
+      // jump animation cost 300 ms;
+      player.anims.play('jump');
+      player.once('animationcomplete', () => {
+        this.stateMachine.transition('fall')
+        return;
+      })
   }
   execute(player){
     player.setStateTime();
   }
-}
-
-export const playerState = {
-  idle: new IdleState(),
-  run: new RunState(),
-  jump: new JumpState(),
-  fall: new FallState(),
 }

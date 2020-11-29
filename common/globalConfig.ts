@@ -1,8 +1,8 @@
 export const serverport = 4000;
 
 export const gameConfig = {
-    debug: true, // enable debug graphics
-    networkdebug: true, // inject server player instance into client side
+    debug: false, // enable debug graphics
+    networkdebug: false, // inject server player instance into client side
     simulatelatency:  false,// simulate latency for testing client side prediction
     size : {
         width: 1024,
@@ -17,7 +17,6 @@ export const collisionData = {
         soft : 0x0002, // soft platform
         player : 0x0003, // player category
         noplayer : 0x0004 // cannot collide with player category
-
     }, 
     group : {
         player: 1,  // any object with group id 1 can interact with the player

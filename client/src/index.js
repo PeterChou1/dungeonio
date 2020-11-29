@@ -37,12 +37,10 @@ const config = {
   }
 };
 
+
+
 const game = new Phaser.Game(config);
-
-
-
 let level = gameConfig.networkdebug ? debugLevel : startLevel;
-
 game.scene.add('startLevel', level);
 game.scene.add('bootScene', bootScene);
 game.scene.add('mainMenu', mainMenu);

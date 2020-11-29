@@ -11,7 +11,7 @@ export class GameRoom extends Room<GameState> {
         // how many client each room can hold
         this.maxClients = 50;
         // every 100ms send an update to all clients
-        this.setPatchRate(100);
+        //this.setPatchRate(100);
         // inject game room into game instance
         config.callbacks = {
             preBoot: () => {

@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import {collisionData} from '../../../../common/globalConfig.ts';
 const {Body, Bodies} = Phaser.Physics.Matter.Matter;
+const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
 /*
  Encapsulate all physics behaviour for player
 */
@@ -18,17 +19,18 @@ export class PlayerPhysics {
         this.playerNamedText.font = "Arial";
         this.playerNamedText.setOrigin(0.5, 0.5);
 
-        this.mainBody = Bodies.rectangle(0, 0, w * 0.6, h * scale, { chamfer: {radius: 15}});
-        const compoundBody = Body.create({
-            parts: [this.mainBody],
-            frictionStatic: 0,
-            frictionAir: 0.02,
-            friction: 0.1,
-            collisionFilter: {
-                mask: collisionData.category.hard,
-            }
-        });
-        this.sprite.setExistingBody(compoundBody)
+        //this.mainBody = Bodies.rectangle(0, 0, w * 0.6, h * scale, { chamfer: {radius: 15}});
+        //const compoundBody = Body.create({
+        //    parts: [this.mainBody],
+        //    frictionStatic: 0,
+        //    frictionAir: 0.02,
+        //    friction: 0.1,
+        //    collisionFilter: {
+        //        mask: collisionData.category.hard,
+        //    }
+        //});
+        const hitbox = PhysicsEditorParser.parseBody(0, 0, this.scene.frameData['adventurer-idle-00']);
+        this.sprite.setExistingBody(hitbox)
                    .setFixedRotation()
                    .setPosition(x, y);
 

@@ -1,7 +1,8 @@
 import Phaser from "phaser";
 import Player from "../entity/player"; 
 import { gameConfig, collisionData, messageType} from '../../../../common/globalConfig.ts';
-import { PlayerT } from '../entity/testplayer'; 
+import { LocalPlayer } from '../entity/localplayer'; 
+import { test } from '../test/test';
 import { playerAnims } from '../config/playerconfig';
 import { createanims, randomInteger } from '../utils/utils';
 const Colyseus = require("colyseus.js");
@@ -63,6 +64,7 @@ export class startLevel extends Phaser.Scene {
     async create() {
         this.room = await this.connect();
         this.setupnetwork();
+        this.frameData = this.cache.json.get('frameData');
         // track request numbers
         this.requestNum = 0;
         // random number generated for network latency test
@@ -159,10 +161,11 @@ export class startLevel extends Phaser.Scene {
             if (!(key in this.allplayers)){
                 console.log(`--Player added with id: ${key}--`);
                 if (gameConfig.debug){
-                    this.allplayers[key] = new PlayerT(this, player.x, player.y, key);
+                    //this.allplayers[key] = new LocalPlayer(this, player.x, player.y, 2)
+                    //var x = new test(this);
+                    this.allplayers[key] = new Player(this, player.x, player.y, 2, key, player.playerName);
                 } else {
                     this.allplayers[key] = new Player(this, player.x, player.y, 2, key, player.playerName);
-                    
                     //this.localplayer = new LocalPlayer(this, player.x, player.y, 2);
                 }
                 if (key === this.sessionId){
@@ -184,7 +187,8 @@ export class startLevel extends Phaser.Scene {
                         y: change.y,
                         flipX: change.flipX,
                         collisionData: change.collisionData,
-                        state: change.state
+                        state: change.state,
+                        misc: change
                     }
                 )
             }

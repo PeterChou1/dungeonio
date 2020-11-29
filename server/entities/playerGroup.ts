@@ -7,7 +7,7 @@ export class PlayerGroup extends Phaser.GameObjects.Group {
 
     constructor(scene: Phaser.Scene, config: Phaser.Types.GameObjects.Group.GroupConfig = {})
 	{
-		const defaults: Phaser.Types.GameObjects.Group.GroupConfig = {
+		const defaults : Phaser.Types.GameObjects.Group.GroupConfig = {
 			classType: Player,
 			maxSize: -1
 		}
@@ -17,7 +17,7 @@ export class PlayerGroup extends Phaser.GameObjects.Group {
     
     spawn(clientid, playerName){
         // set random coordinates for player to spawn into
-        const x = Phaser.Math.Between(0, this.scene.scale.width);
+        const x = Phaser.Math.Between(0, this.scene.scale.width / 2);
         let player;
         if (gameConfig.networkdebug){
             player = new Player(this.scene, 300, 100, clientid, playerName);
