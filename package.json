@@ -8,7 +8,7 @@
     "client": "cd client && npm start",
     "dev": "ts-node-dev server/server.ts",
     "all": "concurrently \"npm run dev \" \"npm run client\"",
-    "postinstall": "husky install && cd client && npm install && npm run build",
+    "postinstall": "cd client && npm install && npm run build",
     "precommit" : "lint-staged"
   },
   "repository": {

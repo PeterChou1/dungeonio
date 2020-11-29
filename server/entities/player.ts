@@ -3,13 +3,13 @@ import Phaser from "phaser";
 import { collisionData, gameConfig } from "../../common/globalConfig.ts";
 //@ts-ignore
 import { playerStateMap } from "../config/playerConfig.ts";
-//@ts-ignore
 import {
   StateMachine,
   IdleState,
   RunState,
   JumpState,
   FallState,
+  //@ts-ignore
 } from "../state/stateMachine.ts";
 const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
 
