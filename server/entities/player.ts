@@ -359,6 +359,9 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     this.scene.events.off("update", this.setFrameData, this);
     this.scene.events.off("update", this.update, this);
     this.scene.room.state.removePlayer(this.clientid);
+    for (const frame in this.matterFrameData) {
+      this.matterFrameData[frame] = null;
+    }
     this.destroy();
   }
 

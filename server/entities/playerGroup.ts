@@ -36,6 +36,7 @@ export class PlayerGroup extends Phaser.GameObjects.Group {
     //player.setVisible(false);
     //player.removeInteractive();
     //player.world.remove(player.body, false);
+    this.remove(player);
     player.destroyPlayer();
     console.log("despawn player with id ", clientid);
   }

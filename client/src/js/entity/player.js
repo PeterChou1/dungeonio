@@ -165,5 +165,8 @@ export default class Player {
     this.physics.destroy();
     this.sprite.world.off("beforeupdate", this.cancelgravity, this);
     this.scene.events.off("update", this.entityinterpolate, this);
+    for (const frame in this.matterFrameData) {
+      this.matterFrameData[frame] = null;
+    }
   }
 }
