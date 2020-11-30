@@ -64,7 +64,7 @@ export class debugLevel extends Phaser.Scene {
     //this.playergroup = new PlayerGroup(this);
     this.frameData = this.cache.json.get("frameData");
     //this.input.mouse.disableContextMenu();
-    createanims(this, playerAnims);
+    this.frameNames = createanims(this, playerAnims);
     //const hitbox = Body.create(airattk.fixtures[0]);
     //const hurtbox = Body.create(airattk.fixtures[1]);
     //const compoundBody = Body.create({

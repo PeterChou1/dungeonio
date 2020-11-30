@@ -15,6 +15,8 @@ export default class Player {
     this.scene = scene;
     this.sprite = scene.matter.add.sprite(x, y, "mainchar", "adventure-idle");
     this.playerId = key;
+    this.matterFrameData = {};
+    this.generateBodyFrames();
     //  keeps track of server updates positions by server for interpolation purposes
     this.serverInterpolation = [];
     this.physics = new PlayerPhysics(
@@ -25,6 +27,13 @@ export default class Player {
       scale,
       playerName
     );
+
+    const hitbox = this.matterFrameData["adventurer-idle-00"];
+    this.sprite.setExistingBody(hitbox);
+    this.sprite.setPosition(x, y);
+    this.sprite.setScale(scale);
+    this.sprite.setFixedRotation();
+
     // default state of player values is idle
     this.playerstate = "idle";
     this.playanimation(this.playerstate);
@@ -34,6 +43,16 @@ export default class Player {
 
     if (gameConfig.debug) {
       this.debugtext = scene.add.text(10, 100, "");
+    }
+  }
+
+  generateBodyFrames() {
+    for (const frameName of this.scene.frameNames) {
+      this.matterFrameData[frameName] = PhysicsEditorParser.parseBody(
+        0,
+        0,
+        this.scene.frameData[frameName]
+      );
     }
   }
 
@@ -92,20 +111,19 @@ export default class Player {
           this.scene.frameData[this.sprite.anims.currentFrame.textureFrame]
         );
         ////console.log(`x: ${this.sprite.x} y: ${this.sprite.y}`);
-        //const collideswith = this.sprite.body.collisionFilter.mask;
-        //this.sprite.setScale(1)
-        //           .setExistingBody(hitbox)
-        //           .setScale(2)
-        //           .setFixedRotation()
-        //           .setCollisionCategory(collisionData.category.player)
-        //           .setCollidesWith(collideswith);
-        //console.log(collideswith);
-
-        //if (this.sprite.flipX) {
-        //    Body.scale(hitbox, -1, 1);
-        //    //this.sprite.setOriginFromFrame();
-        //    this.sprite.setOrigin(1 - this.sprite.originX, this.sprite.originY);
-        //}
+        const collideswith = this.sprite.body.collisionFilter.mask;
+        this.sprite
+          .setScale(1)
+          .setExistingBody(hitbox)
+          .setScale(2)
+          .setFixedRotation()
+          .setCollisionCategory(collisionData.category.player)
+          .setCollidesWith(collideswith);
+        if (this.sprite.flipX) {
+          Body.scale(hitbox, -1, 1);
+          //this.sprite.setOriginFromFrame();
+          this.sprite.setOrigin(1 - this.sprite.originX, this.sprite.originY);
+        }
       }
       const coord = this.serverInterpolation.shift();
       this.sprite.setPosition(coord.x, coord.y);

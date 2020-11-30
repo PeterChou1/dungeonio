@@ -12,9 +12,9 @@ import {
   //@ts-ignore
 } from "../state/stateMachine.ts";
 const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
-
 // @ts-ignore: Property 'Matter' exist but retarded typescript will not see it'.
-const { Body, Bodies } = Phaser.Physics.Matter.Matter;
+const { Body, Bodies, Common } = Phaser.Physics.Matter.Matter;
+const clone = require("clone");
 
 export class Player extends Phaser.Physics.Matter.Sprite {
   isTouching;
@@ -29,7 +29,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   stateTime: number; // keep track of how long we are in each state
   playerName: string; // name supplied by client client side
   collisionContainer; // sensors for determining player collision
-
+  matterFrameData; // matterjs body data
   debugText;
   allcollisionlistener;
   //currentreqId : String;
@@ -38,8 +38,10 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   constructor(scene, x, y, clientid, playerName, scale = 2) {
     super(scene.matter.world, x, y, "mainchar", "adventurer-idle-00");
     scene.add.existing(this);
-    //give sprite data manager
-    const { width: w, height: h } = this;
+    this.matterFrameData = {};
+    // generate frames for the body
+    this.generateBodyFrames();
+    console.log(this.matterFrameData);
     this._clientid = clientid;
     //console.log(`spawn player with width: ${w}  height: ${h}`)
     this.setCollisionCategory(collisionData.category.player);
@@ -85,17 +87,13 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       }.bind(this),
     });
     this.data.set(playerStateMap.playerprop, config);
-    //const hitbox = PhysicsEditorParser.parseBody(
-    //  0,
-    //  0,
-    //  this.scene.frameData["adventurer-idle-00"]
-    //);
-    //this.setExistingBody(hitbox)
+    const hitbox = this.matterFrameData["adventurer-idle-00"];
+    this.setExistingBody(hitbox);
     this.setPosition(x, y);
     this.setScale(scale);
     this.setFixedRotation();
-    //const w = hitbox.bounds.max.x - hitbox.bounds.min.x;
-    //const h = hitbox.bounds.max.y - hitbox.bounds.min.y;
+    const w = hitbox.bounds.max.x - hitbox.bounds.min.x;
+    const h = hitbox.bounds.max.y - hitbox.bounds.min.y;
     //this.mainBody = Bodies.rectangle(0, 0, w * 0.6, h * scale, { chamfer: {radius: 15}});
     this.sensors = {
       nearbottom: Bodies.rectangle(0, h / 2 + 20, w, 50, {
@@ -225,6 +223,18 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       this.debugText = this.scene.add.text(10, 100, "");
     }
   }
+  /**
+   * @description generate the matterjs body for a set of players
+   */
+  generateBodyFrames() {
+    for (const frameName of this.scene.frameNames) {
+      this.matterFrameData[frameName] = PhysicsEditorParser.parseBody(
+        0,
+        0,
+        this.scene.frameData[frameName]
+      );
+    }
+  }
 
   /**
    * @description set player collison hitbox according to frame data defined in common/assets/frameData.json
@@ -232,32 +242,32 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   setFrameData() {
     const playerconfig = this.data.get(playerStateMap.playerprop);
     this.collisionContainer.setPosition(this.x, this.y);
-    //if (this.anims.currentFrame) {
-    //  var sx = this.x;
-    //  var sy = this.y;
-    //  //@ts-ignore
-    //  var sav = this.body.angularVelocity;
-    //  var sv = this.body.velocity;
-    //  const hitbox = PhysicsEditorParser.parseBody(
-    //    0,
-    //    0,
-    //    this.scene.frameData[this.anims.currentFrame.textureFrame]
-    //  );
-    //  this.setFlipX(playerconfig.flipX);
-    //  this.setScale(1);
-    //  this.setExistingBody(hitbox);
-    //  this.setScale(2);
-    //  this.setPosition(sx, sy);
-    //  this.setVelocity(sv.x, sv.y);
-    //  this.setAngularVelocity(sav);
-    //  this.setCollisionCategory(collisionData.category.player);
-    //  this.setCollidesWith(this.collideswith);
-    //  this.setFixedRotation();
-    //  if (playerconfig.flipX) {
-    //    Body.scale(hitbox, -1, 1);
-    //    this.setOrigin(1 - this.originX, this.originY);
-    //  }
-    //}
+    if (this.anims.currentFrame) {
+      var sx = this.x;
+      var sy = this.y;
+      //@ts-ignore
+      var sav = this.body.angularVelocity;
+      var sv = this.body.velocity;
+      //console.log('matter frame data');
+      //console.log(this.scene.matterFrameData);
+      const hitbox = this.matterFrameData[this.anims.currentFrame.textureFrame];
+      //console.log('set frame data');
+      this.setFlipX(playerconfig.flipX);
+      this.setAngle(0);
+      this.setFixedRotation();
+      this.setScale(1);
+      this.setExistingBody(hitbox);
+      this.setScale(2);
+      this.setPosition(sx, sy);
+      this.setVelocity(sv.x, sv.y);
+      this.setAngularVelocity(sav);
+      this.setCollisionCategory(collisionData.category.player);
+      this.setCollidesWith(this.collideswith);
+      if (playerconfig.flipX) {
+        Body.scale(hitbox, -1, 1);
+        this.setOrigin(1 - this.originX, this.originY);
+      }
+    }
   }
 
   /**

@@ -9,7 +9,7 @@
     "dev": "ts-node-dev server/server.ts",
     "all": "concurrently \"npm run dev \" \"npm run client\"",
     "postinstall": "cd client && npm install && npm run build",
-    "precommit" : "lint-staged"
+    "precommit": "lint-staged"
   },
   "repository": {
     "type": "git",
@@ -45,6 +45,7 @@
   "dependencies": {
     "@colyseus/monitor": "^0.12.2",
     "@geckos.io/phaser-on-nodejs": "^1.2.3",
+    "clone": "^2.1.2",
     "colyseus": "^0.13.7",
     "colyseus.js": "^0.13.2",
     "concurrently": "^5.3.0",

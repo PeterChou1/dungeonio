@@ -15,6 +15,7 @@ export class StartLevel extends Phaser.Scene {
   eventQueue: ActionQueue;
   room;
   frameData;
+  frameNames;
 
   constructor() {
     super({
@@ -53,7 +54,6 @@ export class StartLevel extends Phaser.Scene {
       "map",
       "../../../../common/assets/tilemaps/json/level1.json"
     );
-    //this.load.spritesheet('player', '../../../../common/assets/spritesheet/adventurer-Sheet.png', {frameWidth: 50, frameHeight: 37 });
     this.load.multiatlas(
       "mainchar",
       "../../../../common/assets/spritesheet/json/mainchar.json",
@@ -64,8 +64,8 @@ export class StartLevel extends Phaser.Scene {
 
   create() {
     console.log("---start creation---");
-    createanims(this, playerAnims);
     this.frameData = this.cache.json.get("frameData");
+    this.frameNames = createanims(this, playerAnims);
     this.playergroup = new PlayerGroup(this);
     this.map = this.add.tilemap("map");
     this.tileset = this.map.addTilesetImage("mainlevbuild", "tiles");
@@ -92,7 +92,6 @@ export class StartLevel extends Phaser.Scene {
         )
       );
     });
-
     this.ground.forEachTile((tile) => {
       if (tile.properties.collides) {
         const mattertile = new Phaser.Physics.Matter.TileBody(
