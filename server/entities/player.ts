@@ -245,28 +245,28 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     if (this.anims.currentFrame) {
       var sx = this.x;
       var sy = this.y;
-      //@ts-ignore
-      var sav = this.body.angularVelocity;
-      var sv = this.body.velocity;
-      //console.log('matter frame data');
-      //console.log(this.scene.matterFrameData);
-      const hitbox = this.matterFrameData[this.anims.currentFrame.textureFrame];
-      //console.log('set frame data');
-      this.setFlipX(playerconfig.flipX);
-      this.setAngle(0);
-      this.setFixedRotation();
-      this.setScale(1);
-      this.setExistingBody(hitbox);
-      this.setScale(2);
+      ////@ts-ignore
+      //var sav = this.body.angularVelocity;
+      //var sv = this.body.velocity;
+      ////console.log('matter frame data');
+      ////console.log(this.scene.matterFrameData);
+      //const hitbox = this.matterFrameData[this.anims.currentFrame.textureFrame];
+      ////console.log('set frame data');
+      //this.setFlipX(playerconfig.flipX);
+      //this.setAngle(0);
+      //this.setFixedRotation();
+      //this.setScale(1);
+      //this.setExistingBody(hitbox);
+      //this.setScale(2);
       this.setPosition(sx, sy);
-      this.setVelocity(sv.x, sv.y);
-      this.setAngularVelocity(sav);
-      this.setCollisionCategory(collisionData.category.player);
-      this.setCollidesWith(this.collideswith);
-      if (playerconfig.flipX) {
-        Body.scale(hitbox, -1, 1);
-        this.setOrigin(1 - this.originX, this.originY);
-      }
+      //this.setVelocity(sv.x, sv.y);
+      //this.setAngularVelocity(sav);
+      //this.setCollisionCategory(collisionData.category.player);
+      //this.setCollidesWith(this.collideswith);
+      //if (playerconfig.flipX) {
+      //  Body.scale(hitbox, -1, 1);
+      //  this.setOrigin(1 - this.originX, this.originY);
+      //}
     }
   }
 

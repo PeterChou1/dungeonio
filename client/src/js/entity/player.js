@@ -104,26 +104,26 @@ export default class Player {
   entityinterpolate() {
     // interpolate between new and older positions
     if (this.serverInterpolation.length > 0 && this.physics) {
-      if (this.sprite.anims.currentFrame) {
-        const hitbox = this.matterFrameData[
-          this.sprite.anims.currentFrame.textureFrame
-        ];
-        ////console.log(`x: ${this.sprite.x} y: ${this.sprite.y}`);
-        const collideswith = this.sprite.body.collisionFilter.mask;
-        this.sprite
-          .setAngle(0)
-          .setScale(1)
-          .setExistingBody(hitbox)
-          .setScale(2)
-          .setFixedRotation()
-          .setCollisionCategory(collisionData.category.player)
-          .setCollidesWith(collideswith);
-        if (this.sprite.flipX) {
-          Body.scale(hitbox, -1, 1);
-          //this.sprite.setOriginFromFrame();
-          this.sprite.setOrigin(1 - this.sprite.originX, this.sprite.originY);
-        }
-      }
+      //if (this.sprite.anims.currentFrame) {
+      //  const hitbox = this.matterFrameData[
+      //    this.sprite.anims.currentFrame.textureFrame
+      //  ];
+      //  ////console.log(`x: ${this.sprite.x} y: ${this.sprite.y}`);
+      //  const collideswith = this.sprite.body.collisionFilter.mask;
+      //  this.sprite
+      //    .setAngle(0)
+      //    .setScale(1)
+      //    .setExistingBody(hitbox)
+      //    .setScale(2)
+      //    .setFixedRotation()
+      //    .setCollisionCategory(collisionData.category.player)
+      //    .setCollidesWith(collideswith);
+      //  if (this.sprite.flipX) {
+      //    Body.scale(hitbox, -1, 1);
+      //    //this.sprite.setOriginFromFrame();
+      //    this.sprite.setOrigin(1 - this.sprite.originX, this.sprite.originY);
+      //  }
+      //}
       const coord = this.serverInterpolation.shift();
       this.sprite.setPosition(coord.x, coord.y);
     }
