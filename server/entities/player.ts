@@ -41,7 +41,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     this.matterFrameData = {};
     // generate frames for the body
     this.generateBodyFrames();
-    console.log(this.matterFrameData);
+    //console.log(this.matterFrameData);
     this._clientid = clientid;
     //console.log(`spawn player with width: ${w}  height: ${h}`)
     this.setCollisionCategory(collisionData.category.player);
