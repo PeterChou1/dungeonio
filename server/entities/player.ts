@@ -233,32 +233,32 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   setFrameData() {
     const playerconfig = this.data.get(playerStateMap.playerprop);
     this.collisionContainer.setPosition(this.x, this.y);
-    if (this.anims.currentFrame) {
-      var sx = this.x;
-      var sy = this.y;
-      //@ts-ignore
-      var sav = this.body.angularVelocity;
-      var sv = this.body.velocity;
-      const hitbox = PhysicsEditorParser.parseBody(
-        0,
-        0,
-        this.scene.frameData[this.anims.currentFrame.textureFrame]
-      );
-      this.setFlipX(playerconfig.flipX);
-      this.setScale(1);
-      this.setExistingBody(hitbox);
-      this.setScale(2);
-      this.setPosition(sx, sy);
-      this.setVelocity(sv.x, sv.y);
-      this.setAngularVelocity(sav);
-      this.setCollisionCategory(collisionData.category.player);
-      this.setCollidesWith(this.collideswith);
-      this.setFixedRotation();
-      if (playerconfig.flipX) {
-        Body.scale(hitbox, -1, 1);
-        this.setOrigin(1 - this.originX, this.originY);
-      }
-    }
+    //if (this.anims.currentFrame) {
+    //  var sx = this.x;
+    //  var sy = this.y;
+    //  //@ts-ignore
+    //  var sav = this.body.angularVelocity;
+    //  var sv = this.body.velocity;
+    //  const hitbox = PhysicsEditorParser.parseBody(
+    //    0,
+    //    0,
+    //    this.scene.frameData[this.anims.currentFrame.textureFrame]
+    //  );
+    //  this.setFlipX(playerconfig.flipX);
+    //  this.setScale(1);
+    //  this.setExistingBody(hitbox);
+    //  this.setScale(2);
+    //  this.setPosition(sx, sy);
+    //  this.setVelocity(sv.x, sv.y);
+    //  this.setAngularVelocity(sav);
+    //  this.setCollisionCategory(collisionData.category.player);
+    //  this.setCollidesWith(this.collideswith);
+    //  this.setFixedRotation();
+    //  if (playerconfig.flipX) {
+    //    Body.scale(hitbox, -1, 1);
+    //    this.setOrigin(1 - this.originX, this.originY);
+    //  }
+    //}
   }
 
   /**
