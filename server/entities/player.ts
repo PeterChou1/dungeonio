@@ -39,7 +39,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     super(scene.matter.world, x, y, "mainchar", "adventurer-idle-00");
     scene.add.existing(this);
     //give sprite data manager
-    //const {width : w, height: h} = this;
+    const { width: w, height: h } = this;
     this._clientid = clientid;
     //console.log(`spawn player with width: ${w}  height: ${h}`)
     this.setCollisionCategory(collisionData.category.player);
@@ -85,17 +85,17 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       }.bind(this),
     });
     this.data.set(playerStateMap.playerprop, config);
-    const hitbox = PhysicsEditorParser.parseBody(
-      0,
-      0,
-      this.scene.frameData["adventurer-idle-00"]
-    );
-    this.setExistingBody(hitbox);
-    this.setFixedRotation();
+    //const hitbox = PhysicsEditorParser.parseBody(
+    //  0,
+    //  0,
+    //  this.scene.frameData["adventurer-idle-00"]
+    //);
+    //this.setExistingBody(hitbox)
     this.setPosition(x, y);
     this.setScale(scale);
-    const w = hitbox.bounds.max.x - hitbox.bounds.min.x;
-    const h = hitbox.bounds.max.y - hitbox.bounds.min.y;
+    this.setFixedRotation();
+    //const w = hitbox.bounds.max.x - hitbox.bounds.min.x;
+    //const h = hitbox.bounds.max.y - hitbox.bounds.min.y;
     //this.mainBody = Bodies.rectangle(0, 0, w * 0.6, h * scale, { chamfer: {radius: 15}});
     this.sensors = {
       nearbottom: Bodies.rectangle(0, h / 2 + 20, w, 50, {
@@ -117,7 +117,6 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         isSensor: true,
       }),
     };
-
     const compoundBody = Body.create({
       parts: [
         this.sensors.bottom,
