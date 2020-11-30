@@ -105,14 +105,13 @@ export default class Player {
     // interpolate between new and older positions
     if (this.serverInterpolation.length > 0 && this.physics) {
       if (this.sprite.anims.currentFrame) {
-        const hitbox = PhysicsEditorParser.parseBody(
-          0,
-          0,
-          this.scene.frameData[this.sprite.anims.currentFrame.textureFrame]
-        );
+        const hitbox = this.matterFrameData[
+          this.sprite.anims.currentFrame.textureFrame
+        ];
         ////console.log(`x: ${this.sprite.x} y: ${this.sprite.y}`);
         const collideswith = this.sprite.body.collisionFilter.mask;
         this.sprite
+          .setAngle(0)
           .setScale(1)
           .setExistingBody(hitbox)
           .setScale(2)
