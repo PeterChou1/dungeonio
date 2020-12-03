@@ -6,17 +6,22 @@ import {
   collisionData,
 } from "../../../../common/globalConfig.ts";
 import { PlayerPhysics } from "../physics/playerPhysics";
-const { Body } = Phaser.Physics.Matter.Matter;
+const { Body, Bodies } = Phaser.Physics.Matter.Matter;
 const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
 
 export default class Player {
   constructor(scene, x, y, scale, key, playerName) {
     console.log(`player name: ${playerName} joined`);
     this.scene = scene;
-    this.sprite = scene.matter.add.sprite(x, y, "mainchar", "adventure-idle");
+    this.sprite = scene.matter.add.sprite(
+      x,
+      y,
+      "mainchar",
+      "adventure-idle-00"
+    );
     this.playerId = key;
     this.matterFrameData = {};
-    this.generateBodyFrames();
+    //this.generateBodyFrames();
     //  keeps track of server updates positions by server for interpolation purposes
     this.serverInterpolation = [];
     this.physics = new PlayerPhysics(
@@ -28,11 +33,47 @@ export default class Player {
       playerName
     );
 
-    const hitbox = this.matterFrameData["adventurer-idle-00"];
-    this.sprite.setExistingBody(hitbox);
-    this.sprite.setPosition(x, y);
+    const w = this.sprite.width;
+    const h = this.sprite.height;
+    this.mainBody = Bodies.rectangle(0, 0, w * 0.6, h * scale, {
+      chamfer: { radius: 5 },
+    });
+    this.sensors = {
+      nearbottom: Bodies.rectangle(0, h + 25, w, 50, { isSensor: true }),
+      bottom: Bodies.rectangle(0, h, w / 2, 2, { isSensor: true }),
+      left: Bodies.rectangle(-w * 0.35, 0, 2, h, { isSensor: true }),
+      right: Bodies.rectangle(w * 0.35, 0, 2, h, { isSensor: true }),
+      top: Bodies.rectangle(0, -h, w / 2, 2, { isSensor: true }),
+      neartop: Bodies.rectangle(0, -h - 25, w, 50, { isSensor: true }),
+      //nearbottom: Bodies.rectangle(0, h - 15, w, 50, {isSensor: true}),
+      //bottom: Bodies.rectangle(0, h - 38, w, 4, {isSensor: true}),
+      //left: Bodies.rectangle(-w * 0.35, 0, 2, h * 0.5,  {isSensor: true}),
+      //right: Bodies.rectangle(w * 0.35, 0, 2, h * 0.5, {isSensor: true}),
+      //top: Bodies.rectangle(0, -h + 38, w, 2, {isSensor: true}),
+      //neartop: Bodies.rectangle(0, -h + 13, w, 50, {isSensor: true})
+    };
+
+    const compoundBody = Body.create({
+      parts: [
+        this.mainBody,
+        this.sensors.bottom,
+        this.sensors.left,
+        this.sensors.right,
+        this.sensors.top,
+        this.sensors.nearbottom,
+        this.sensors.neartop,
+      ],
+      frictionStatic: 0,
+      frictionAir: 0.02,
+      friction: 0.1,
+      collisionFilter: {
+        mask: collisionData.category.hard,
+      },
+    });
+    this.sprite.setExistingBody(compoundBody);
     this.sprite.setScale(scale);
     this.sprite.setFixedRotation();
+    this.sprite.setPosition(x, y);
 
     // default state of player values is idle
     this.playerstate = "idle";

@@ -32,6 +32,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
   matterFrameData; // matterjs body data
   debugText;
   allcollisionlistener;
+  mainBody;
   //currentreqId : String;
   private _clientid;
 
@@ -87,36 +88,38 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       }.bind(this),
     });
     this.data.set(playerStateMap.playerprop, config);
-    const hitbox = this.matterFrameData["adventurer-idle-00"];
-    this.setExistingBody(hitbox);
-    this.setPosition(x, y);
-    this.setScale(scale);
-    this.setFixedRotation();
-    const w = hitbox.bounds.max.x - hitbox.bounds.min.x;
-    const h = hitbox.bounds.max.y - hitbox.bounds.min.y;
+    //const hitbox = this.matterFrameData["adventurer-idle-00"];
+    //this.setExistingBody(hitbox);
+    //this.setPosition(x, y);
+    //this.setScale(scale);
+    //this.setFixedRotation();
+    //const w = hitbox.bounds.max.x - hitbox.bounds.min.x;
+    //const h = hitbox.bounds.max.y - hitbox.bounds.min.y;
+    const w = this.width;
+    const h = this.height;
     //this.mainBody = Bodies.rectangle(0, 0, w * 0.6, h * scale, { chamfer: {radius: 15}});
+
+    this.mainBody = Bodies.rectangle(0, 0, w * 0.6, h * scale, {
+      chamfer: { radius: 5 },
+    });
     this.sensors = {
-      nearbottom: Bodies.rectangle(0, h / 2 + 20, w, 50, {
-        isSensor: true,
-      }),
-      bottom: Bodies.rectangle(0, h / 2 - 10, w * 0.8, 20, {
-        isSensor: true,
-      }),
-      left: Bodies.rectangle(-w / 2, 0, 5, h * 0.25, {
-        isSensor: true,
-      }),
-      right: Bodies.rectangle(w / 2, 0, 5, h * 0.25, {
-        isSensor: true,
-      }),
-      top: Bodies.rectangle(0, -h / 2 + 10, w * 0.8, 20, {
-        isSensor: true,
-      }),
-      neartop: Bodies.rectangle(0, -h / 2 - 20, w, 50, {
-        isSensor: true,
-      }),
+      nearbottom: Bodies.rectangle(0, h + 25, w, 50, { isSensor: true }),
+      bottom: Bodies.rectangle(0, h, w / 2, 2, { isSensor: true }),
+      left: Bodies.rectangle(-w * 0.35, 0, 2, h, { isSensor: true }),
+      right: Bodies.rectangle(w * 0.35, 0, 2, h, { isSensor: true }),
+      top: Bodies.rectangle(0, -h, w / 2, 2, { isSensor: true }),
+      neartop: Bodies.rectangle(0, -h - 25, w, 50, { isSensor: true }),
+      //nearbottom: Bodies.rectangle(0, h - 15, w, 50, {isSensor: true}),
+      //bottom: Bodies.rectangle(0, h - 38, w, 4, {isSensor: true}),
+      //left: Bodies.rectangle(-w * 0.35, 0, 2, h * 0.5,  {isSensor: true}),
+      //right: Bodies.rectangle(w * 0.35, 0, 2, h * 0.5, {isSensor: true}),
+      //top: Bodies.rectangle(0, -h + 38, w, 2, {isSensor: true}),
+      //neartop: Bodies.rectangle(0, -h + 13, w, 50, {isSensor: true})
     };
+
     const compoundBody = Body.create({
       parts: [
+        this.mainBody,
         this.sensors.bottom,
         this.sensors.left,
         this.sensors.right,
@@ -131,8 +134,48 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         mask: collisionData.category.hard,
       },
     });
-    this.collisionContainer = this.scene.matter.add.image(x, y, "");
-    this.collisionContainer.setExistingBody(compoundBody).setFixedRotation();
+    this.setExistingBody(compoundBody);
+    //this.setScale(scale)
+    this.setFixedRotation();
+    this.setPosition(x, y);
+    //this.sensors = {
+    //  nearbottom: Bodies.rectangle(0, h / 2 + 20, w, 50, {
+    //    isSensor: true,
+    //  }),
+    //  bottom: Bodies.rectangle(0, h / 2 - 10, w * 0.8, 20, {
+    //    isSensor: true,
+    //  }),
+    //  left: Bodies.rectangle(-w / 2, 0, 5, h * 0.25, {
+    //    isSensor: true,
+    //  }),
+    //  right: Bodies.rectangle(w / 2, 0, 5, h * 0.25, {
+    //    isSensor: true,
+    //  }),
+    //  top: Bodies.rectangle(0, -h / 2 + 10, w * 0.8, 20, {
+    //    isSensor: true,
+    //  }),
+    //  neartop: Bodies.rectangle(0, -h / 2 - 20, w, 50, {
+    //    isSensor: true,
+    //  }),
+    //};
+    //const compoundBody = Body.create({
+    //  parts: [
+    //    this.sensors.bottom,
+    //    this.sensors.left,
+    //    this.sensors.right,
+    //    this.sensors.top,
+    //    this.sensors.nearbottom,
+    //    this.sensors.neartop,
+    //  ],
+    //  frictionStatic: 0,
+    //  frictionAir: 0.02,
+    //  friction: 0.1,
+    //  collisionFilter: {
+    //    mask: collisionData.category.hard,
+    //  },
+    //});
+    //this.collisionContainer = this.scene.matter.add.image(x, y, "");
+    //this.collisionContainer.setExistingBody(compoundBody).setFixedRotation();
     const playerState = {
       idle: new IdleState(),
       run: new RunState(),
@@ -213,7 +256,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       }),
     ];
     this.world.on("beforeupdate", this.resetTouching, this);
-    this.scene.events.on("update", this.setFrameData, this);
+    //this.scene.events.on("update", this.setFrameData, this);
     this.scene.events.on("update", this.update, this);
     // setup callbacks for client input
     // add player to room state
