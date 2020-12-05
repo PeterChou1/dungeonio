@@ -45,8 +45,8 @@ export class debugLevel extends Phaser.Scene {
 
   preload() {
     console.log("preload");
-    this.load.image("tiles", "public/tilemaps/tilesetImage/mainlevbuild.png"); //'../../../../common/assets/tilemaps/tilesetImage/mainlevbuild.png');
-    this.load.tilemapTiledJSON("map", "public/tilemaps/json/level1.json"); //'../../../../common/assets/tilemaps/json/level1.json');
+    this.load.image("tiles", "public/tilemaps/tilesetImage/mainlevbuild.png");
+    this.load.tilemapTiledJSON("map", "public/tilemaps/json/level1.json");
     this.load.spritesheet("player", "public/spritesheet/adventurer-Sheet.png", {
       frameWidth: 50,
       frameHeight: 37,

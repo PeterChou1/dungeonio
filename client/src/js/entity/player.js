@@ -36,7 +36,7 @@ export default class Player {
     const w = this.sprite.width;
     const h = this.sprite.height;
     this.mainBody = Bodies.rectangle(0, 0, w * 0.6, h * scale, {
-      chamfer: { radius: 5 },
+      chamfer: { radius: 25 },
     });
     this.sensors = {
       nearbottom: Bodies.rectangle(0, h + 25, w, 50, { isSensor: true }),

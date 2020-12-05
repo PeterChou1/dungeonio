@@ -37,14 +37,14 @@ export class startLevel extends Phaser.Scene {
   async connect() {
     //const host = window.document.location.host.replace(/:.*/, '');
     var host = window.document.location.host.replace(/:.*/, "");
-    // game server is located on port 4000
     let port;
-    // if port is 8080 it means we are using dev environment then default to default port
-    if (location.port && location.port !== "8080") {
+    // if port is 8080 or 8081 it means we are using dev environment then default to default port
+    if (location.port && location.port !== "8081" && location.port != "8080") {
       port = `:${location.port}`;
     } else {
       port = "";
     }
+
     var websocket =
       location.protocol.replace("http", "ws") + "//" + host + port;
     console.log(location);
@@ -153,7 +153,7 @@ export class startLevel extends Phaser.Scene {
           this.matter.world,
           tile
         );
-        ////console.log(mattertile);
+        console.log(mattertile);
         if (tile.properties.soft) {
           mattertile.setCollisionCategory(collisionData.category.soft);
         } else {

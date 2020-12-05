@@ -100,7 +100,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
     //this.mainBody = Bodies.rectangle(0, 0, w * 0.6, h * scale, { chamfer: {radius: 15}});
 
     this.mainBody = Bodies.rectangle(0, 0, w * 0.6, h * scale, {
-      chamfer: { radius: 5 },
+      chamfer: { radius: 25 },
     });
     this.sensors = {
       nearbottom: Bodies.rectangle(0, h + 25, w, 50, { isSensor: true }),
@@ -109,12 +109,6 @@ export class Player extends Phaser.Physics.Matter.Sprite {
       right: Bodies.rectangle(w * 0.35, 0, 2, h, { isSensor: true }),
       top: Bodies.rectangle(0, -h, w / 2, 2, { isSensor: true }),
       neartop: Bodies.rectangle(0, -h - 25, w, 50, { isSensor: true }),
-      //nearbottom: Bodies.rectangle(0, h - 15, w, 50, {isSensor: true}),
-      //bottom: Bodies.rectangle(0, h - 38, w, 4, {isSensor: true}),
-      //left: Bodies.rectangle(-w * 0.35, 0, 2, h * 0.5,  {isSensor: true}),
-      //right: Bodies.rectangle(w * 0.35, 0, 2, h * 0.5, {isSensor: true}),
-      //top: Bodies.rectangle(0, -h + 38, w, 2, {isSensor: true}),
-      //neartop: Bodies.rectangle(0, -h + 13, w, 50, {isSensor: true})
     };
 
     const compoundBody = Body.create({

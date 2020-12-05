@@ -32,7 +32,6 @@ export class GameRoom extends Room<GameState> {
     console.log(`client with id: (${client.sessionId}) joined`);
     console.log(options);
     console.log("------");
-
     //@ts-ignore add player custom method
     this.scene.addPlayer(client.sessionId, options.playerName);
   }
