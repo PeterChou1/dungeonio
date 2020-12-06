@@ -1,12 +1,14 @@
 import { World, Bodies, Body } from "matter-js";
-import { collisionData, gameConfig } from "../../common/globalConfig";
+//@ts-ignore
+import { collisionData, gameConfig } from "../../common/globalConfig.ts";
 import {
   StateMachine,
   IdleState,
   RunState,
   JumpState,
   FallState,
-} from "./state";
+  //@ts-ignore
+} from "./state.ts";
 
 export class Player {
   world;
@@ -74,17 +76,17 @@ export class Player {
         collideswith: [collisionData.category.hard],
       };
       this.attributes = {
-        groundspeed: 20,
-        airspeed: 20,
+        groundspeed: 5,
+        airspeed: 5,
         jumpheight: 12,
       };
       this.input = {
         left_keydown: false,
-        right_keydown: true,
+        right_keydown: false,
         up_keydown: false,
         down_keydown: false,
         left_keyup: true,
-        right_keyup: false,
+        right_keyup: true,
         up_keyup: true,
         down_keyup: true,
       };
@@ -156,19 +158,21 @@ export class Player {
   update() {
     this.stateMachine.step();
     if (!gameConfig.networkdebug) {
+      //console.log(`x: ${this.compoundBody.position.x} y: ${this.compoundBody.position.y}`);
+      //console.log(this.input);
       this.room.state.updatePlayer(this.sessionId, {
         timestamp: new Date().getTime(),
-        x: this.compoundBody.x,
-        y: this.compoundBody.y,
+        x: this.compoundBody.position.x,
+        y: this.compoundBody.position.y,
         velocityX: this.compoundBody.velocity.x,
         velocityY: this.compoundBody.velocity.y,
-        stateTime: null,
+        stateTime: 0,
         flipX: this.state.flipX,
         collisionData: this.state.collideswith,
         state: this.stateMachine.state,
-        isTouching: null,
-        onPlatform: null,
-        elaspsedTime: null,
+        isTouching: Object.values(this.isTouching),
+        onPlatform: this.state.onPlatform,
+        elaspsedTime: 0,
       });
     }
   }

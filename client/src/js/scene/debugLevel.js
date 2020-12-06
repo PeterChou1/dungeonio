@@ -2,19 +2,16 @@ import Phaser from "phaser";
 import { gameConfig, collisionData } from "../../../../common/globalConfig.ts";
 import PhaserMatterCollisionPlugin from "../../../../server/utils/matterCollision.ts";
 // imported from server for hitbox comparison
-import { Player } from "../../../../server/entities/player.ts";
-// testplayer
-import { PlayerT } from "../entity/testplayer";
-// local player
-import { LocalPlayer } from "../entity/localplayer";
-// actual player used
+//import { Player } from "../../../../server/entities/player.ts";
+import { Player } from "../../../../server/gameinstance_v2/player.ts";
 import PlayerA from "../entity/player";
-import { createanims, randomInteger } from "../utils/utils";
+// local player
+//import { LocalPlayer } from "../entity/localplayer";
+// actual player used
+import { createanims } from "../utils/utils";
 import { playerAnims } from "../config/playerconfig";
 const { Body, Bodies, Bounds } = Phaser.Physics.Matter.Matter;
 const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
-
-const diff = require("deep-object-diff").diff;
 
 export class debugLevel extends Phaser.Scene {
   constructor() {
@@ -60,116 +57,9 @@ export class debugLevel extends Phaser.Scene {
   }
 
   create() {
-    //@ts-ignore playergroups
-    //this.playergroup = new PlayerGroup(this);
     this.frameData = this.cache.json.get("frameData");
     //this.input.mouse.disableContextMenu();
     this.frameNames = createanims(this, playerAnims);
-    //const hitbox = Body.create(airattk.fixtures[0]);
-    //const hurtbox = Body.create(airattk.fixtures[1]);
-    //const compoundBody = Body.create({
-    //    parts: [hitbox, hurtbox],
-    //    frictionStatic: 0,
-    //    frictionAir: 0.02,
-    //    friction: 0.1
-    //})
-    //console.log(rect);
-    //console.log(hitbox);
-    //console.log(hurtbox);
-    //console.log(compoundBody);
-    //const body0 = PhysicsEditorParser.parseBody(400, 100, this.frameData['adventurer-attack1-02'] );
-    //const hashitbox = body0.parts.find( (part) => part.label === 'hitbox');
-    //console.log(body0);
-    //console.log('--hitbox--')
-    //console.log(hashitbox);
-    //this.testsprite = this.matter.add.sprite(400, 100, 'mainchar', 'adventurer-attack1-02')
-    //                                 .setExistingBody(body0)
-    //                                 .setScale(2)
-    //                                 .setCollisionCategory(collisionData.category.player)
-    //                                 .setFixedRotation();
-
-    //this.testsprite = this.matter.add.sprite(400, 100, 'mainchar', 'adventurer-attack1-01', {shape: this.frameData['adventurer-attack1-01']})
-    //                                 .setScale(2)
-    //                                 .setFixedRotation();
-
-    //const OrgW = (body0.bounds.max.x - body0.bounds.min.x) * 2;
-    //const OrgH = (body0.bounds.max.y - body0.bounds.min.y) * 2;
-    //const sensors = {
-    //    test: Bodies.rectangle(0, 0, OrgH, OrgW, {isSensor: true}),
-    //    bottom: Bodies.rectangle(0, OrgH / 2, OrgW * 0.95, 2, {isSensor: true}),
-    //    left: Bodies.rectangle(-OrgW / 2, 0, 2, OrgH * 0.95,  {isSensor: true}),
-    //    right: Bodies.rectangle(OrgW / 2, 0, 2, OrgH * 0.95, {isSensor: true}),
-    //    top: Bodies.rectangle(0, -OrgH / 2, OrgW * 0.95, 2, {isSensor: true}),
-    //};
-    //const compoundBody = Body.create({
-    //    parts: [sensors.test], //sensors.left, sensors.right, sensors.top, sensors.bottom], //sensors.nearbottom, sensors.neartop],
-    //    frictionStatic: 0,
-    //    frictionAir: 0.02,
-    //    friction: 0.1,
-    //    collisionFilter: {
-    //        mask: collisionData.category.hard,
-    //    }
-    //})
-    //const width = compoundBody.bounds.max.x - compoundBody.bounds.min.x;
-    //const height = compoundBody.bounds.max.y - compoundBody.bounds.min.y;
-    //console.log(`width: ${OrgW} height: ${OrgH}`)
-    //console.log(`width: ${width} height: ${height}`);
-    //this.matter.world.add(compoundBody);
-    //this.events.on('update',() => {
-    //    Body.setPosition(compoundBody, {x : //this.testsprite.x, y: //this.testsprite.y});
-    //    //Body.setPosition(sensors.left, {x:  //this.testsprite.x, y: //this.testsprite.y});
-    //} , this);
-    //Body.setInertia(compoundBody, Infinity);
-
-    //this.testsprite.anims.play('attack1', false)
-    ////this.testsprite.animation = 'attack1';
-    ////this.testsprite.on('animationcomplete', function (anim, frame) {
-    //    if (this.animation === 'attack1') {
-    //        this.anims.play('idleOnce', false);
-    //        this.animation = 'idleOnce';
-    //    } else {
-    //        this.anims.play('attack1', false);
-    //        this.animation = 'attack1';
-    //    }
-    //}, //this.testsprite);
-
-    //const func = (stuff, stuff2) => {
-    //    const x = this.testsprite.x;
-    //    const y = this.testsprite.y;
-    //    console.log('---test frame---');
-    //    console.log(this.testsprite.anims.currentFrame.textureFrame);
-    //    const body0 = PhysicsEditorParser.parseBody(0, 0, this.frameData[this.testsprite.anims.currentFrame.textureFrame] );
-    //    const hashitbox = body0.parts.find( (part) => part.label === 'hitbox');
-    //    if (hashitbox) {
-    //         const hurtbox = body0.parts.find( (part) => part.label === 'hurtbox');
-    //         console.log(hurtbox.position);
-    //         console.log(body0.position);
-    //         body0.position.x     += hurtbox.position.x;
-    //         body0.position.y     += hurtbox.position.y;
-    //         body0.positionPrev.x += hurtbox.position.x;
-    //         body0.positionPrev.y += hurtbox.position.y;
-    //         //body0.position.x -= 10;
-    //         //body0.position.y += 10;
-    //         //body0.positionPrev.x -= 10;
-    //         //body0.positionPrev.y += 10;
-    //         //this.testsprite.setScale(1)
-    //                    .setExistingBody(body0)
-    //                    .setScale(2)
-    //                    .setCollisionCategory(collisionData.category.player)
-    //                    .setFixedRotation()
-    //                    .setPosition(x, y);
-    //    } else {
-    //        //this.testsprite.setScale(1)
-    //                        .setExistingBody(body0)
-    //                        .setScale(2)
-    //                        .setCollisionCategory(collisionData.category.player)
-    //                        .setFixedRotation()
-    //                        .setPosition(x, y);
-    //
-    //    }
-    //}
-    //this.testsprite.on('animationupdate-attack1', func, this);
-
     this.keys = this.input.keyboard.createCursorKeys();
     this.map = this.add.tilemap("map");
     this.tileset = this.map.addTilesetImage("mainlevbuild", "tiles");

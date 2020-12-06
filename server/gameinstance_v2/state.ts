@@ -1,4 +1,6 @@
-import { collisionData } from "../../common/globalConfig";
+//@ts-ignore
+import { collisionData } from "../../common/globalConfig.ts";
+
 interface PossibleStates {
   [key: string]: State;
 }
@@ -54,8 +56,8 @@ export class IdleState extends State {
     ////console.log(isTouching.bottom);
     if (!isTouching.bottom) {
       //console.log('idle player not touching ground transitioning');
-      this.stateMachine.transition("fall");
-      return;
+      //this.stateMachine.transition("fall");
+      //return;
     }
     ////console.log('idle state');
     if (clientinput.left_keydown || clientinput.right_keydown) {
@@ -112,8 +114,8 @@ export class RunState extends State {
       this.stateMachine.transition("jump");
       return;
     } else if (!isTouching.nearground) {
-      this.stateMachine.transition("fall");
-      return;
+      //this.stateMachine.transition("fall");
+      //return;
     }
 
     if (clientinput.down_keydown && player.onPlatform) {

@@ -74,16 +74,16 @@ export default class Player {
     this.sprite.setScale(scale);
     this.sprite.setFixedRotation();
     this.sprite.setPosition(x, y);
-
     // default state of player values is idle
     this.playerstate = "idle";
-    this.playanimation(this.playerstate);
-    this.disablegravity();
-    this.scene.events.on("update", this.entityinterpolate, this);
-    // debug text
 
     if (gameConfig.debug) {
       this.debugtext = scene.add.text(10, 100, "");
+    }
+    if (!gameConfig.networkdebug) {
+      this.playanimation(this.playerstate);
+      this.disablegravity();
+      this.scene.events.on("update", this.entityinterpolate, this);
     }
   }
 
@@ -104,7 +104,8 @@ export default class Player {
   updatePlayer({ x, y, flipX, collisionData, state, misc }) {
     //console.log('update player');
     //console.log({x, y, flipX, collisionData, state});
-    // interpolate from old to new
+    // interpolate from old to need
+    // console.log(`x:${x} y:${y} flipX: ${flipX} collisionData: ${collisionData} state: ${state}`);
     let serverInterpolation = [];
     if (!document.hidden) {
       // do what you need
@@ -133,11 +134,11 @@ export default class Player {
       this.playanimation(state);
     }
     this.playerstate = state;
-
+    console.log("debug update");
     if (gameConfig.debug) {
       console.log(misc);
       this.debugtext.setText(
-        `left: ${misc.isTouching[0]} right: ${misc.isTouching[1]} ground: ${misc.isTouching[2]} top: ${misc.isTouching[3]} nearground: ${misc.isTouching[4]} \n platform: ${misc.onPlatform} state: ${misc.state}`
+        `nearbottom: ${misc.isTouching[0]} bottom: ${misc.isTouching[1]} left: ${misc.isTouching[2]} right: ${misc.isTouching[3]} \n platform: ${misc.onPlatform} state: ${misc.state}`
       );
     }
   }

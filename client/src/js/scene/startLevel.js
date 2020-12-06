@@ -153,7 +153,6 @@ export class startLevel extends Phaser.Scene {
           this.matter.world,
           tile
         );
-        console.log(mattertile);
         if (tile.properties.soft) {
           mattertile.setCollisionCategory(collisionData.category.soft);
         } else {
