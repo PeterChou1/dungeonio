@@ -49,6 +49,7 @@ export class Game {
 
   removePlayer(sessionId) {
     this.allplayers[sessionId].destroy();
+    this.room.state.removePlayer(sessionId);
     delete this.allplayers[sessionId];
   }
 

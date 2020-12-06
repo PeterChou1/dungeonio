@@ -134,9 +134,9 @@ export default class Player {
       this.playanimation(state);
     }
     this.playerstate = state;
-    console.log("debug update");
-    if (gameConfig.debug) {
-      console.log(misc);
+    //console.log("debug update");
+    if (gameConfig.debug && this.scene.sessionId === this.playerId) {
+      //console.log(misc);
       this.debugtext.setText(
         `nearbottom: ${misc.isTouching[0]} bottom: ${misc.isTouching[1]} left: ${misc.isTouching[2]} right: ${misc.isTouching[3]} \n platform: ${misc.onPlatform} state: ${misc.state}`
       );

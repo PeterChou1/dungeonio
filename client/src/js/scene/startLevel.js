@@ -213,6 +213,7 @@ export class startLevel extends Phaser.Scene {
         }
       }
     };
+
     this.room.state.players.onChange = (change, key) => {
       if (key in this.allplayers) {
         this.allplayers[key].updatePlayer({
@@ -227,7 +228,7 @@ export class startLevel extends Phaser.Scene {
     };
 
     this.room.state.players.onRemove = (player, key) => {
-      //console.log(`player id ${key} was removed`);
+      console.log(`player id ${key} was removed`);
       this.allplayers[key].destroy();
     };
   }
