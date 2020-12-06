@@ -178,7 +178,7 @@ export class startLevel extends Phaser.Scene {
     this.room.state.players.onAdd = (player, key) => {
       // check if player is added already
       //console.log(`---${key}---`)
-      if (!(key in this.allplayers)) {
+      if (!(key in this.allplayers) && key === this.sessionId) {
         console.log(`--Player added with id: ${key}--`);
         if (gameConfig.debug) {
           //this.allplayers[key] = new LocalPlayer(this, player.x, player.y, 2)
@@ -215,7 +215,7 @@ export class startLevel extends Phaser.Scene {
     };
 
     this.room.state.players.onChange = (change, key) => {
-      if (key in this.allplayers) {
+      if (key in this.allplayers && key === this.sessionId) {
         this.allplayers[key].updatePlayer({
           x: change.x,
           y: change.y,
@@ -229,7 +229,9 @@ export class startLevel extends Phaser.Scene {
 
     this.room.state.players.onRemove = (player, key) => {
       console.log(`player id ${key} was removed`);
-      this.allplayers[key].destroy();
+      if (key === this.sessionId) {
+        this.allplayers[key].destroy();
+      }
     };
   }
 
