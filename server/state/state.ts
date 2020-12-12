@@ -68,9 +68,6 @@ export class GameState extends Schema {
     this.players[id].x = x;
     this.players[id].y = y;
     this.players[id].collisionData.push(collisionData.category.hard);
-    //console.log(this.players[id].collisionData);
-    //console.log(typeof this.players[id].collisionData === typeof ArraySchema);
-    //console.log("player added to game state");
   }
 
   removePlayer(id) {

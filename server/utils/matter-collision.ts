@@ -2,7 +2,7 @@ var Matter = require("matter-js");
 var MatterCollisionEvents = {
   name: "matter-collision-events",
   version: "0.1.5",
-  for: "matter-js@^0.12.0",
+  for: "matter-js@0.14.2",
   install: function (matter) {
     // add the onCollide, onCollideEnd, and onCollideActive callback handlers
     // to the native Matter.Body created

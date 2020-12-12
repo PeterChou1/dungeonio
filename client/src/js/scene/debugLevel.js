@@ -3,7 +3,7 @@ import { gameConfig, collisionData } from "../../../../common/globalConfig.ts";
 import PhaserMatterCollisionPlugin from "../../../../server/utils/matterCollision.ts";
 // imported from server for hitbox comparison
 //import { Player } from "../../../../server/entities/player.ts";
-import { Player } from "../../../../server/gameinstance_v2/player.ts";
+import { Player } from "../../../../server/game.v2/player.ts";
 import PlayerA from "../entity/player";
 // local player
 //import { LocalPlayer } from "../entity/localplayer";

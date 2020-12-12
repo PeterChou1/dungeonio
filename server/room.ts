@@ -3,7 +3,7 @@ import { GameState } from "./state/state";
 import "@geckos.io/phaser-on-nodejs";
 import Phaser from "phaser";
 import { config } from "./config/gameConfig";
-import { Game } from "./gameinstance_v2/game.core";
+import { Game } from "./game.v2/game.core";
 
 export class GameRoom extends Room<GameState> {
   game: Game;
@@ -11,7 +11,7 @@ export class GameRoom extends Room<GameState> {
     // how many client each room can hold
     this.maxClients = 50;
     // every 100ms send an update to all clients
-    this.setPatchRate(50);
+    this.setPatchRate(100);
     this.setState(new GameState());
     this.game = new Game(this);
     // inject game room into game instance
@@ -35,13 +35,13 @@ export class GameRoom extends Room<GameState> {
     console.log("------");
     //@ts-ignore add player custom method
     //this.scene.addPlayer(client.sessionId, options.playerName);
-    this.game.addPlayer(client.sessionId, options.playerName);
+    this.game.addPlayer(client, options.playerName);
   }
 
   onLeave(client) {
     console.log(`client with id (${client.sessionId}) left`);
     //@ts-ignore
-    this.game.removePlayer(client.sessionId);
+    this.game.removePlayer(client);
   }
 
   onDispose() {

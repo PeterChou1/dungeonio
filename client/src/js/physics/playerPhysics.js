@@ -1,23 +1,25 @@
 import Phaser from "phaser";
-import { collisionData } from "../../../../common/globalConfig.ts";
-const { Body, Bodies } = Phaser.Physics.Matter.Matter;
-const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
-/*
- Encapsulate all physics behaviour for player
-*/
+import { getParsedCommandLineOfConfigFile } from "typescript";
+import { collisionData, gameConfig } from "../../../../common/globalConfig.ts";
+
+/**
+ * @deprecated
+ */
 export class PlayerPhysics {
   constructor(scene, sprite, x, y, scale, playerName) {
     this.sprite = sprite;
     const { width: w, height: h } = this.sprite;
     this.scene = scene;
-    this.sprite.setScale(scale);
+    //this.sprite.setScale(scale);
     console.log("--player--");
     console.log(`width ${w} height: ${h}`);
     //console.log(this.sprite instanceof Phaser.)
-
-    this.playerNamedText = this.scene.add.text(0, 0, playerName);
-    this.playerNamedText.font = "Arial";
-    this.playerNamedText.setOrigin(0.5, 0.5);
+    if (!gameConfig.networkdebug) {
+      this.playerNamedText = this.scene.add.text(0, 0, playerName);
+      this.playerNamedText.font = "Arial";
+      this.playerNamedText.setOrigin(0.5, 0.5);
+      this.scene.events.on("update", this.update, this);
+    }
 
     //this.mainBody = Bodies.rectangle(0, 0, w * 0.6, h * scale, { chamfer: {radius: 15}});
     //const compoundBody = Body.create({
@@ -33,12 +35,10 @@ export class PlayerPhysics {
     //this.sprite.setExistingBody(hitbox)
     //           .setFixedRotation()
     //           .setPosition(x, y);
-
-    this.scene.events.on("update", this.update, this);
   }
 
   update() {
-    this.playerNamedText.setPosition(this.sprite.x, this.sprite.y - 50);
+    this.playerNamedText.setPosition(this.sprite.x, this.sprite.y - 35);
   }
 
   destroy() {

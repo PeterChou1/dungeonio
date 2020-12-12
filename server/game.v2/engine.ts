@@ -1,8 +1,9 @@
 import Phaser from "phaser";
 import { Engine, World, Bodies, use } from "matter-js";
-import { collisionData } from "../../common/globalConfig";
-import "@geckos.io/phaser-on-nodejs";
-require("./matter-collision");
+//@ts-ignore
+import { collisionData, gameConfig } from "../../common/globalConfig.ts";
+
+require("../utils/matter-collision.ts");
 //install plugin matterjs
 use("matter-collision-events");
 /**
@@ -10,10 +11,12 @@ use("matter-collision-events");
  */
 export const createEngine = () => {
   // create an engine
-  const engine = Engine.create();
+  const engine = Engine.create({
+    enableSleeping: true, // perf optimzation for engine
+  });
   const config = {
     type: Phaser.HEADLESS,
-    parent: "phaser-example",
+    parent: "phaser",
     scene: {
       preload: preload,
       create: create,
@@ -26,11 +29,15 @@ export const createEngine = () => {
   function preload() {
     this.load.image(
       "tiles",
-      "../../../../common/assets/tilemaps/tilesetImage/mainlevbuild.png"
+      gameConfig.networkdebug
+        ? "public/tilemaps/tilesetImage/mainlevbuild.png"
+        : "../../../../common/assets/tilemaps/tilesetImage/mainlevbuild.png"
     );
     this.load.tilemapTiledJSON(
       "map",
-      "../../../../common/assets/tilemaps/json/level1.json"
+      gameConfig.networkdebug
+        ? "public/tilemaps/json/level2.json"
+        : "../../../../common/assets/tilemaps/json/level2.json"
     );
   }
 
@@ -38,9 +45,7 @@ export const createEngine = () => {
     const map = this.add.tilemap("map");
     const gametile = map.addTilesetImage("mainlevbuild", "tiles");
     //console.log(this.gametile);
-    const gamelayer = {
-      ground: map.createDynamicLayer("ground", gametile, 0, 0),
-    };
+    const levelmap = map.createDynamicLayer("ground", gametile, 0, 0);
     const platforms = map.getObjectLayer("platform");
     platforms.objects.forEach((rect) => {
       World.addBody(
@@ -57,7 +62,7 @@ export const createEngine = () => {
         )
       );
     });
-    gamelayer.ground.forEachTile((tile) => {
+    levelmap.forEachTile((tile) => {
       if (tile.properties.collides) {
         const mattertile = new Phaser.Physics.Matter.TileBody(
           this.matter.world,
@@ -68,10 +73,16 @@ export const createEngine = () => {
         } else {
           mattertile.setCollisionCategory(collisionData.category.hard);
         }
+        //console.log(engine.world.bounds.max);
         //@ts-ignore
         World.addBody(engine.world, mattertile.body);
       }
     });
+    engine.world.bounds.min.x = 0;
+    engine.world.bounds.min.y = 0;
+    engine.world.bounds.max.x = levelmap.width;
+    engine.world.bounds.max.y = levelmap.height;
+    console.log(engine.world.bounds);
     this.game.destroy(true);
   }
   new Phaser.Game(config);

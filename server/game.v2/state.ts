@@ -1,6 +1,5 @@
 //@ts-ignore
 import { collisionData } from "../../common/globalConfig.ts";
-
 interface PossibleStates {
   [key: string]: State;
 }
@@ -55,9 +54,10 @@ export class IdleState extends State {
     const state = player.state;
     ////console.log(isTouching.bottom);
     if (!isTouching.bottom) {
+      console.log(isTouching.bottom);
       //console.log('idle player not touching ground transitioning');
-      //this.stateMachine.transition("fall");
-      //return;
+      this.stateMachine.transition("fall");
+      return;
     }
     ////console.log('idle state');
     if (clientinput.left_keydown || clientinput.right_keydown) {
@@ -88,7 +88,9 @@ export class IdleState extends State {
 }
 
 export class RunState extends State {
-  enter(player) {}
+  enter(player) {
+    //player.awakeplayer();
+  }
   execute(player) {
     const clientinput = player.input;
     const isTouching = player.isTouching;
@@ -113,9 +115,9 @@ export class RunState extends State {
       }
       this.stateMachine.transition("jump");
       return;
-    } else if (!isTouching.nearground) {
-      //this.stateMachine.transition("fall");
-      //return;
+    } else if (!isTouching.nearbottom) {
+      this.stateMachine.transition("fall");
+      return;
     }
 
     if (clientinput.down_keydown && player.onPlatform) {
@@ -159,6 +161,7 @@ export class FallState extends State {
 
 export class JumpState extends State {
   enter(player) {
+    //player.awakeplayer();
     const attributes = player.attributes;
     player.setVelocityY(-attributes.jumpheight);
     // jump animation cost 300 ms;

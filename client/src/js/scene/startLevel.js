@@ -8,7 +8,8 @@ import {
 import { LocalPlayer } from "../entity/localplayer";
 import { test } from "../test/test";
 import { playerAnims } from "../config/playerconfig";
-import { createanims, randomInteger } from "../utils/utils";
+import { createanims } from "../utils/utils";
+import { Game } from "../../../../server/game.v2/game.core.ts";
 const Colyseus = require("colyseus.js");
 
 export class startLevel extends Phaser.Scene {
@@ -44,7 +45,6 @@ export class startLevel extends Phaser.Scene {
     } else {
       port = "";
     }
-
     var websocket =
       location.protocol.replace("http", "ws") + "//" + host + port;
     console.log(location);
@@ -65,8 +65,10 @@ export class startLevel extends Phaser.Scene {
   }
 
   async create() {
-    this.room = await this.connect();
-    this.setupnetwork();
+    if (!gameConfig.networkdebug) {
+      this.room = await this.connect();
+      this.setupnetwork();
+    }
     this.frameData = this.cache.json.get("frameData");
     // create player animations;
     this.frameNames = createanims(this, playerAnims);
@@ -75,7 +77,7 @@ export class startLevel extends Phaser.Scene {
     // random number generated for network latency test
     this.randlatency = 50; //randomInteger(0, 500);
     console.log("random latency (client) ", this.randlatency);
-    this.sessionId = this.room.sessionId;
+    this.sessionId = gameConfig.networkdebug ? "test" : this.room.sessionId;
     //console.log('joined room with sessionId ', this.sessionId);
     this.keys = this.input.keyboard.createCursorKeys();
     // request Id of the last request sent to server
@@ -169,70 +171,65 @@ export class startLevel extends Phaser.Scene {
       //console.log('---game debug mode---');
       this.matter.world.createDebugGraphic();
     }
+    if (gameConfig.networkdebug) {
+      //inject server instance into client side
+      this.serverinstance = new Game();
+      this.serverinstance.addPlayer({ sessionId: "test" }, "test");
+      this.testplayer = new Player(this, 100, 200, "test", "test");
+      const height = this.gamelayer.ground.height;
+      const width = this.gamelayer.ground.width;
+      this.matter.world.setBounds(0, 0, width, height);
+      this.cameras.main.setBounds(0, 0, width, height);
+      this.cameras.main.startFollow(this.testplayer.sprite);
+    }
     // set initial input
     this.updatePlayerInput();
   }
 
   setupnetwork() {
     this.allplayers = {};
-    this.room.state.players.onAdd = (player, key) => {
-      // check if player is added already
-      //console.log(`---${key}---`)
-      if (!(key in this.allplayers) && key === this.sessionId) {
-        console.log(`--Player added with id: ${key}--`);
-        if (gameConfig.debug) {
-          //this.allplayers[key] = new LocalPlayer(this, player.x, player.y, 2)
-          //var x = new test(this);
-          this.allplayers[key] = new Player(
-            this,
-            player.x,
-            player.y,
-            2,
-            key,
-            player.playerName
-          );
-        } else {
-          this.allplayers[key] = new Player(
-            this,
-            player.x,
-            player.y,
-            2,
-            key,
-            player.playerName
-          );
-          //this.localplayer = new LocalPlayer(this, player.x, player.y, 2);
-        }
-        if (key === this.sessionId) {
+    this.room.onMessage(messageType.aoiadd, (entity) => {
+      if (!(entity in this.allplayers)) {
+        console.log(`--Player added with id: ${entity.id}--`);
+        this.allplayers[entity.id] = new Player(
+          this,
+          entity.x,
+          entity.y,
+          entity.id,
+          entity.name
+        );
+        //this.localplayer = new LocalPlayer(this, player.x, player.y, 2);
+        if (entity.id === this.sessionId) {
           // follow player
           //console.log('camera followed player');
           const height = this.gamelayer.ground.height;
           const width = this.gamelayer.ground.width;
           this.matter.world.setBounds(0, 0, width, height);
           this.cameras.main.setBounds(0, 0, width, height);
-          this.cameras.main.startFollow(this.allplayers[key].sprite);
+          this.cameras.main.startFollow(this.allplayers[entity.id].sprite);
         }
       }
-    };
+    });
 
-    this.room.state.players.onChange = (change, key) => {
-      if (key in this.allplayers && key === this.sessionId) {
-        this.allplayers[key].updatePlayer({
-          x: change.x,
-          y: change.y,
-          flipX: change.flipX,
-          collisionData: change.collisionData,
-          state: change.state,
-          misc: change,
-        });
+    this.room.onMessage(messageType.aoiupdate, (entities) => {
+      for (const id in entities) {
+        if (id in this.allplayers) {
+          this.allplayers[id].updatePlayer({
+            x: entities[id].x,
+            y: entities[id].y,
+            flipX: entities[id].flipX,
+            collisionData: entities[id].collisionData,
+            state: entities[id].state,
+          });
+        }
       }
-    };
+    });
 
-    this.room.state.players.onRemove = (player, key) => {
-      console.log(`player id ${key} was removed`);
-      if (key === this.sessionId) {
-        this.allplayers[key].destroy();
-      }
-    };
+    this.room.onMessage(messageType.aoiremove, (entity) => {
+      console.log("aoi remove");
+      this.allplayers[entity.id].destroy();
+      delete this.allplayers[entity.id];
+    });
   }
 
   updatePlayerInput() {
@@ -253,10 +250,24 @@ export class startLevel extends Phaser.Scene {
       setTimeout(() => {
         this.room.send(messageType.playerinput, req);
       }, this.randlatency);
+    } else if (gameConfig.networkdebug) {
+      this.serverinstance.manualUpdateInput("test", req);
     } else {
       this.room.send(messageType.playerinput, req);
     }
   }
 
-  update() {}
+  update() {
+    if (gameConfig.networkdebug) {
+      const state = this.serverinstance.manualGetState("test");
+      this.testplayer.updatePlayer({
+        x: state.x,
+        y: state.y,
+        flipX: state.flipX,
+        collisionData: state.collisionData,
+        state: state.state,
+        misc: state,
+      });
+    }
+  }
 }

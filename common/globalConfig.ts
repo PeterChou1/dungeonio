@@ -2,11 +2,15 @@ export const serverport = 4000;
 
 export const gameConfig = {
   debug: true, // enable debug graphics
-  networkdebug: false, // inject server player instance into client side
+  networkdebug: false, // inject server instance into client side
   simulatelatency: false, // simulate latency for testing client side prediction
   size: {
     width: 1024,
     height: 768,
+  },
+  debugsize: {
+    width: 512,
+    height: 384,
   },
 };
 
@@ -27,4 +31,7 @@ export const collisionData = {
 export const messageType = {
   move: 0, // message for player movement
   playerinput: 1,
+  aoiadd: 2, // add gameobject to aoi
+  aoiupdate: 3, // update gameobject in player area of interest
+  aoiremove: 4, // remove gameobject in player area of interest
 };
