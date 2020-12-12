@@ -1,9 +1,10 @@
 import { World, Bodies, Body, Sleeping, Events } from "matter-js";
-//@ts-ignore
+
 import {
   collisionData,
   gameConfig,
   messageType,
+  //@ts-ignore
 } from "../../common/globalConfig.ts";
 import {
   StateMachine,
