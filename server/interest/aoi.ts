@@ -15,7 +15,7 @@ export class AOI {
   height;
   x;
   y;
-
+  inc;
   constructor(width, height, x, y, id) {
     this.aoiId = id;
     this.entities = {};
@@ -25,7 +25,7 @@ export class AOI {
     this.height = height;
     this.x = x;
     this.y = y;
-    console.log(`id x:${this.aoiId.x} y: ${this.aoiId.y} aoi x:${x} y:${y}`);
+    //console.log(`id x:${this.aoiId.x} y: ${this.aoiId.y} aoi x:${x} y:${y}`);
     this.clearId = setInterval(this.updateEntity.bind(this), 100);
   }
 
@@ -148,16 +148,12 @@ export class AOI {
   getAOIEntities() {
     const entities = {};
     for (const id in this.entities) {
-      const saved_state = this.saved_state[id];
       const new_state = this.entities[id].getState();
-      if (
-        saved_state === undefined ||
-        JSON.stringify(saved_state) !== JSON.stringify(new_state)
-      ) {
+      if (JSON.stringify(new_state) !== JSON.stringify(this.saved_state[id])) {
         entities[id] = new_state;
       }
+      this.saved_state[id] = new_state;
     }
-    this.saved_state = entities;
     return entities;
   }
   destroy() {
