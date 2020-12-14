@@ -122,7 +122,7 @@ export class AOI {
     });
   }
   /**
-   * @description Update loop for current AOI instanitate on start on AOI
+   * @description Update loop for current AOI instanitate on start up
    * and shutdown on destruction
    */
   private updateEntity() {
@@ -135,7 +135,7 @@ export class AOI {
    * @param msg
    */
   broadcast(msgtype, msg) {
-    // check if object is not empty then broadcast
+    // check if object is empty then don't broadcast
     if (!(Object.keys(msg).length === 0 && msg.constructor === Object)) {
       for (const clientid in this.clients) {
         this.clients[clientid].send(msgtype, msg);
