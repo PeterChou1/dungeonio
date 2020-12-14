@@ -25,6 +25,7 @@ export class AOI {
     this.height = height;
     this.x = x;
     this.y = y;
+    this.inc = 0;
     //console.log(`id x:${this.aoiId.x} y: ${this.aoiId.y} aoi x:${x} y:${y}`);
     this.clearId = setInterval(this.updateEntity.bind(this), 100);
   }
@@ -150,6 +151,12 @@ export class AOI {
     for (const id in this.entities) {
       const new_state = this.entities[id].getState();
       if (JSON.stringify(new_state) !== JSON.stringify(this.saved_state[id])) {
+        //console.log(`----saved state ${this.inc} ---`);
+        //console.log(this.saved_state[id]);
+        //console.log('----message---');
+        //console.log(new_state);
+        //console.log('----------------');
+        //this.inc++;
         entities[id] = new_state;
       }
       this.saved_state[id] = new_state;

@@ -209,8 +209,8 @@ export class Player extends gameObject {
   getState() {
     const pos = this.getPosition();
     return {
-      velocityX: this.compoundBody.velocity.x,
-      velocityY: this.compoundBody.velocity.y,
+      velocityX: Math.trunc(this.compoundBody.velocity.x),
+      velocityY: Math.trunc(this.compoundBody.velocity.y),
       flipX: this.state.flipX,
       collisionData: this.state.collideswith,
       state: this.stateMachine.state,

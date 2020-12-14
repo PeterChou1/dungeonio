@@ -58,7 +58,7 @@ export class AOImanager {
           } else {
             aoi.addEntity(gameobject);
           }
-          console.log(aoi.aoiId);
+          //console.log(aoi.aoiId);
           return aoi.aoiId;
         }
       }

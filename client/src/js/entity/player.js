@@ -32,7 +32,7 @@ export default class Player {
     this.playerstate = "idle";
     this.playanimation(this.playerstate);
     this.disablegravity();
-    this.playertext = scene.add.text(100, 100, playerName);
+    this.playertext = scene.add.text(x, y - 50, playerName);
     this.playertext.setOrigin(0.5, 0.5);
     this.scene.events.on("update", this.entityinterpolate, this);
   }
@@ -52,9 +52,6 @@ export default class Player {
   }
 
   updatePlayer({ x, y, flipX, collisionData, state, misc }) {
-    // matterjs offset is around 25
-    y -= 25;
-
     this.sprite.setFlipX(flipX);
     this.sprite.setCollidesWith(collisionData);
     if (this.playerstate !== state) {
@@ -64,11 +61,13 @@ export default class Player {
     let serverInterpolation = [];
     if (gameConfig.networkdebug) {
       this.sprite.setPosition(x, y);
+      this.playertext.setPosition(x, y - 50);
     } else {
       //console.log(`set position x:${x} y: ${y}`);;
       if (document.hidden) {
         // when browser is hidden don't interpolate update immediately
         this.sprite.setPosition(x, y);
+        this.playertext.setPosition(x, y - 50);
       } else {
         for (let i = 0; i <= 1; i += 0.25) {
           let xInterp = Phaser.Math.Interpolation.Linear([this.sprite.x, x], i);

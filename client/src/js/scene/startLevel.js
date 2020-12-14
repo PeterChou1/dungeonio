@@ -191,6 +191,8 @@ export class startLevel extends Phaser.Scene {
     this.room.onMessage(messageType.aoiadd, (entity) => {
       if (!(entity in this.allplayers)) {
         console.log(`--Player added with id: ${entity.id}--`);
+        // NOTE: simulation coordinates differ by 25
+        entity.y -= 25;
         this.allplayers[entity.id] = new Player(
           this,
           entity.x,
@@ -214,6 +216,8 @@ export class startLevel extends Phaser.Scene {
       console.log("aoi update");
       for (const id in entities) {
         if (id in this.allplayers) {
+          // NOTE: simulation coordinates differ by 25
+          entities[id].y -= 25;
           this.allplayers[id].updatePlayer({
             x: entities[id].x,
             y: entities[id].y,
