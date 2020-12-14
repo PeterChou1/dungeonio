@@ -8,14 +8,18 @@ export class AOI {
     y: number;
   };
   entities;
+  // save states of entity used for diffing
+  saved_state;
   clients;
   width;
   height;
   x;
   y;
+
   constructor(width, height, x, y, id) {
     this.aoiId = id;
     this.entities = {};
+    this.saved_state = {};
     this.clients = {};
     this.width = width;
     this.height = height;
@@ -56,6 +60,7 @@ export class AOI {
     }
     this.clients[clientGameObject.id] = clientGameObject.client;
     this.entities[clientGameObject.id] = clientGameObject;
+    //this.saved_state[clientGameObject.id] = clientGameObject.getState();
     if (init) {
       clientGameObject.client.send(messageType.aoiadd, {
         ...clientGameObject.getPosition(),
@@ -78,6 +83,7 @@ export class AOI {
     }
     delete this.clients[clientGameObject.id];
     delete this.entities[clientGameObject.id];
+    delete this.saved_state[clientGameObject.id];
 
     for (const clientid in this.clients) {
       this.clients[clientid].send(messageType.aoiremove, {
@@ -128,8 +134,11 @@ export class AOI {
    * @param msg
    */
   broadcast(msgtype, msg) {
-    for (const clientid in this.clients) {
-      this.clients[clientid].send(msgtype, msg);
+    // check if object is not empty then broadcast
+    if (!(Object.keys(msg).length === 0 && msg.constructor === Object)) {
+      for (const clientid in this.clients) {
+        this.clients[clientid].send(msgtype, msg);
+      }
     }
   }
   /**
@@ -139,8 +148,16 @@ export class AOI {
   getAOIEntities() {
     const entities = {};
     for (const id in this.entities) {
-      entities[id] = this.entities[id].getState();
+      const saved_state = this.saved_state[id];
+      const new_state = this.entities[id].getState();
+      if (
+        saved_state === undefined ||
+        JSON.stringify(saved_state) !== JSON.stringify(new_state)
+      ) {
+        entities[id] = new_state;
+      }
     }
+    this.saved_state = entities;
     return entities;
   }
   destroy() {

@@ -209,16 +209,11 @@ export class Player extends gameObject {
   getState() {
     const pos = this.getPosition();
     return {
-      timestamp: new Date().getTime(),
       velocityX: this.compoundBody.velocity.x,
       velocityY: this.compoundBody.velocity.y,
-      stateTime: 0,
       flipX: this.state.flipX,
       collisionData: this.state.collideswith,
       state: this.stateMachine.state,
-      isTouching: Object.values(this.isTouching),
-      onPlatform: this.state.onPlatform,
-      elaspsedTime: 0,
       ...pos,
     };
   }

@@ -210,8 +210,8 @@ export class startLevel extends Phaser.Scene {
         }
       }
     });
-
     this.room.onMessage(messageType.aoiupdate, (entities) => {
+      console.log("aoi update");
       for (const id in entities) {
         if (id in this.allplayers) {
           this.allplayers[id].updatePlayer({

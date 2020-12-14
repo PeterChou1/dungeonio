@@ -1,4 +1,3 @@
-console.log("start app");
 import express from "express";
 import cors from "cors";
 import { createServer } from "http";
