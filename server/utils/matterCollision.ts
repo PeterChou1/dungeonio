@@ -37,6 +37,7 @@ function warnInvalidObject(obj) {
         `Expected a Matter body, Tile or an object with a body property, but instead, recieved: ${obj}`
     );
 }
+
 export default class MatterCollisionPlugin extends Phaser.Plugins.ScenePlugin {
 
     events : Phaser.Events.EventEmitter;
@@ -357,7 +358,6 @@ export default class MatterCollisionPlugin extends Phaser.Plugins.ScenePlugin {
         logger.warn("Plugin requires matter!");
         return;
       }
-      console.log('subscribed matter event');
       matter.world.on("collisionstart", this.onCollisionStart);
       matter.world.on("collisionactive", this.onCollisionActive);
       matter.world.on("collisionend", this.onCollisionEnd);

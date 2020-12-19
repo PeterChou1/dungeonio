@@ -1,0 +1,2309 @@
+{
+	"textures": [
+		{
+			"image": "mainchar.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1417,
+				"h": 64
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "adventurer-air-attack-3-end-00",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 50,
+						"h": 37
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 50,
+						"h": 37
+					}
+				},
+				{
+					"filename": "adventurer-attack2-04",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 14,
+						"w": 34,
+						"h": 23
+					},
+					"frame": {
+						"x": 1,
+						"y": 40,
+						"w": 34,
+						"h": 23
+					}
+				},
+				{
+					"filename": "adventurer-crouch-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 14,
+						"w": 21,
+						"h": 23
+					},
+					"frame": {
+						"x": 37,
+						"y": 40,
+						"w": 21,
+						"h": 23
+					}
+				},
+				{
+					"filename": "adventurer-attack1-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 0,
+						"w": 36,
+						"h": 37
+					},
+					"frame": {
+						"x": 53,
+						"y": 1,
+						"w": 36,
+						"h": 37
+					}
+				},
+				{
+					"filename": "adventurer-smrslt-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 19,
+						"y": 9,
+						"w": 20,
+						"h": 23
+					},
+					"frame": {
+						"x": 60,
+						"y": 40,
+						"w": 20,
+						"h": 23
+					}
+				},
+				{
+					"filename": "adventurer-crouch-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 16,
+						"y": 14,
+						"w": 19,
+						"h": 23
+					},
+					"frame": {
+						"x": 82,
+						"y": 40,
+						"w": 19,
+						"h": 23
+					}
+				},
+				{
+					"filename": "adventurer-attack1-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 0,
+						"w": 29,
+						"h": 37
+					},
+					"frame": {
+						"x": 91,
+						"y": 1,
+						"w": 29,
+						"h": 37
+					}
+				},
+				{
+					"filename": "adventurer-smrslt-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 17,
+						"y": 6,
+						"w": 17,
+						"h": 23
+					},
+					"frame": {
+						"x": 103,
+						"y": 40,
+						"w": 17,
+						"h": 23
+					}
+				},
+				{
+					"filename": "adventurer-crnr-grb-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 19,
+						"y": 2,
+						"w": 17,
+						"h": 35
+					},
+					"frame": {
+						"x": 122,
+						"y": 1,
+						"w": 17,
+						"h": 35
+					}
+				},
+				{
+					"filename": "adventurer-attack3-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 12,
+						"w": 49,
+						"h": 25
+					},
+					"frame": {
+						"x": 122,
+						"y": 38,
+						"w": 49,
+						"h": 25
+					}
+				},
+				{
+					"filename": "adventurer-crnr-grb-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 2,
+						"w": 16,
+						"h": 35
+					},
+					"frame": {
+						"x": 141,
+						"y": 1,
+						"w": 16,
+						"h": 35
+					}
+				},
+				{
+					"filename": "adventurer-crnr-grb-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 2,
+						"w": 16,
+						"h": 35
+					},
+					"frame": {
+						"x": 159,
+						"y": 1,
+						"w": 16,
+						"h": 35
+					}
+				},
+				{
+					"filename": "adventurer-jump-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 13,
+						"y": 4,
+						"w": 23,
+						"h": 25
+					},
+					"frame": {
+						"x": 173,
+						"y": 38,
+						"w": 23,
+						"h": 25
+					}
+				},
+				{
+					"filename": "adventurer-crnr-grb-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 2,
+						"w": 16,
+						"h": 35
+					},
+					"frame": {
+						"x": 177,
+						"y": 1,
+						"w": 16,
+						"h": 35
+					}
+				},
+				{
+					"filename": "adventurer-attack1-04",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 3,
+						"w": 21,
+						"h": 34
+					},
+					"frame": {
+						"x": 195,
+						"y": 1,
+						"w": 21,
+						"h": 34
+					}
+				},
+				{
+					"filename": "adventurer-cast-loop-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 11,
+						"w": 31,
+						"h": 26
+					},
+					"frame": {
+						"x": 198,
+						"y": 37,
+						"w": 31,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-wall-slide-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 1,
+						"w": 19,
+						"h": 34
+					},
+					"frame": {
+						"x": 218,
+						"y": 1,
+						"w": 19,
+						"h": 34
+					}
+				},
+				{
+					"filename": "adventurer-cast-loop-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 11,
+						"w": 31,
+						"h": 26
+					},
+					"frame": {
+						"x": 231,
+						"y": 37,
+						"w": 31,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-air-attack2-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 3,
+						"w": 36,
+						"h": 33
+					},
+					"frame": {
+						"x": 239,
+						"y": 1,
+						"w": 36,
+						"h": 33
+					}
+				},
+				{
+					"filename": "adventurer-items-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 10,
+						"w": 23,
+						"h": 27
+					},
+					"frame": {
+						"x": 264,
+						"y": 36,
+						"w": 23,
+						"h": 27
+					}
+				},
+				{
+					"filename": "adventurer-air-attack3-rdy-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 7,
+						"y": 0,
+						"w": 30,
+						"h": 33
+					},
+					"frame": {
+						"x": 277,
+						"y": 1,
+						"w": 30,
+						"h": 33
+					}
+				},
+				{
+					"filename": "adventurer-run-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 10,
+						"w": 22,
+						"h": 27
+					},
+					"frame": {
+						"x": 289,
+						"y": 36,
+						"w": 22,
+						"h": 27
+					}
+				},
+				{
+					"filename": "adventurer-air-attack1-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 4,
+						"y": 1,
+						"w": 29,
+						"h": 33
+					},
+					"frame": {
+						"x": 309,
+						"y": 1,
+						"w": 29,
+						"h": 33
+					}
+				},
+				{
+					"filename": "adventurer-run-05",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 10,
+						"w": 22,
+						"h": 27
+					},
+					"frame": {
+						"x": 313,
+						"y": 36,
+						"w": 22,
+						"h": 27
+					}
+				},
+				{
+					"filename": "adventurer-cast-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 10,
+						"w": 20,
+						"h": 27
+					},
+					"frame": {
+						"x": 337,
+						"y": 36,
+						"w": 20,
+						"h": 27
+					}
+				},
+				{
+					"filename": "adventurer-air-attack3-loop-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 7,
+						"y": 1,
+						"w": 29,
+						"h": 33
+					},
+					"frame": {
+						"x": 340,
+						"y": 1,
+						"w": 29,
+						"h": 33
+					}
+				},
+				{
+					"filename": "adventurer-swrd-drw-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 10,
+						"w": 20,
+						"h": 27
+					},
+					"frame": {
+						"x": 359,
+						"y": 36,
+						"w": 20,
+						"h": 27
+					}
+				},
+				{
+					"filename": "adventurer-air-attack2-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 2,
+						"w": 25,
+						"h": 33
+					},
+					"frame": {
+						"x": 371,
+						"y": 1,
+						"w": 25,
+						"h": 33
+					}
+				},
+				{
+					"filename": "adventurer-cast-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 10,
+						"w": 19,
+						"h": 27
+					},
+					"frame": {
+						"x": 381,
+						"y": 36,
+						"w": 19,
+						"h": 27
+					}
+				},
+				{
+					"filename": "adventurer-fall-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 17,
+						"y": 0,
+						"w": 19,
+						"h": 33
+					},
+					"frame": {
+						"x": 398,
+						"y": 1,
+						"w": 19,
+						"h": 33
+					}
+				},
+				{
+					"filename": "adventurer-swrd-shte-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 10,
+						"w": 19,
+						"h": 27
+					},
+					"frame": {
+						"x": 402,
+						"y": 36,
+						"w": 19,
+						"h": 27
+					}
+				},
+				{
+					"filename": "adventurer-wall-slide-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 2,
+						"w": 19,
+						"h": 33
+					},
+					"frame": {
+						"x": 419,
+						"y": 1,
+						"w": 19,
+						"h": 33
+					}
+				},
+				{
+					"filename": "adventurer-cast-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 11,
+						"w": 29,
+						"h": 26
+					},
+					"frame": {
+						"x": 423,
+						"y": 36,
+						"w": 29,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-air-attack-3-end-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 5,
+						"w": 48,
+						"h": 32
+					},
+					"frame": {
+						"x": 440,
+						"y": 1,
+						"w": 48,
+						"h": 32
+					}
+				},
+				{
+					"filename": "adventurer-cast-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 9,
+						"w": 23,
+						"h": 28
+					},
+					"frame": {
+						"x": 454,
+						"y": 35,
+						"w": 23,
+						"h": 28
+					}
+				},
+				{
+					"filename": "adventurer-attack3-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 18,
+						"y": 9,
+						"w": 22,
+						"h": 28
+					},
+					"frame": {
+						"x": 479,
+						"y": 35,
+						"w": 22,
+						"h": 28
+					}
+				},
+				{
+					"filename": "adventurer-air-attack1-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 3,
+						"w": 48,
+						"h": 32
+					},
+					"frame": {
+						"x": 490,
+						"y": 1,
+						"w": 48,
+						"h": 32
+					}
+				},
+				{
+					"filename": "adventurer-attack3-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 19,
+						"y": 9,
+						"w": 22,
+						"h": 28
+					},
+					"frame": {
+						"x": 503,
+						"y": 35,
+						"w": 22,
+						"h": 28
+					}
+				},
+				{
+					"filename": "adventurer-swrd-shte-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 9,
+						"w": 22,
+						"h": 28
+					},
+					"frame": {
+						"x": 527,
+						"y": 35,
+						"w": 22,
+						"h": 28
+					}
+				},
+				{
+					"filename": "adventurer-air-attack1-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 5,
+						"y": 2,
+						"w": 31,
+						"h": 32
+					},
+					"frame": {
+						"x": 540,
+						"y": 1,
+						"w": 31,
+						"h": 32
+					}
+				},
+				{
+					"filename": "adventurer-items-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 9,
+						"w": 21,
+						"h": 28
+					},
+					"frame": {
+						"x": 551,
+						"y": 35,
+						"w": 21,
+						"h": 28
+					}
+				},
+				{
+					"filename": "adventurer-air-attack3-loop-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 7,
+						"y": 2,
+						"w": 29,
+						"h": 32
+					},
+					"frame": {
+						"x": 573,
+						"y": 1,
+						"w": 29,
+						"h": 32
+					}
+				},
+				{
+					"filename": "adventurer-air-attack1-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 8,
+						"w": 20,
+						"h": 28
+					},
+					"frame": {
+						"x": 574,
+						"y": 35,
+						"w": 20,
+						"h": 28
+					}
+				},
+				{
+					"filename": "adventurer-attack2-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 9,
+						"w": 20,
+						"h": 28
+					},
+					"frame": {
+						"x": 596,
+						"y": 35,
+						"w": 20,
+						"h": 28
+					}
+				},
+				{
+					"filename": "adventurer-idle-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 5,
+						"w": 21,
+						"h": 32
+					},
+					"frame": {
+						"x": 604,
+						"y": 1,
+						"w": 21,
+						"h": 32
+					}
+				},
+				{
+					"filename": "adventurer-swrd-drw-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 9,
+						"w": 20,
+						"h": 28
+					},
+					"frame": {
+						"x": 618,
+						"y": 35,
+						"w": 20,
+						"h": 28
+					}
+				},
+				{
+					"filename": "adventurer-fall-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 17,
+						"y": 1,
+						"w": 19,
+						"h": 32
+					},
+					"frame": {
+						"x": 627,
+						"y": 1,
+						"w": 19,
+						"h": 32
+					}
+				},
+				{
+					"filename": "adventurer-air-attack2-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 6,
+						"w": 18,
+						"h": 28
+					},
+					"frame": {
+						"x": 640,
+						"y": 35,
+						"w": 18,
+						"h": 28
+					}
+				},
+				{
+					"filename": "adventurer-idle-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 5,
+						"w": 19,
+						"h": 32
+					},
+					"frame": {
+						"x": 648,
+						"y": 1,
+						"w": 19,
+						"h": 32
+					}
+				},
+				{
+					"filename": "adventurer-crnr-clmb-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 6,
+						"w": 17,
+						"h": 28
+					},
+					"frame": {
+						"x": 660,
+						"y": 35,
+						"w": 17,
+						"h": 28
+					}
+				},
+				{
+					"filename": "adventurer-ladder-climb-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 18,
+						"y": 3,
+						"w": 15,
+						"h": 32
+					},
+					"frame": {
+						"x": 669,
+						"y": 1,
+						"w": 15,
+						"h": 32
+					}
+				},
+				{
+					"filename": "adventurer-cast-loop-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 11,
+						"w": 29,
+						"h": 26
+					},
+					"frame": {
+						"x": 679,
+						"y": 35,
+						"w": 29,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-ladder-climb-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 18,
+						"y": 3,
+						"w": 15,
+						"h": 32
+					},
+					"frame": {
+						"x": 686,
+						"y": 1,
+						"w": 15,
+						"h": 32
+					}
+				},
+				{
+					"filename": "adventurer-attack2-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 9,
+						"y": 6,
+						"w": 39,
+						"h": 31
+					},
+					"frame": {
+						"x": 703,
+						"y": 1,
+						"w": 39,
+						"h": 31
+					}
+				},
+				{
+					"filename": "adventurer-idle-2-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 9,
+						"y": 8,
+						"w": 25,
+						"h": 29
+					},
+					"frame": {
+						"x": 710,
+						"y": 34,
+						"w": 25,
+						"h": 29
+					}
+				},
+				{
+					"filename": "adventurer-idle-2-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 9,
+						"y": 8,
+						"w": 25,
+						"h": 29
+					},
+					"frame": {
+						"x": 737,
+						"y": 34,
+						"w": 25,
+						"h": 29
+					}
+				},
+				{
+					"filename": "adventurer-swrd-drw-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 7,
+						"y": 6,
+						"w": 26,
+						"h": 31
+					},
+					"frame": {
+						"x": 744,
+						"y": 1,
+						"w": 26,
+						"h": 31
+					}
+				},
+				{
+					"filename": "adventurer-attack2-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 8,
+						"w": 22,
+						"h": 29
+					},
+					"frame": {
+						"x": 764,
+						"y": 34,
+						"w": 22,
+						"h": 29
+					}
+				},
+				{
+					"filename": "adventurer-swrd-shte-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 7,
+						"y": 6,
+						"w": 26,
+						"h": 31
+					},
+					"frame": {
+						"x": 772,
+						"y": 1,
+						"w": 26,
+						"h": 31
+					}
+				},
+				{
+					"filename": "adventurer-run-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 8,
+						"w": 22,
+						"h": 29
+					},
+					"frame": {
+						"x": 788,
+						"y": 34,
+						"w": 22,
+						"h": 29
+					}
+				},
+				{
+					"filename": "adventurer-crnr-jmp-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 16,
+						"y": 6,
+						"w": 25,
+						"h": 31
+					},
+					"frame": {
+						"x": 800,
+						"y": 1,
+						"w": 25,
+						"h": 31
+					}
+				},
+				{
+					"filename": "adventurer-run-04",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 8,
+						"w": 22,
+						"h": 29
+					},
+					"frame": {
+						"x": 812,
+						"y": 34,
+						"w": 22,
+						"h": 29
+					}
+				},
+				{
+					"filename": "adventurer-crnr-jmp-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 17,
+						"y": 6,
+						"w": 24,
+						"h": 31
+					},
+					"frame": {
+						"x": 827,
+						"y": 1,
+						"w": 24,
+						"h": 31
+					}
+				},
+				{
+					"filename": "adventurer-jump-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 16,
+						"y": 6,
+						"w": 21,
+						"h": 29
+					},
+					"frame": {
+						"x": 836,
+						"y": 34,
+						"w": 21,
+						"h": 29
+					}
+				},
+				{
+					"filename": "adventurer-idle-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 6,
+						"w": 22,
+						"h": 31
+					},
+					"frame": {
+						"x": 853,
+						"y": 1,
+						"w": 22,
+						"h": 31
+					}
+				},
+				{
+					"filename": "adventurer-attack2-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 8,
+						"w": 20,
+						"h": 29
+					},
+					"frame": {
+						"x": 859,
+						"y": 34,
+						"w": 20,
+						"h": 29
+					}
+				},
+				{
+					"filename": "adventurer-idle-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 13,
+						"y": 6,
+						"w": 21,
+						"h": 31
+					},
+					"frame": {
+						"x": 877,
+						"y": 1,
+						"w": 21,
+						"h": 31
+					}
+				},
+				{
+					"filename": "adventurer-ladder-climb-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 18,
+						"y": 4,
+						"w": 15,
+						"h": 29
+					},
+					"frame": {
+						"x": 881,
+						"y": 34,
+						"w": 15,
+						"h": 29
+					}
+				},
+				{
+					"filename": "adventurer-ladder-climb-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 18,
+						"y": 4,
+						"w": 15,
+						"h": 29
+					},
+					"frame": {
+						"x": 898,
+						"y": 34,
+						"w": 15,
+						"h": 29
+					}
+				},
+				{
+					"filename": "adventurer-swrd-drw-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 6,
+						"w": 21,
+						"h": 31
+					},
+					"frame": {
+						"x": 900,
+						"y": 1,
+						"w": 21,
+						"h": 31
+					}
+				},
+				{
+					"filename": "adventurer-cast-loop-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 11,
+						"w": 29,
+						"h": 26
+					},
+					"frame": {
+						"x": 915,
+						"y": 34,
+						"w": 29,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-swrd-shte-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 6,
+						"w": 21,
+						"h": 31
+					},
+					"frame": {
+						"x": 923,
+						"y": 1,
+						"w": 21,
+						"h": 31
+					}
+				},
+				{
+					"filename": "adventurer-crnr-clmb-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 5,
+						"w": 18,
+						"h": 31
+					},
+					"frame": {
+						"x": 946,
+						"y": 1,
+						"w": 18,
+						"h": 31
+					}
+				},
+				{
+					"filename": "adventurer-die-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 11,
+						"w": 23,
+						"h": 26
+					},
+					"frame": {
+						"x": 946,
+						"y": 34,
+						"w": 23,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-idle-2-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 8,
+						"y": 7,
+						"w": 27,
+						"h": 30
+					},
+					"frame": {
+						"x": 966,
+						"y": 1,
+						"w": 27,
+						"h": 30
+					}
+				},
+				{
+					"filename": "adventurer-idle-2-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 8,
+						"y": 7,
+						"w": 27,
+						"h": 30
+					},
+					"frame": {
+						"x": 971,
+						"y": 33,
+						"w": 27,
+						"h": 30
+					}
+				},
+				{
+					"filename": "adventurer-run-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 16,
+						"y": 7,
+						"w": 25,
+						"h": 30
+					},
+					"frame": {
+						"x": 995,
+						"y": 1,
+						"w": 25,
+						"h": 30
+					}
+				},
+				{
+					"filename": "adventurer-run-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 16,
+						"y": 7,
+						"w": 22,
+						"h": 30
+					},
+					"frame": {
+						"x": 1000,
+						"y": 33,
+						"w": 22,
+						"h": 30
+					}
+				},
+				{
+					"filename": "adventurer-hurt-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 11,
+						"w": 23,
+						"h": 26
+					},
+					"frame": {
+						"x": 1022,
+						"y": 1,
+						"w": 23,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-jump-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 11,
+						"w": 22,
+						"h": 26
+					},
+					"frame": {
+						"x": 1024,
+						"y": 29,
+						"w": 22,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-die-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 16,
+						"y": 11,
+						"w": 21,
+						"h": 26
+					},
+					"frame": {
+						"x": 1047,
+						"y": 1,
+						"w": 21,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-die-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 11,
+						"w": 21,
+						"h": 26
+					},
+					"frame": {
+						"x": 1048,
+						"y": 29,
+						"w": 21,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-hurt-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 16,
+						"y": 11,
+						"w": 21,
+						"h": 26
+					},
+					"frame": {
+						"x": 1070,
+						"y": 1,
+						"w": 21,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-hurt-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 11,
+						"w": 21,
+						"h": 26
+					},
+					"frame": {
+						"x": 1071,
+						"y": 29,
+						"w": 21,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-items-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 16,
+						"y": 11,
+						"w": 20,
+						"h": 26
+					},
+					"frame": {
+						"x": 1093,
+						"y": 1,
+						"w": 20,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-crnr-clmb-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 19,
+						"y": 7,
+						"w": 17,
+						"h": 26
+					},
+					"frame": {
+						"x": 1094,
+						"y": 29,
+						"w": 17,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-crnr-clmb-04",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 5,
+						"w": 17,
+						"h": 26
+					},
+					"frame": {
+						"x": 1113,
+						"y": 29,
+						"w": 17,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-crnr-clmb-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 5,
+						"w": 16,
+						"h": 26
+					},
+					"frame": {
+						"x": 1115,
+						"y": 1,
+						"w": 16,
+						"h": 26
+					}
+				},
+				{
+					"filename": "adventurer-air-attack-3-end-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 13,
+						"w": 48,
+						"h": 24
+					},
+					"frame": {
+						"x": 1132,
+						"y": 29,
+						"w": 48,
+						"h": 24
+					}
+				},
+				{
+					"filename": "adventurer-attack2-05",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 13,
+						"w": 33,
+						"h": 24
+					},
+					"frame": {
+						"x": 1133,
+						"y": 1,
+						"w": 33,
+						"h": 24
+					}
+				},
+				{
+					"filename": "adventurer-attack1-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 6,
+						"y": 13,
+						"w": 29,
+						"h": 24
+					},
+					"frame": {
+						"x": 1168,
+						"y": 1,
+						"w": 29,
+						"h": 24
+					}
+				},
+				{
+					"filename": "adventurer-die-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 15,
+						"y": 13,
+						"w": 24,
+						"h": 24
+					},
+					"frame": {
+						"x": 1182,
+						"y": 27,
+						"w": 24,
+						"h": 24
+					}
+				},
+				{
+					"filename": "adventurer-crouch-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 13,
+						"w": 22,
+						"h": 24
+					},
+					"frame": {
+						"x": 1199,
+						"y": 1,
+						"w": 22,
+						"h": 24
+					}
+				},
+				{
+					"filename": "adventurer-jump-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 13,
+						"w": 22,
+						"h": 24
+					},
+					"frame": {
+						"x": 1208,
+						"y": 27,
+						"w": 22,
+						"h": 24
+					}
+				},
+				{
+					"filename": "adventurer-crouch-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 13,
+						"w": 21,
+						"h": 24
+					},
+					"frame": {
+						"x": 1223,
+						"y": 1,
+						"w": 21,
+						"h": 24
+					}
+				},
+				{
+					"filename": "adventurer-attack3-04",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 15,
+						"w": 35,
+						"h": 22
+					},
+					"frame": {
+						"x": 1232,
+						"y": 27,
+						"w": 35,
+						"h": 22
+					}
+				},
+				{
+					"filename": "adventurer-attack3-05",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 15,
+						"w": 35,
+						"h": 22
+					},
+					"frame": {
+						"x": 1246,
+						"y": 1,
+						"w": 35,
+						"h": 22
+					}
+				},
+				{
+					"filename": "adventurer-attack1-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 7,
+						"y": 15,
+						"w": 27,
+						"h": 22
+					},
+					"frame": {
+						"x": 1269,
+						"y": 25,
+						"w": 27,
+						"h": 22
+					}
+				},
+				{
+					"filename": "adventurer-attack3-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 16,
+						"w": 33,
+						"h": 21
+					},
+					"frame": {
+						"x": 1283,
+						"y": 1,
+						"w": 33,
+						"h": 21
+					}
+				},
+				{
+					"filename": "adventurer-die-04",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 17,
+						"y": 17,
+						"w": 20,
+						"h": 20
+					},
+					"frame": {
+						"x": 1298,
+						"y": 24,
+						"w": 20,
+						"h": 20
+					}
+				},
+				{
+					"filename": "adventurer-slide-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 4,
+						"y": 20,
+						"w": 36,
+						"h": 17
+					},
+					"frame": {
+						"x": 1298,
+						"y": 46,
+						"w": 36,
+						"h": 17
+					}
+				},
+				{
+					"filename": "adventurer-die-06",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 17,
+						"y": 17,
+						"w": 20,
+						"h": 20
+					},
+					"frame": {
+						"x": 1318,
+						"y": 1,
+						"w": 20,
+						"h": 20
+					}
+				},
+				{
+					"filename": "adventurer-stand-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 8,
+						"y": 18,
+						"w": 32,
+						"h": 19
+					},
+					"frame": {
+						"x": 1320,
+						"y": 23,
+						"w": 32,
+						"h": 19
+					}
+				},
+				{
+					"filename": "adventurer-smrslt-03",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 10,
+						"y": 12,
+						"w": 28,
+						"h": 19
+					},
+					"frame": {
+						"x": 1336,
+						"y": 44,
+						"w": 28,
+						"h": 19
+					}
+				},
+				{
+					"filename": "adventurer-smrslt-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 13,
+						"y": 9,
+						"w": 26,
+						"h": 19
+					},
+					"frame": {
+						"x": 1340,
+						"y": 1,
+						"w": 26,
+						"h": 19
+					}
+				},
+				{
+					"filename": "adventurer-stand-02",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 14,
+						"y": 18,
+						"w": 24,
+						"h": 19
+					},
+					"frame": {
+						"x": 1354,
+						"y": 22,
+						"w": 24,
+						"h": 19
+					}
+				},
+				{
+					"filename": "adventurer-die-05",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 18,
+						"w": 17,
+						"h": 19
+					},
+					"frame": {
+						"x": 1368,
+						"y": 1,
+						"w": 17,
+						"h": 19
+					}
+				},
+				{
+					"filename": "adventurer-stand-00",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 4,
+						"y": 19,
+						"w": 36,
+						"h": 18
+					},
+					"frame": {
+						"x": 1366,
+						"y": 43,
+						"w": 36,
+						"h": 18
+					}
+				},
+				{
+					"filename": "adventurer-slide-01",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 50,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 4,
+						"y": 20,
+						"w": 36,
+						"h": 17
+					},
+					"frame": {
+						"x": 1380,
+						"y": 22,
+						"w": 36,
+						"h": 17
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:84b5a1b9a5ec59dd4773de6728037c35:71380a26560b864d20c2559987c89e25:b5ec123845df0ed66e3617124187bbac$"
+	}
+}
