@@ -1,5 +1,4 @@
-//@ts-ignore
-import { AOI } from "./aoi.ts";
+import { AOI } from "./aoi";
 
 export class AOImanager {
   static directions = [
@@ -12,10 +11,10 @@ export class AOImanager {
     [1, 0],
     [1, 1],
   ];
-  height;
-  width;
-  aoiwidth;
-  aoiheight;
+  height: number;
+  width: number;
+  aoiwidth: number;
+  aoiheight: number;
   aoi: Array<Array<AOI>>;
   constructor() {
     //TODO: hardcoded for now make it dynamic later

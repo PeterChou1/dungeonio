@@ -1,5 +1,6 @@
-//@ts-ignore
-import { messageType } from "../../common/globalConfig.ts";
+import { messageType } from "../../common/config/globalConfig";
+import { gameObject } from "../game.v2/gameobject";
+import { Player } from "../game.v2/player";
 
 export class AOI {
   clearId;
@@ -7,7 +8,9 @@ export class AOI {
     x: number;
     y: number;
   };
-  entities;
+  entities: {
+    [id: string]: gameObject;
+  };
   // save states of entity used for diffing
   saved_state;
   clients;
@@ -38,13 +41,14 @@ export class AOI {
       y <= this.y + this.height
     );
   }
+
   /**
    * should be used for adding a client (real player) to current AOI only
    * @param clientGameObject
    * @param init optional parameter which will broadcast add player to client being
    * added (used for init)
    */
-  addClient(clientGameObject, init?) {
+  addClient(clientGameObject: Player, init?) {
     // send to the client add to every other client within the aoi
     for (const clientid in this.clients) {
       this.clients[clientid].send(messageType.aoiadd, {
@@ -74,9 +78,8 @@ export class AOI {
    * should be used for removing a client from current AOI
    * @param clientGameObject
    * @param quit optional parameter used for players quiting the game
-   * ie shutting down the browser
    */
-  removeClient(clientGameObject, quit?) {
+  removeClient(clientGameObject: Player, quit?) {
     if (quit) {
       clientGameObject.client.send(messageType.aoiremove, {
         id: clientGameObject.id,
@@ -143,7 +146,7 @@ export class AOI {
     }
   }
   /**
-   * @description get all entity within AOI
+   * @description get all entity within AOI that have changed state
    * @returns {array} of all state within aoi
    */
   getAOIEntities() {

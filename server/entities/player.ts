@@ -1,20 +1,16 @@
 import Phaser from "phaser";
-//@ts-ignore
-import { collisionData, gameConfig } from "../../common/globalConfig.ts";
-//@ts-ignore
-import { playerStateMap } from "../config/playerConfig.ts";
+import { collisionData, gameConfig } from "../../common/config/globalConfig";
+import { playerStateMap } from "../config/playerConfig";
 import {
   StateMachine,
   IdleState,
   RunState,
   JumpState,
   FallState,
-  //@ts-ignore
-} from "../state/stateMachine.ts";
+} from "../state/stateMachine";
 const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
 // @ts-ignore: Property 'Matter' exist but retarded typescript will not see it'.
-const { Body, Bodies, Common } = Phaser.Physics.Matter.Matter;
-const clone = require("clone");
+const { Body, Bodies } = Phaser.Physics.Matter.Matter;
 
 export class Player extends Phaser.Physics.Matter.Sprite {
   isTouching;

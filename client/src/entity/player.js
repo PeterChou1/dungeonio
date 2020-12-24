@@ -1,10 +1,6 @@
 import { StateMachine, SimulatedStateMachine } from "../state/stateMachine";
 import { getplayerstate, getsimplayerState } from "../state/playerState";
-import {
-  gameConfig,
-  collisionData,
-  messageType,
-} from "../../../../common/globalConfig.ts";
+import { gameConfig, playerConfig } from "../../../common";
 const { Body, Bodies } = Phaser.Physics.Matter.Matter;
 const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
 
@@ -23,29 +19,30 @@ export default class Player {
     //this.generateBodyFrames();
     //  keeps track of server updates positions by server for interpolation purposes
     this.serverInterpolation = [];
-    this.mainBody = Bodies.rectangle(0, 0, 50, 75, { chamfer: 10 });
     this.sprite.setScale(2);
+    this.mainBody = Bodies.rectangle(0, 0, 2, 2, { chamfer: 10 });
     this.sprite.setExistingBody(this.mainBody);
     this.sprite.setFixedRotation();
     this.sprite.setPosition(x, y);
+
     // default state of player values is idle
     this.playerstate = "idle";
     this.playanimation(this.playerstate);
-    this.disablegravity();
+    //this.disablegravity();
     this.playertext = scene.add.text(x, y - 50, playerName);
     this.playertext.setOrigin(0.5, 0.5);
     this.scene.events.on("update", this.entityinterpolate, this);
   }
 
-  generateBodyFrames() {
-    for (const frameName of this.scene.frameNames) {
-      this.matterFrameData[frameName] = PhysicsEditorParser.parseBody(
-        0,
-        0,
-        this.scene.frameData[frameName]
-      );
-    }
-  }
+  //generateBodyFrames() {
+  //  for (const frameName of this.scene.frameNames) {
+  //    this.matterFrameData[frameName] = PhysicsEditorParser.parseBody(
+  //      0,
+  //      0,
+  //      this.scene.frameData[frameName]
+  //    );
+  //  }
+  //}
 
   playanimation(anims) {
     this.sprite.anims.play(anims);
@@ -62,8 +59,8 @@ export default class Player {
     if (gameConfig.networkdebug) {
       this.sprite.setPosition(x, y);
       this.playertext.setPosition(x, y - 50);
+      this.playertext.setText(JSON.stringify(state));
     } else {
-      //console.log(`set position x:${x} y: ${y}`);;
       if (document.hidden) {
         // when browser is hidden don't interpolate update immediately
         this.sprite.setPosition(x, y);
@@ -90,18 +87,10 @@ export default class Player {
     if (this.serverInterpolation.length > 0) {
       const coord = this.serverInterpolation.shift();
       this.sprite.setPosition(coord.x, coord.y);
+      //@ts-ignore
       if (gameConfig.networkdebug && this.scene.sessionId === this.playerId) {
         //console.log(misc);
         this.playertext.setPosition(coord.x - 200, coord.y - 100);
-        this.playertext.setText(
-          `nearbottom: ${misc.isTouching[0]} bottom: ${
-            misc.isTouching[1]
-          } left: ${misc.isTouching[2]} right: ${
-            misc.isTouching[3]
-          } \n platform: ${misc.onPlatform} state: ${
-            misc.state
-          } x: ${Math.trunc(this.sprite.x)} y: ${Math.trunc(this.sprite.y)}`
-        );
       } else {
         this.playertext.setPosition(coord.x, coord.y - 50);
       }
@@ -130,8 +119,8 @@ export default class Player {
   }
 
   destroy() {
+    //this.sprite.world.off("beforeupdate", this.cancelgravity, this);
     this.sprite.destroy();
-    this.sprite.world.off("beforeupdate", this.cancelgravity, this);
     this.scene.events.off("update", this.entityinterpolate, this);
     this.playertext.destroy();
     for (const frame in this.matterFrameData) {

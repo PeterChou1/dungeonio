@@ -30,15 +30,7 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":33, "y":36 }, { "x":33, "y":7 }, { "x":25, "y":6 }, { "x":17, "y":7 }, { "x":17, "y":36 } ]
-				]
-			}
-		]
+		"fixtures": []
 	},
 	"adventurer-wall-slide-01": {
 		"type": "fromPhysicsEditor",
@@ -342,15 +334,7 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":36, "y":36 }, { "x":36, "y":7 }, { "x":28, "y":6 }, { "x":20, "y":7 }, { "x":20, "y":36 } ]
-				]
-			}
-		]
+		"fixtures": []
 	},
 	"adventurer-slide-00": {
 		"type": "fromPhysicsEditor",
@@ -382,15 +366,7 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":36, "y":36 }, { "x":36, "y":7 }, { "x":28, "y":6 }, { "x":20, "y":7 }, { "x":20, "y":36 } ]
-				]
-			}
-		]
+		"fixtures": []
 	},
 	"adventurer-run-03": {
 		"type": "fromPhysicsEditor",
@@ -406,39 +382,7 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":36, "y":36 }, { "x":36, "y":7 }, { "x":28, "y":6 }, { "x":20, "y":7 }, { "x":20, "y":36 } ]
-				]
-			}
-		]
-	},
-	"adventurer-run-04": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-run-04",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":36, "y":36 }, { "x":36, "y":7 }, { "x":28, "y":6 }, { "x":20, "y":7 }, { "x":20, "y":36 } ]
-				]
-			}
-		]
+		"fixtures": []
 	},
 	"adventurer-ladder-climb-02": {
 		"type": "fromPhysicsEditor",
@@ -486,15 +430,7 @@
 			"category": 0,
 			"mask": 255
 		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":36, "y":36 }, { "x":36, "y":7 }, { "x":28, "y":6 }, { "x":20, "y":7 }, { "x":20, "y":36 } ]
-				]
-			}
-		]
+		"fixtures": []
 	},
 	"adventurer-jump-03": {
 		"type": "fromPhysicsEditor",
@@ -510,15 +446,7 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":34, "y":29 }, { "x":34, "y":6 }, { "x":26, "y":4 }, { "x":18, "y":6 }, { "x":18, "y":29 } ]
-				]
-			}
-		]
+		"fixtures": []
 	},
 	"adventurer-ladder-climb-00": {
 		"type": "fromPhysicsEditor",
@@ -694,15 +622,7 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":33, "y":36 }, { "x":33, "y":7 }, { "x":25, "y":6 }, { "x":17, "y":7 }, { "x":17, "y":36 } ]
-				]
-			}
-		]
+		"fixtures": []
 	},
 	"adventurer-fall-00": {
 		"type": "fromPhysicsEditor",
@@ -718,15 +638,7 @@
 			"category": 0,
 			"mask": 255
 		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":35, "y":32 }, { "x":35, "y":7 }, { "x":28, "y":6 }, { "x":20, "y":7 }, { "x":20, "y":32 } ]
-				]
-			}
-		]
+		"fixtures": []
 	},
 	"adventurer-hurt-00": {
 		"type": "fromPhysicsEditor",
@@ -1048,30 +960,6 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-attack1-03": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack1-03",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":32, "y":36 }, { "x":32, "y":12 }, { "x":24, "y":10 }, { "x":16, "y":12 }, { "x":16, "y":36 } ]
-				]
-			}
-		]
-	},
 	"adventurer-attack1-04": {
 		"type": "fromPhysicsEditor",
 		"label": "adventurer-attack1-04",
@@ -1088,10 +976,10 @@
 		},
 		"fixtures": [
 			{
-				"label": "",
+				"label": "hurtbox",
 				"isSensor": false,
 				"vertices": [
-					[ { "x":32, "y":36 }, { "x":32, "y":12 }, { "x":24, "y":11 }, { "x":16, "y":12 }, { "x":16, "y":36 } ]
+					[ { "x":14, "y":10 }, { "x":14, "y":37 }, { "x":34, "y":37 }, { "x":34, "y":10 } ]
 				]
 			}
 		]
@@ -1144,10 +1032,10 @@
 		},
 		"fixtures": [
 			{
-				"label": "",
+				"label": "hurtbox",
 				"isSensor": false,
 				"vertices": [
-					[ { "x":32, "y":36 }, { "x":32, "y":15 }, { "x":24, "y":14 }, { "x":16, "y":15 }, { "x":16, "y":36 } ]
+					[ { "x":14, "y":15 }, { "x":14, "y":37 }, { "x":34, "y":37 }, { "x":34, "y":15 } ]
 				]
 			}
 		]
@@ -1613,15 +1501,7 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":33, "y":36 }, { "x":33, "y":7 }, { "x":25, "y":6 }, { "x":17, "y":7 }, { "x":17, "y":36 } ]
-				]
-			}
-		]
+		"fixtures": []
 	},
 	"adventurer-idle-2-01": {
 		"type": "fromPhysicsEditor",
@@ -1685,15 +1565,7 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":33, "y":36 }, { "x":33, "y":13 }, { "x":25, "y":11 }, { "x":17, "y":13 }, { "x":17, "y":36 } ]
-				]
-			}
-		]
+		"fixtures": []
 	},
 	"adventurer-jump-01": {
 		"type": "fromPhysicsEditor",
@@ -1709,15 +1581,7 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":33, "y":36 }, { "x":33, "y":13 }, { "x":25, "y":11 }, { "x":17, "y":13 }, { "x":17, "y":36 } ]
-				]
-			}
-		]
+		"fixtures": []
 	},
 	"adventurer-jump-02": {
 		"type": "fromPhysicsEditor",
@@ -1733,15 +1597,7 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":33, "y":33 }, { "x":33, "y":10 }, { "x":25, "y":8 }, { "x":17, "y":10 }, { "x":17, "y":33 } ]
-				]
-			}
-		]
+		"fixtures": []
 	},
 	"adventurer-attack1-00": {
 		"type": "fromPhysicsEditor",
@@ -1759,10 +1615,10 @@
 		},
 		"fixtures": [
 			{
-				"label": "",
+				"label": "hurtbox",
 				"isSensor": false,
 				"vertices": [
-					[ { "x":32, "y":36 }, { "x":32, "y":15 }, { "x":24, "y":14 }, { "x":16, "y":15 }, { "x":16, "y":36 } ]
+					[ { "x":14, "y":13 }, { "x":14, "y":37 }, { "x":34, "y":37 }, { "x":34, "y":13 } ]
 				]
 			}
 		]
@@ -1771,10 +1627,10 @@
 		"type": "fromPhysicsEditor",
 		"label": "adventurer-attack1-02",
 		"isStatic": false,
-		"density": 0.10000000149011612,
+		"density": 0.1,
 		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
+		"friction": 0.1,
+		"frictionAir": 0.01,
 		"frictionStatic": 0.5,
 		"collisionFilter": {
 			"group": 0,
@@ -1783,10 +1639,17 @@
 		},
 		"fixtures": [
 			{
-				"label": "",
+				"label": "hurtbox",
 				"isSensor": false,
 				"vertices": [
-					[ { "x":32, "y":36 }, { "x":32, "y":12 }, { "x":24, "y":10 }, { "x":16, "y":12 }, { "x":16, "y":36 } ]
+					[ { "x":14, "y":10 }, { "x":14, "y":37 }, { "x":34, "y":37 }, { "x":34, "y":10 } ]
+				]
+			},
+			{
+				"label": "hitbox",
+				"isSensor": true,
+				"vertices": [
+					[ { "x":53, "y":23 }, { "x":40, "y":-5 }, { "x":23, "y":2 }, { "x":36, "y":31 } ]
 				]
 			}
 		]
@@ -1805,15 +1668,7 @@
 			"category": 0,
 			"mask": 255
 		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":35, "y":32 }, { "x":35, "y":7 }, { "x":28, "y":6 }, { "x":20, "y":7 }, { "x":20, "y":32 } ]
-				]
-			}
-		]
+		"fixtures": []
 	},
 	"adventurer-run-01": {
 		"type": "fromPhysicsEditor",
@@ -1829,24 +1684,32 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":36, "y":36 }, { "x":36, "y":7 }, { "x":28, "y":6 }, { "x":20, "y":7 }, { "x":20, "y":36 } ]
-				]
-			}
-		]
+		"fixtures": []
 	},
-	"adventurer-idle-01": {
+	"adventurer-run-04": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-idle-01",
+		"label": "adventurer-run-04",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
 		"friction": 0.10000000149011612,
-		"frictionAir": 0.01,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-attack1-03": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-attack1-03",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
 		"frictionStatic": 0.5,
 		"collisionFilter": {
 			"group": 0,
@@ -1855,10 +1718,10 @@
 		},
 		"fixtures": [
 			{
-				"label": "",
+				"label": "hurtbox",
 				"isSensor": false,
 				"vertices": [
-					[ { "x":33, "y":36 }, { "x":33, "y":7 }, { "x":25, "y":6 }, { "x":17, "y":7 }, { "x":17, "y":36 } ]
+					[ { "x":14, "y":10 }, { "x":14, "y":37 }, { "x":34, "y":37 }, { "x":34, "y":10 } ]
 				]
 			}
 		]

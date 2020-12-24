@@ -57,3 +57,15 @@ export const createanims = (scene, anims) => {
 
   return frameNames;
 };
+
+export const createFrameNames = (animsManager, anims) => {
+  const copy = JSON.parse(JSON.stringify(anims));
+  const frameNames = [];
+  for (const anim of copy) {
+    console.log(anim.frames);
+    console.log(animsManager.generateFrameNames);
+    console.log(animsManager.generateFrameNames(...anim.frames));
+    frameNames.push(animsManager.generateFrameNames(...anim.frames));
+  }
+  return frameNames;
+};

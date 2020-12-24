@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-const Colyseus = require("colyseus.js");
 
 export class bootScene extends Phaser.Scene {
   constructor() {

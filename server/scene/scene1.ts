@@ -1,7 +1,7 @@
 import Phaser from "phaser";
-import { collisionData } from "../../common/globalConfig";
+import { collisionData } from "../../common/config/globalConfig";
 import { PlayerGroup } from "../entities/playerGroup";
-import { messageType } from "../../common/globalConfig";
+import { messageType } from "../../common/config/globalConfig";
 import { ActionQueue, createanims } from "../utils/utils";
 import { playerAnims } from "../config/playerConfig";
 import PhaserMatterCollisionPlugin from "../utils/matterCollision";

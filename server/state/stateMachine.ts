@@ -1,10 +1,8 @@
 interface PossibleStates {
   [key: string]: State;
 }
-//@ts-ignore
-import { collisionData } from "../../common/globalConfig.ts";
-//@ts-ignore
-import { playerStateMap } from "../config/playerConfig.ts";
+import { collisionData } from "../../common/config/globalConfig";
+import { playerStateMap } from "../config/playerConfig";
 
 export class StateMachine {
   initialState;

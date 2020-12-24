@@ -19,7 +19,7 @@ const StartMenu = (props) => {
               class="input"
               type="text"
               ref={textbox}
-              maxlength="15"
+              maxLength="15"
               placeholder="unnamed warrior"
             ></input>
           </div>

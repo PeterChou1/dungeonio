@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { StateMachine } from "../state/stateMachine.ts";
+import { StateMachine } from "../state/stateMachine";
 export declare class Player extends Phaser.Physics.Matter.Sprite {
   isTouching: any;
   sensors: any;

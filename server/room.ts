@@ -1,50 +1,34 @@
-import { Room, Client } from "colyseus";
+import { Room } from "colyseus";
 import { GameState } from "./state/state";
 import "@geckos.io/phaser-on-nodejs";
-import Phaser from "phaser";
-import { config } from "./config/gameConfig";
 import { Game } from "./game.v2/game.core";
+import { propertyDefined } from "../common";
 
 export class GameRoom extends Room<GameState> {
   game: Game;
-  onCreate(options) {
+  async onCreate(options) {
     // how many client each room can hold
     this.maxClients = 50;
     // every 100ms send an update to all clients
     this.setPatchRate(100);
     this.setState(new GameState());
-    this.game = new Game(this);
-    // inject game room into game instance
-    // config.callbacks = {
-    //   preBoot: () => {
-    //     return this;
-    //   },
-    // };
-    // this.game = new Phaser.Game(config);
-    // this.scene = this.game.scene.getScene("start");
-    // console.log("game started");
-    // console.log("---scene---");
-    // console.log(
-    //   `width: ${this.scene.scale.width} height: ${this.scene.scale.height}`
-    // );
+    this.game = await Game.createGame(this);
   }
 
-  onJoin(client, options) {
+  async onJoin(client, options) {
+    await propertyDefined(this, (room) => room.game);
     console.log(`client with id: (${client.sessionId}) joined`);
-    console.log(options);
-    console.log("------");
-    //@ts-ignore add player custom method
-    //this.scene.addPlayer(client.sessionId, options.playerName);
     this.game.addPlayer(client, options.playerName);
   }
 
-  onLeave(client) {
+  async onLeave(client) {
+    await propertyDefined(this, (room) => room.game);
     console.log(`client with id (${client.sessionId}) left`);
-    //@ts-ignore
     this.game.removePlayer(client);
   }
 
-  onDispose() {
+  async onDispose() {
+    await propertyDefined(this, (room) => room.game);
     console.log("destory game");
     this.game.destroy();
     //throw Error('disposed of game');

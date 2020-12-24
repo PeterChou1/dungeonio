@@ -1,13 +1,42 @@
+type hitbox = {
+  [propName: string]: {
+    knockback: number;
+    damage: number;
+  };
+};
+/**
+ * @description describes hitbox data
+ */
+export const playerHitboxData: hitbox = {
+  "adventure-attack-02": {
+    knockback: 10,
+    damage: 10,
+  },
+};
+
 export const playerConfig = {
-  direction: {
-    left: "left",
-    right: "right",
+  dim: {
+    h: 70,
+    w: 37,
   },
   groundspeed: 5,
   airspeed: 5,
   jumpheight: 10,
 };
 
+/**
+ * @deprecated
+ * */
+export const playerStateMap = {
+  clientinput: "client input",
+  playerprop: "player property",
+};
+/**
+ * @description Defines animation player has
+ * NOTE: duration frames * 1000 ms / frameRate
+ * example: jump = 4 * 1000 / 10 = 400ms
+ * Also used to create animation client side
+ */
 export const playerAnims = [
   {
     key: "run",
@@ -25,6 +54,7 @@ export const playerAnims = [
     key: "jump",
     frames: ["mainchar", { end: 3, prefix: "adventurer-jump-", zeroPad: 2 }],
     frameRate: 10,
+    repeat: 0,
   },
   {
     key: "fall",
@@ -35,12 +65,6 @@ export const playerAnims = [
   {
     key: "attack1",
     frames: ["mainchar", { end: 4, prefix: "adventurer-attack1-", zeroPad: 2 }],
-    frameRate: 10,
-    repeat: 0,
-  },
-  {
-    key: "idleOnce",
-    frames: ["mainchar", { end: 2, prefix: "adventurer-idle-", zeroPad: 2 }],
     frameRate: 10,
     repeat: 0,
   },

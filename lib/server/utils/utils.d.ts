@@ -12,4 +12,5 @@ export declare class ActionQueue {
 }
 export declare function randomInteger(min: any, max: any): any;
 export declare const createanims: (scene: any, anims: any) => any[];
+export declare const createFrameNames: (animsManager: any, anims: any) => any[];
 export {};

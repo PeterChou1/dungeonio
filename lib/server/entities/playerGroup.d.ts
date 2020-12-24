@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Player } from "./player.ts";
+import { Player } from "./player";
 export declare class PlayerGroup extends Phaser.GameObjects.Group {
   constructor(
     scene: Phaser.Scene,

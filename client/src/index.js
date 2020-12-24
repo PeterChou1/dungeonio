@@ -1,16 +1,15 @@
 import Phaser from "phaser";
-import { gameConfig } from "../../common/globalConfig.ts";
+import { gameConfig } from "../../common";
 import PhaserMatterCollisionPlugin from "phaser-matter-collision-plugin";
 import RexUIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin";
-import { debugLevel } from "./js/scene/debugLevel";
-import { startLevel } from "./js/scene/startLevel";
-import { bootScene } from "./js/scene/boot";
-import { mainMenu } from "./js/scene/mainMenu";
-import { hudScene } from "./js/scene/hud";
+import { startLevel } from "./scene/startLevel";
+import { bootScene } from "./scene/boot";
+import { mainMenu } from "./scene/mainMenu";
+import { hudScene } from "./scene/hud";
 
 const config = {
   type: Phaser.AUTO,
-  parent: "phaser-container",
+  parent: gameConfig.networkdebug ? "game" : "phaser-container",
   dom: {
     createContainer: true,
   },

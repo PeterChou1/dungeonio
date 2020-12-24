@@ -1,38 +1,47 @@
-//@ts-ignore
-import { createEngine } from "./engine.ts";
-//@ts-ignore
-import { Player } from "./player.ts";
-//@ts-ignore
-import { messageType, gameConfig } from "../../common/globalConfig.ts";
-//@ts-ignore
-import { AOImanager } from "../interest/aoi.manager.ts";
-import { Bodies, Body, Engine, World, Render, Events } from "matter-js";
-
+import { setupGame } from "./engine";
+import { Player } from "./player";
+import { messageType, gameConfig } from "../../common/config/globalConfig";
+import { AOImanager } from "../interest/aoi.manager";
+import { Engine, World, Render, Events } from "matter-js";
+//declare document for injection into client side code
+declare let document: any;
 /**
  * Core game engine loop
  */
 export class Game {
   private engine;
   // stores simulate player instances
-  private allplayers;
+  private allplayers: {
+    [id: string]: Player;
+  };
   //colyseus.js room
   private room;
   private clearId;
   private aoimanager;
+  // frame data of player character
+  private framesInfo;
+  private frameData;
+  private render;
 
-  constructor(room?) {
-    this.engine = createEngine();
+  public static async createGame(room?): Promise<Game> {
+    const { engine, framesInfo, frameData } = await setupGame();
+    return new Game(engine, framesInfo, frameData, room);
+  }
+
+  private constructor(engine, framesInfo, frameData, room?) {
+    this.engine = engine;
     this.allplayers = {};
+    this.framesInfo = framesInfo;
+    this.frameData = frameData;
     this.clearId = setInterval(this.startGame.bind(this), 1000 / 60);
     this.aoimanager = new AOImanager();
     if (gameConfig.networkdebug) {
-      var render = Render.create({
-        //@ts-ignore
-        element: document.body,
+      this.render = Render.create({
+        element: document.getElementById("debug"),
         engine: this.engine,
       });
       // run the renderer
-      Render.run(render);
+      Render.run(this.render);
     } else {
       this.room = room;
       this.room.onMessage(messageType.playerinput, (client, playerinput) => {
@@ -58,18 +67,16 @@ export class Game {
 
   addPlayer(client, name) {
     // add in internal colyseus js
-    this.allplayers[client.sessionId] = new Player(
-      this.engine,
-      name,
-      client,
-      this.room,
-      100,
-      300,
-      75,
-      50,
-      this.aoimanager
-    );
-    if (!gameConfig.networkdebug) {
+    this.allplayers[client.sessionId] = new Player(this, name, client, 96, 582);
+    if (gameConfig.networkdebug && client.sessionId === "test") {
+      Events.on(
+        this.engine,
+        "beforeUpdate",
+        function () {
+          this.allplayers["test"].setCamera(this.render);
+        }.bind(this)
+      );
+    } else if (!gameConfig.networkdebug) {
       this.room.state.addPlayer(client.sessionId, name, 100, 100);
     }
   }

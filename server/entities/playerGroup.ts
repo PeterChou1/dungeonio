@@ -1,7 +1,6 @@
 import Phaser from "phaser";
-import { gameConfig } from "../../common/globalConfig";
-//@ts-ignore
-import { Player } from "./player.ts";
+import { gameConfig } from "../../common/config/globalConfig";
+import { Player } from "./player";
 
 export class PlayerGroup extends Phaser.GameObjects.Group {
   constructor(

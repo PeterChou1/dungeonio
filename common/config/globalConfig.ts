@@ -9,8 +9,8 @@ export const gameConfig = {
     height: 768,
   },
   debugsize: {
-    width: 512,
-    height: 384,
+    width: 800,
+    height: 600,
   },
 };
 
@@ -31,7 +31,9 @@ export const collisionData = {
 export const messageType = {
   move: 0, // message for player movement
   playerinput: 1,
-  aoiadd: 2, // add gameobject to aoi
-  aoiupdate: 3, // update gameobject in player area of interest
-  aoiremove: 4, // remove gameobject in player area of interest
+  playersleep: 2, // when player navigates away from tab
+  playerawake: 3, // when user navigates back to tab
+  aoiadd: 4, // add gameobject to aoi
+  aoiupdate: 5, // update gameobject in player area of interest
+  aoiremove: 6, // remove gameobject in player area of interest
 };

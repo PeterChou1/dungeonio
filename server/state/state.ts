@@ -1,5 +1,5 @@
 import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
-import { collisionData, gameConfig } from "../../common/globalConfig";
+import { collisionData, gameConfig } from "../../common/config/globalConfig";
 // player state
 import { randomInteger } from "../utils/utils";
 const randlatency = 50; //randomInteger(0, 500);

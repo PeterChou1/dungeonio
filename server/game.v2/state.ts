@@ -1,5 +1,6 @@
-//@ts-ignore
-import { collisionData } from "../../common/globalConfig.ts";
+import { collisionData } from "../../common";
+import { EventEmitter } from "events";
+import { Player } from "./player";
 interface PossibleStates {
   [key: string]: State;
 }
@@ -10,15 +11,71 @@ export abstract class State {
   abstract execute(...args);
 }
 
+/**
+ * @description used to minick animation frames used for setting hitbox
+ * based on frames being animated and
+ */
+class MockAnimsManager {
+  key;
+  frame;
+  frameInfo;
+  event: EventEmitter;
+  anims;
+  duration;
+  repeat;
+  clearId;
+
+  constructor(frameInfo) {
+    this.frame = null;
+    this.key = null;
+    this.frameInfo = frameInfo;
+    this.event = new EventEmitter();
+  }
+
+  play(key) {
+    clearInterval(this.clearId);
+    this.key = key;
+    this.anims = this.frameInfo[this.key];
+    this.duration = this.anims.duration;
+    this.repeat = this.anims.repeat;
+    this.frameExecution();
+    this.clearId = setInterval(
+      this.frameExecution.bind(this),
+      this.anims.interval
+    );
+  }
+
+  frameExecution() {
+    this.duration -= this.anims.interval;
+    this.frame = this.anims.frames[this.duration / this.anims.interval];
+    this.event.emit("framechange", this.frame);
+    if (this.duration === 0) {
+      this.event.emit("animationcomplete");
+      if (this.repeat > 0) {
+        this.repeat -= 1;
+      } else if (this.repeat === 0) {
+        clearInterval(this.clearId);
+      } else if (this.repeat === -1) {
+        this.duration = this.anims.duration;
+      }
+    }
+  }
+}
+
 export class StateMachine {
   initialState;
   possibleStates: PossibleStates;
+  // mock animation manager to minick phaser animation manager
+  anims: MockAnimsManager;
   stateArgs;
+  // state the player is in
   state;
-  constructor(initialState, possibleStates, stateArgs = []) {
+
+  constructor(initialState, possibleStates, frameInfo, stateArgs = []) {
     this.initialState = initialState;
     this.possibleStates = possibleStates;
     this.stateArgs = stateArgs;
+    this.anims = new MockAnimsManager(frameInfo);
     this.state = null;
     // State instances get access to the state machine via this.stateMachine.
     for (const state of Object.values(this.possibleStates)) {
@@ -43,18 +100,18 @@ export class StateMachine {
 }
 
 export class IdleState extends State {
-  enter(player) {
+  enter(player: Player) {
+    this.stateMachine.anims.play("idle");
     player.setVelocity(0);
   }
 
-  execute(player) {
+  execute(player: Player) {
     //const cursors = scene.input.keyboard.createCursorKeys();
     const clientinput = player.input;
-    const isTouching = player.isTouching;
-    const state = player.state;
+    const isTouching = player.getIsTouching();
+    const state = player.getInternalState();
     ////console.log(isTouching.bottom);
     if (!isTouching.bottom) {
-      console.log(isTouching.bottom);
       //console.log('idle player not touching ground transitioning');
       this.stateMachine.transition("fall");
       return;
@@ -67,51 +124,50 @@ export class IdleState extends State {
     }
     if (clientinput.up_keydown && isTouching.bottom) {
       ////console.log('jump');
-      if (player.onPlatform) {
-        state.collideswith = [collisionData.category.hard];
-        state.onPlatform = false;
-        player.setCollidesWith(state.collideswith);
+      if (state.onPlatform) {
+        player.setInternalState({ onPlatform: false });
+        player.setCollidesWith([collisionData.category.hard]);
       }
       this.stateMachine.transition("jump");
       return;
     }
-    if (clientinput.down_keydown && player.onPlatform) {
-      // reset player to only collide with hard platform
-      state.collideswith = [collisionData.category.hard];
-      player.setCollidesWith(player.state.collideswith);
-      state.onPlatform = false;
-      state.platformFall = true;
+    if (clientinput.down_keydown && state.onPlatform) {
+      player.setCollidesWith([collisionData.category.hard]);
+      player.setInternalState({ onPlatform: false, platformFall: true });
       this.stateMachine.transition("fall");
       return;
+    }
+    if (clientinput.attack_keydown) {
+      this.stateMachine.transition("attack1");
     }
   }
 }
 
 export class RunState extends State {
-  enter(player) {
+  enter(player: Player) {
+    this.stateMachine.anims.play("run");
     //player.awakeplayer();
   }
-  execute(player) {
+  execute(player: Player) {
     const clientinput = player.input;
-    const isTouching = player.isTouching;
-    const state = player.state;
-    const attributes = player.attributes;
+    const isTouching = player.getIsTouching();
+    const state = player.getInternalState();
+    const attributes = player.getAttributes();
 
     if (clientinput.left_keydown) {
       //console.log('going left');
-      state.flipX = true;
+      player.setInternalState({ flipX: true });
       player.setVelocityX(-attributes.groundspeed);
     } else if (clientinput.right_keydown) {
       //console.log('going right');
-      state.flipX = false;
+      player.setInternalState({ flipX: false });
       player.setVelocityX(attributes.groundspeed);
     }
 
     if (clientinput.up_keydown && isTouching.bottom) {
-      if (player.onPlatform) {
-        state.collideswith = [collisionData.category.hard];
+      if (state.onPlatform) {
+        player.setInternalState({ onPlatform: false });
         player.setCollidesWith([collisionData.category.hard]);
-        player.onPlatform = false;
       }
       this.stateMachine.transition("jump");
       return;
@@ -120,11 +176,10 @@ export class RunState extends State {
       return;
     }
 
-    if (clientinput.down_keydown && player.onPlatform) {
+    if (clientinput.down_keydown && state.onPlatform) {
       // reset player to only collide with hard platform
-      state.collideswith = [collisionData.category.hard];
       player.setCollidesWith([collisionData.category.hard]);
-      state.onPlatform = false;
+      player.setInternalState({ onPlatform: false });
       this.stateMachine.transition("fall");
       return;
     }
@@ -140,15 +195,17 @@ export class RunState extends State {
 }
 
 export class FallState extends State {
-  enter(player) {}
-  execute(player) {
+  enter(player: Player) {
+    this.stateMachine.anims.play("fall");
+  }
+  execute(player: Player) {
     const clientinput = player.input;
-    const isTouching = player.isTouching;
-    const attributes = player.attributes;
+    const isTouching = player.getIsTouching();
+    const attributes = player.getAttributes();
 
-    if (clientinput.right_keydown) {
+    if (clientinput.right_keydown && !isTouching.right) {
       player.setVelocityX(attributes.airspeed);
-    } else if (clientinput.left_keydown) {
+    } else if (clientinput.left_keydown && !isTouching.left) {
       player.setVelocityX(-attributes.airspeed);
     }
     if (isTouching.bottom) {
@@ -160,15 +217,27 @@ export class FallState extends State {
 }
 
 export class JumpState extends State {
-  enter(player) {
+  enter(player: Player) {
+    this.stateMachine.anims.play("jump");
     //player.awakeplayer();
-    const attributes = player.attributes;
+    const attributes = player.getAttributes();
     player.setVelocityY(-attributes.jumpheight);
     // jump animation cost 300 ms;
-    setTimeout(() => {
+    this.stateMachine.anims.event.once("animationcomplete", () => {
       this.stateMachine.transition("fall");
       return;
-    }, 300);
+    });
   }
   execute(player) {}
+}
+
+export class AttackState extends State {
+  enter(player: Player) {
+    this.stateMachine.anims.play("attack1");
+    this.stateMachine.anims.event.once("animationcomplete", () => {
+      this.stateMachine.transition("idle");
+      return;
+    });
+  }
+  execute(player: Player) {}
 }

@@ -4,13 +4,13 @@ import {
   gameConfig,
   collisionData,
   messageType,
-} from "../../../../common/globalConfig.ts";
-import { LocalPlayer } from "../entity/localplayer";
-import { test } from "../test/test";
-import { playerAnims } from "../config/playerconfig";
+  playerAnims,
+} from "../../../common";
 import { createanims } from "../utils/utils";
-import { Game } from "../../../../server/game.v2/game.core.ts";
+import { Game } from "../../../server/game.v2/game.core";
+
 const Colyseus = require("colyseus.js");
+const KeyCodes = Phaser.Input.Keyboard.KeyCodes;
 
 export class startLevel extends Phaser.Scene {
   constructor() {
@@ -20,7 +20,7 @@ export class startLevel extends Phaser.Scene {
         default: "matter",
         matter: {
           debug: gameConfig.debug,
-          gravity: { y: 1 }, // set 0 to disable gravity
+          gravity: { y: 0 }, // set 0 to disable gravity
         },
       },
     });
@@ -79,10 +79,22 @@ export class startLevel extends Phaser.Scene {
     console.log("random latency (client) ", this.randlatency);
     this.sessionId = gameConfig.networkdebug ? "test" : this.room.sessionId;
     //console.log('joined room with sessionId ', this.sessionId);
-    this.keys = this.input.keyboard.createCursorKeys();
+    this.keys = this.input.keyboard.addKeys({
+      up: KeyCodes.W,
+      down: KeyCodes.S,
+      left: KeyCodes.A,
+      right: KeyCodes.D,
+      attack: KeyCodes.P,
+      ...(gameConfig.networkdebug && {
+        up_p2: KeyCodes.UP,
+        down_p2: KeyCodes.DOWN,
+        left_p2: KeyCodes.LEFT,
+        right_p2: KeyCodes.RIGHT,
+        attack_p2: KeyCodes.SPACE,
+      }),
+    });
     // request Id of the last request sent to server
     this.curreqId = 0;
-
     // attach listener to keyboard inputs
     // TODO: detach listener on destruction
     for (var prop in this.keys) {
@@ -95,6 +107,30 @@ export class startLevel extends Phaser.Scene {
         });
       }
     }
+    // track all players in game
+    this.setuplevel();
+    // debug purposes
+    if (gameConfig.debug) {
+      this.matter.world.createDebugGraphic();
+    }
+    if (gameConfig.networkdebug) {
+      //inject server instance into client side
+      this.serverinstance = await Game.createGame();
+      this.serverinstance.addPlayer({ sessionId: "test" }, "test");
+      this.testplayer2 = new Player(this, 200, 200, "test", "test");
+      this.serverinstance.addPlayer({ sessionId: "test2" }, "test2");
+      this.testplayer = new Player(this, 100, 200, "test2", "test2");
+      const height = this.gamelayer.ground.height;
+      const width = this.gamelayer.ground.width;
+      this.matter.world.setBounds(0, 0, width, height);
+      this.cameras.main.setBounds(0, 0, width, height);
+      this.cameras.main.startFollow(this.testplayer.sprite);
+    }
+    // set initial input
+    this.updatePlayerInput();
+  }
+
+  setuplevel() {
     this.map = this.add.tilemap("map");
     this.gametile = {
       mainlev: this.map.addTilesetImage("mainlevbuild", "tiles"),
@@ -127,13 +163,10 @@ export class startLevel extends Phaser.Scene {
         0
       ),
     };
-
-    ////console.log(convertedlayer);
     this.objectgroup = {
       soft: [], // soft tiles
       hard: this.gamelayer.ground.filterTiles((tile) => !tile.properties.soft),
     };
-
     const platforms = this.map.getObjectLayer("platform");
     platforms.objects.forEach((rect) => {
       this.objectgroup.soft.push(
@@ -165,25 +198,6 @@ export class startLevel extends Phaser.Scene {
         }
       }
     });
-    // track all players in game
-
-    if (gameConfig.debug) {
-      //console.log('---game debug mode---');
-      this.matter.world.createDebugGraphic();
-    }
-    if (gameConfig.networkdebug) {
-      //inject server instance into client side
-      this.serverinstance = new Game();
-      this.serverinstance.addPlayer({ sessionId: "test" }, "test");
-      this.testplayer = new Player(this, 100, 200, "test", "test");
-      const height = this.gamelayer.ground.height;
-      const width = this.gamelayer.ground.width;
-      this.matter.world.setBounds(0, 0, width, height);
-      this.cameras.main.setBounds(0, 0, width, height);
-      this.cameras.main.startFollow(this.testplayer.sprite);
-    }
-    // set initial input
-    this.updatePlayerInput();
   }
 
   setupnetwork() {
@@ -228,11 +242,20 @@ export class startLevel extends Phaser.Scene {
         }
       }
     });
-
     this.room.onMessage(messageType.aoiremove, (entity) => {
       console.log("aoi remove");
       this.allplayers[entity.id].destroy();
       delete this.allplayers[entity.id];
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        console.log("hidden player");
+        this.room.send(messageType.playersleep);
+      } else {
+        console.log("awake player");
+        this.room.send(messageType.playerawake);
+      }
     });
   }
 
@@ -242,11 +265,12 @@ export class startLevel extends Phaser.Scene {
       right_keydown: this.keys.right.isDown,
       up_keydown: this.keys.up.isDown,
       down_keydown: this.keys.down.isDown,
+      attack_keydown: this.keys.attack.isDown,
       left_keyup: this.keys.left.isUp,
       right_keyup: this.keys.right.isUp,
       up_keyup: this.keys.up.isUp,
       down_keyup: this.keys.down.isUp,
-      id: this.curreqId,
+      attack_keyup: this.keys.attack.isUp,
     };
     // increment curr req Id for next request
     this.curreqId++;
@@ -255,22 +279,44 @@ export class startLevel extends Phaser.Scene {
         this.room.send(messageType.playerinput, req);
       }, this.randlatency);
     } else if (gameConfig.networkdebug) {
+      const req_p2 = {
+        left_keydown: this.keys.left_p2.isDown,
+        right_keydown: this.keys.right_p2.isDown,
+        up_keydown: this.keys.up_p2.isDown,
+        down_keydown: this.keys.down_p2.isDown,
+        attack_keydown: this.keys.attack_p2.isDown,
+        left_keyup: this.keys.left_p2.isUp,
+        right_keyup: this.keys.right_p2.isUp,
+        up_keyup: this.keys.up_p2.isUp,
+        down_keyup: this.keys.down_p2.isUp,
+        attack_keyup: this.keys.attack_p2.isUp,
+      };
       this.serverinstance.manualUpdateInput("test", req);
+      this.serverinstance.manualUpdateInput("test2", req_p2);
     } else {
       this.room.send(messageType.playerinput, req);
     }
   }
 
   update() {
-    if (gameConfig.networkdebug) {
+    if (gameConfig.networkdebug && this.serverinstance) {
       const state = this.serverinstance.manualGetState("test");
       this.testplayer.updatePlayer({
         x: state.x,
-        y: state.y,
+        y: state.y - 25,
         flipX: state.flipX,
         collisionData: state.collisionData,
         state: state.state,
         misc: state,
+      });
+      const state2 = this.serverinstance.manualGetState("test2");
+      this.testplayer2.updatePlayer({
+        x: state2.x,
+        y: state2.y - 25,
+        flipX: state2.flipX,
+        collisionData: state2.collisionData,
+        state: state2.state,
+        misc: state2,
       });
     }
   }

@@ -16,11 +16,11 @@ app.use(express.json());
 app.use("/colyseus", monitor());
 if (env === "production") {
   console.log("---set environment---");
-  console.log(path.resolve(__dirname, "../common/assets"));
+  console.log(path.resolve(__dirname, "../client/assets"));
   console.log(path.resolve(__dirname, "../client/dist"));
   app.use(
     "/public",
-    express.static(path.resolve(__dirname, "../common/assets"))
+    express.static(path.resolve(__dirname, "../client/assets"))
   );
   app.use("/", express.static(path.resolve(__dirname, "../client/dist")));
 }
@@ -33,7 +33,7 @@ const gameServer = new Server({
 
 gameServer.define("game", GameRoom).enableRealtimeListing();
 gameServer.listen(port);
+console.log(`Server listening on port: ${port}`);
 gameServer.onShutdown(function () {
   console.log(`game server is going down.`);
 });
-console.log(`Server listening on port: ${port}`);
