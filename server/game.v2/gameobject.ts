@@ -5,6 +5,7 @@ export abstract class gameObject {
   abstract setVelocityY(...args);
   abstract setCollidesWith(...args);
   abstract getPosition(...args);
+  abstract getInternalState(...args);
   abstract getState(...args);
   abstract getMeta(...args);
 }

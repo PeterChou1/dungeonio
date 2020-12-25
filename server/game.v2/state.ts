@@ -1,19 +1,43 @@
-import { collisionData } from "../../common";
+import { collisionData, playerAnims } from "../../common";
 import { EventEmitter } from "events";
 import { Player } from "./player";
-interface PossibleStates {
+
+type hitConfig = {
+  knockback: { x: number; y: number };
+  damage: number;
+  hitstun: number;
+  flipX: boolean;
+};
+type eventHit = {
+  id: number;
+  category: "hit";
+  eventConfig: hitConfig;
+};
+type eventGrab = {
+  id: number;
+  category: "grab";
+  eventConfig: {
+    // to be implemented
+  };
+};
+
+type PossibleStates = {
   [key: string]: State;
-}
+};
 
 export abstract class State {
   stateMachine: StateMachine;
   abstract enter(...args);
   abstract execute(...args);
+  //deregister any events and clean up state and quit
+  abstract quit();
 }
+
+export type event = eventHit | eventGrab;
 
 /**
  * @description used to minick animation frames used for setting hitbox
- * based on frames being animated and
+ * based on frames being animated
  */
 class MockAnimsManager {
   key;
@@ -64,6 +88,7 @@ class MockAnimsManager {
 
 export class StateMachine {
   initialState;
+  event: EventEmitter;
   possibleStates: PossibleStates;
   // mock animation manager to minick phaser animation manager
   anims: MockAnimsManager;
@@ -76,11 +101,46 @@ export class StateMachine {
     this.possibleStates = possibleStates;
     this.stateArgs = stateArgs;
     this.anims = new MockAnimsManager(frameInfo);
+    this.event = new EventEmitter();
     this.state = null;
     // State instances get access to the state machine via this.stateMachine.
     for (const state of Object.values(this.possibleStates)) {
       state.stateMachine = this;
     }
+  }
+
+  /**
+   * dispatches events to state machine which forces it to transition to
+   * a certain state
+   * @param events
+   * @return {Promise<number>} id when event dispatch is finished
+   */
+  async dispatch(event: event): Promise<number> {
+    return new Promise((resolve, reject) => {
+      console.log("recieved event");
+      console.log(event);
+      switch (event.category) {
+        case "hit":
+          this.stateArgs.push(event.eventConfig);
+          this.transition("hurt");
+          const callback = (state) => {
+            if (state !== "hurt" && state !== "hitstun") {
+              this.stateArgs = this.stateArgs.slice(0, 1);
+              this.event.emit("dispatchcomplete");
+              resolve(event.id);
+            }
+          };
+          this.event.on("enter", callback);
+          this.event.once("dispatchcomplete", () => {
+            this.event.off("enter", callback);
+          });
+
+          break;
+        case "grab":
+          resolve(event.id);
+          break;
+      }
+    });
   }
 
   step() {
@@ -102,6 +162,7 @@ export class StateMachine {
 export class IdleState extends State {
   enter(player: Player) {
     this.stateMachine.anims.play("idle");
+    this.stateMachine.event.emit("enter", "idle");
     player.setVelocity(0);
   }
 
@@ -141,11 +202,14 @@ export class IdleState extends State {
       this.stateMachine.transition("attack1");
     }
   }
+
+  quit() {}
 }
 
 export class RunState extends State {
   enter(player: Player) {
     this.stateMachine.anims.play("run");
+    this.stateMachine.event.emit("enter", "run");
     //player.awakeplayer();
   }
   execute(player: Player) {
@@ -192,11 +256,14 @@ export class RunState extends State {
       return;
     }
   }
+
+  quit() {}
 }
 
 export class FallState extends State {
   enter(player: Player) {
     this.stateMachine.anims.play("fall");
+    this.stateMachine.event.emit("enter", "fall");
   }
   execute(player: Player) {
     const clientinput = player.input;
@@ -214,30 +281,85 @@ export class FallState extends State {
       return;
     }
   }
+  quit() {}
 }
 
 export class JumpState extends State {
+  callback;
+
   enter(player: Player) {
     this.stateMachine.anims.play("jump");
     //player.awakeplayer();
     const attributes = player.getAttributes();
     player.setVelocityY(-attributes.jumpheight);
-    // jump animation cost 300 ms;
-    this.stateMachine.anims.event.once("animationcomplete", () => {
+    this.callback = () => {
       this.stateMachine.transition("fall");
       return;
-    });
+    };
+    this.stateMachine.anims.event.once("animationcomplete", this.callback);
   }
+
   execute(player) {}
+
+  quit() {
+    this.stateMachine.anims.event.off("animationcomplete", this.callback);
+  }
 }
 
 export class AttackState extends State {
+  callback;
   enter(player: Player) {
     this.stateMachine.anims.play("attack1");
-    this.stateMachine.anims.event.once("animationcomplete", () => {
+    this.stateMachine.event.emit("enter", "attack1");
+    this.callback = () => {
       this.stateMachine.transition("idle");
+      return;
+    };
+    this.stateMachine.anims.event.once("animationcomplete", this.callback);
+  }
+
+  execute(player: Player) {}
+
+  quit() {
+    this.stateMachine.anims.event.off("animationcomplete", this.callback);
+  }
+}
+
+export class Hurt extends State {
+  enter(player: Player, hitconfig: hitConfig) {
+    this.stateMachine.anims.play("hurt");
+    this.stateMachine.event.emit("enter", "hurt");
+    console.log(hitconfig);
+    if (hitconfig.flipX) {
+      player.setVelocity(-hitconfig.knockback.x, hitconfig.knockback.y);
+    } else {
+      player.setVelocity(hitconfig.knockback.x, hitconfig.knockback.y);
+    }
+    this.stateMachine.anims.event.once("animationcomplete", () => {
+      this.stateMachine.transition("hitstun");
       return;
     });
   }
-  execute(player: Player) {}
+  execute(player: Player, hitconfig: hitConfig) {}
+
+  quit() {}
+}
+
+export class HitStun extends State {
+  enter(player: Player, hitconfig: hitConfig) {
+    this.stateMachine.anims.play("hitstun");
+    this.stateMachine.event.emit("enter", "hitstun");
+    setTimeout(() => {
+      const isTouching = player.getIsTouching();
+      if (isTouching.bottom) {
+        this.stateMachine.transition("idle");
+      } else {
+        this.stateMachine.transition("fall");
+      }
+    }, hitconfig.hitstun);
+  }
+
+  execute(player: Player, hitconfig: hitConfig) {}
+
+  quit() {}
 }

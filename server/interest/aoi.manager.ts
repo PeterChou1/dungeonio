@@ -1,3 +1,4 @@
+import { Player } from "../game.v2/player";
 import { AOI } from "./aoi";
 
 export class AOImanager {
@@ -52,7 +53,7 @@ export class AOImanager {
       for (const aoi of row) {
         if (aoi.inAOI(coords.x, coords.y)) {
           //check condition for gameobject to be a player
-          if (gameobject.client) {
+          if (gameobject instanceof Player) {
             aoi.addClient(gameobject, true);
           } else {
             aoi.addEntity(gameobject);
@@ -83,7 +84,7 @@ export class AOImanager {
       } else {
         for (const aoi of adjacent) {
           if (aoi.inAOI(coords.x, coords.y)) {
-            if (gameobject.client) {
+            if (gameobject instanceof Player) {
               aoi.addClient(gameobject);
               currentAOI.removeClient(gameobject);
             } else {

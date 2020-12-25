@@ -1,16 +1,20 @@
-type hitbox = {
+type hitboxdata = {
   [propName: string]: {
-    knockback: number;
+    label: string; // which body parts connect to which hitbox
+    knockback: { x: number; y: number };
+    hitstun: number;
     damage: number;
   };
 };
 /**
  * @description describes hitbox data
  */
-export const playerHitboxData: hitbox = {
-  "adventure-attack-02": {
-    knockback: 10,
+export const playerHitboxData: hitboxdata = {
+  "adventurer-attack1-02": {
+    label: "hitbox",
+    knockback: { x: 5, y: -5 },
     damage: 10,
+    hitstun: 100,
   },
 };
 
@@ -67,5 +71,20 @@ export const playerAnims = [
     frames: ["mainchar", { end: 4, prefix: "adventurer-attack1-", zeroPad: 2 }],
     frameRate: 10,
     repeat: 0,
+  },
+  {
+    key: "hurt",
+    frames: ["mainchar", { end: 2, prefix: "adventurer-hurt-", zeroPad: 2 }],
+    frameRate: 10,
+    repeat: 0,
+  },
+  {
+    key: "hitstun",
+    frames: [
+      "mainchar",
+      { start: 2, end: 2, prefix: "adventurer-hurt-", zeroPad: 2 },
+    ],
+    frameRate: 20,
+    repeat: -1,
   },
 ];

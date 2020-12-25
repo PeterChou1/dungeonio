@@ -251,6 +251,14 @@ export class startLevel extends Phaser.Scene {
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         console.log("hidden player");
+        // TODO: if AI enemies are added delete those too
+        // delete every character not main character
+        for (const id in this.allplayers) {
+          if (id !== this.sessionId) {
+            this.allplayers[id].destroy();
+            delete this.allplayers[id];
+          }
+        }
         this.room.send(messageType.playersleep);
       } else {
         console.log("awake player");

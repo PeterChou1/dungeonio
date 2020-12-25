@@ -110,7 +110,6 @@ export const setupGame = (): Promise<{
           .generateFrameNames(...anim.frames)
           .map((d) => d.frame)
           .reverse();
-        console.log(frames);
         frameInfo[anim.key] = {
           frames: frames,
           interval: 1000 / anim.frameRate,

@@ -12,10 +12,14 @@ import {
   JumpState,
   FallState,
   AttackState,
+  Hurt,
+  HitStun,
 } from "./state";
 import { gameObject } from "./gameobject";
 import Phaser from "phaser";
 import { AOImanager } from "../interest/aoi.manager";
+import { EventEmitter } from "events";
+import { event } from "./state";
 
 const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
 
@@ -35,6 +39,7 @@ type sensorConfig = {
 };
 
 type internalState = {
+  asleep?: boolean; //whether or not player is asleep
   onPlatform?: boolean;
   platformFall?: boolean;
   flipX?: boolean;
@@ -44,6 +49,7 @@ type attributes = {
   groundspeed: number;
   airspeed: number;
   jumpheight: number;
+  health: number;
 };
 
 type compoundBodyConfig = {
@@ -65,8 +71,16 @@ class PlayerBody {
   h: number;
   w: number;
   isTouching;
+  // register event emitter for when a state change happens
+  event: EventEmitter;
+  // a object keeps track of action being done to user
+  private registeredActions: {
+    [id: string]: event;
+  };
   // offset for sensors
-  private offset = { x: 0, y: 0 };
+  private sensoroffset = { x: 0, y: 0 };
+  // offset for position
+  private posoffset = { x: 0, y: 0 };
   // keep track if player is flipped or not
   private flipX = false;
   private sensors;
@@ -98,7 +112,7 @@ class PlayerBody {
   private compoundBodyConfig: compoundBodyConfig = {
     frictionStatic: 0,
     frictionAir: 0.02,
-    friction: 0,
+    friction: 0.1,
     sleepThreshold: -1,
     collisionFilter: {
       mask: collisionData.category.hard,
@@ -107,6 +121,7 @@ class PlayerBody {
 
   constructor(engine, x, y, frameData) {
     this.engine = engine;
+    this.event = new EventEmitter();
     this.generateframeBody(frameData);
     this.default = Bodies.rectangle(
       0,
@@ -117,10 +132,22 @@ class PlayerBody {
         chamfer: { radius: 10 },
       }
     );
+    //console.log(this.default.inertia);
     this.h = this.default.bounds.max.y - this.default.bounds.min.y;
     this.w = this.default.bounds.max.x - this.default.bounds.min.x;
     this.sensors = {};
     this.isTouching = {};
+    this.registeredActions = new Proxy(
+      {},
+      {
+        set: (obj, prop, value) => {
+          obj[prop] = value;
+          this.event.emit("statechange", value);
+          return true;
+        },
+      }
+    );
+    console.log(this.registeredActions);
     this.createSensors(this.sensorsConfig);
     this.createDefaultBody(x, y);
     Events.on(this.engine, "beforeUpdate", () => {
@@ -135,20 +162,46 @@ class PlayerBody {
    */
   private mainBodyCallback(pair) {
     const { bodyA, bodyB } = pair;
-    if (bodyB.label === "hitbox") {
-      console.log("hurt");
+    if (!(bodyB.id in this.registeredActions)) {
+      if (bodyB.label === "hitbox") {
+        console.log("bodyB collide");
+        console.log(bodyB.config);
+        this.registeredActions[bodyB.id] = {
+          id: bodyB.id,
+          category: "hit",
+          eventConfig: {
+            knockback: bodyB.config.knockback,
+            damage: bodyB.config.damage,
+            hitstun: bodyB.config.hitstun,
+            flipX: bodyB.config.flipX,
+          },
+        };
+      }
     }
   }
+  /**
+   * once an action is completed it must be deregistered or else that action
+   * can never occur again to this player
+   * @param id
+   */
+  deregisterAction(id: number) {
+    delete this.registeredActions[id];
+  }
 
+  /**
+   * @description recreates default body
+   * @param x
+   * @param y
+   */
   createDefaultBody(x, y) {
     if (this.compoundBody) World.remove(this.engine.world, this.compoundBody);
     this.h = this.default.bounds.max.y - this.default.bounds.min.y;
     this.w = this.default.bounds.max.x - this.default.bounds.min.x;
     this.createSensors(this.sensorsConfig);
     this.mainBody = this.default;
-    this.mainBody.onCollide(this.mainBodyCallback);
-    this.mainBody.onCollideActive(this.mainBodyCallback);
-    this.mainBody.onCollideEnd(this.mainBodyCallback);
+    this.mainBody.onCollide(this.mainBodyCallback.bind(this));
+    this.mainBody.onCollideActive(this.mainBodyCallback.bind(this));
+    this.mainBody.onCollideEnd(this.mainBodyCallback.bind(this));
     this.compoundBody = Body.create({
       parts: [this.default, ...Object.values(this.sensors)],
       ...this.compoundBodyConfig,
@@ -181,7 +234,7 @@ class PlayerBody {
       const cur: configObj = config[sensor];
       const pos = cur.pos({ w: this.w, h: this.h });
       const dim = cur.dim({ w: this.w, h: this.h });
-      Vector.add(pos, this.offset, pos);
+      Vector.add(pos, this.sensoroffset, pos);
       // if there is a sensor modify it
       if (this.sensors[sensor]) {
         Body.scale(
@@ -254,18 +307,31 @@ class PlayerBody {
           1,
           frameBody.parts.length
         );
-        // set custom configuration for
-        this.frameData[frameName][0]["config"] = {
-          flipX: false,
-        };
+        // set custom configuration for body
+        for (const bodyparts of this.frameData[frameName]) {
+          bodyparts["config"] = {
+            flipX: false,
+            orgh: frameBody.bounds.max.y - frameBody.bounds.min.y,
+            orgw: frameBody.bounds.max.x - frameBody.bounds.min.x,
+            h:
+              this.frameData[frameName][0].bounds.max.y -
+              this.frameData[frameName][0].bounds.min.y,
+            w:
+              this.frameData[frameName][0].bounds.max.x -
+              this.frameData[frameName][0].bounds.min.x,
+            ...(playerHitboxData.hasOwnProperty(frameName) &&
+              bodyparts.label === playerHitboxData[frameName].label &&
+              playerHitboxData[frameName]),
+          };
+        }
       }
     }
   }
 
   getPosition() {
     return {
-      x: Math.trunc(this.compoundBody.position.x),
-      y: Math.trunc(this.compoundBody.position.y),
+      x: Math.trunc(this.compoundBody.position.x + this.posoffset.x),
+      y: Math.trunc(this.compoundBody.position.y + this.posoffset.y),
     };
   }
 
@@ -316,7 +382,7 @@ class PlayerBody {
   }
 
   /**
-   *
+   * @desciption set based on frame the body of the player
    * @param frame
    */
   setFrameBody(frame) {
@@ -325,10 +391,9 @@ class PlayerBody {
       World.remove(this.engine.world, this.compoundBody);
       var pos = this.getPosition();
       this.mainBody = this.frameData[frame][0];
-      const { min, max } = this.mainBody.bounds;
-      this.h = max.y - min.y;
-      this.w = max.x - min.x;
-      this.offset = {
+      this.h = this.mainBody.config.h;
+      this.w = this.mainBody.config.w;
+      this.sensoroffset = {
         x: this.mainBody.position.x,
         y: this.mainBody.position.y,
       };
@@ -337,27 +402,40 @@ class PlayerBody {
         parts: [...this.frameData[frame], ...Object.values(this.sensors)],
         ...this.compoundBodyConfig,
       });
-      if (this.flipX !== this.frameData[frame][0]["config"].flipX) {
+      if (this.flipX !== this.mainBody.config.flipX) {
         Body.scale(this.compoundBody, -1, 1);
-        this.frameData[frame][0]["config"].flipX = this.flipX;
+        console.log("setting flipX");
+        console.log(this.flipX);
+        this.frameData[frame].forEach(
+          (body) => (body.config.flipX = this.flipX)
+        );
       }
-      //if (this.frameData[frame].length > 1) {
-      //  console.log('------');
-      //  console.log(this.compoundBody.position);
-      //  this.compoundBody.position.x -= this.frameData[frame][0].centerOffset.x;
-      //  this.compoundBody.positionPrev.x -= this.frameData[frame][0].centerOffset.x;
-      //  this.offset.y = this.frameData[frame][0].centerOffset.y;
-      //} else {
-      //  this.offset.y = 0;
-      //  this.offset.x = 0;
-      //}
+      if (this.w < this.mainBody.config.orgw) {
+        if (this.flipX) {
+          this.compoundBody.position.x += this.mainBody.centerOffset.x;
+          this.compoundBody.positionPrev.x += this.mainBody.centerOffset.x;
+        } else {
+          this.compoundBody.position.x -= this.mainBody.centerOffset.x;
+          this.compoundBody.positionPrev.x -= this.mainBody.centerOffset.x;
+        }
+      }
+      if (this.h < this.mainBody.config.orgh) {
+        this.posoffset.y = this.mainBody.centerOffset.y;
+      } else {
+        this.posoffset.y = 0;
+        this.posoffset.x = 0;
+      }
       World.addBody(this.engine.world, this.compoundBody);
       Body.setPosition(this.compoundBody, { x: pos.x, y: pos.y });
       Body.setInertia(this.compoundBody, Infinity);
       Body.setVelocity(this.compoundBody, { x: 0, y: 0 });
     } else if (this.mainBody !== this.default) {
       const pos = this.getPosition();
-      this.offset = { x: this.default.position.x, y: this.default.position.y };
+      this.posoffset = { x: 0, y: 0 };
+      this.sensoroffset = {
+        x: this.default.position.x,
+        y: this.default.position.y,
+      };
       this.createDefaultBody(pos.x, pos.y);
     }
   }
@@ -401,12 +479,18 @@ export class Player extends gameObject {
     this.client = client;
     this.id = client.sessionId;
     this.body = new PlayerBody(this.engine, x, y, game.frameData);
+    this.body.event.on("statechange", async (change) => {
+      const id = await this.stateMachine.dispatch(change);
+      this.body.deregisterAction(id);
+    });
     const playerState = {
       idle: new IdleState(),
       run: new RunState(),
       jump: new JumpState(),
       fall: new FallState(),
       attack1: new AttackState(),
+      hurt: new Hurt(),
+      hitstun: new HitStun(),
     };
     this.stateMachine = new StateMachine("idle", playerState, game.framesInfo, [
       this,
@@ -419,10 +503,12 @@ export class Player extends gameObject {
       platformFall: false,
       flipX: false,
     };
+    // default attributes
     this.attributes = {
       groundspeed: 5,
       airspeed: 5,
       jumpheight: 12,
+      health: 100,
     };
     this.input = {
       left_keydown: false,
@@ -463,9 +549,13 @@ export class Player extends gameObject {
   }
 
   setInternalState(newstate: internalState) {
-    typeof newstate.flipX === "boolean"
-      ? this.body.setFlipX(newstate.flipX)
-      : null;
+    if (newstate.hasOwnProperty("flipX")) {
+      this.body.setFlipX(newstate.flipX);
+    }
+    if (this.state.asleep && newstate.asleep === false) {
+      this.awakePlayer();
+    }
+    //newstate.asleep ? this.awakePlayer()
     this.state = {
       ...this.state,
       ...newstate,
@@ -474,6 +564,14 @@ export class Player extends gameObject {
 
   setCamera(renderer) {
     this.body.setCamera(renderer);
+  }
+
+  /**
+   * @description re initializes client with newly updated information after they navigated back to game
+   */
+  awakePlayer() {
+    const currentAOI = this.aoi.getAOI(this.aoiId);
+    currentAOI.awakePlayer(this);
   }
 
   getMeta() {

@@ -14,7 +14,9 @@ export class Game {
   private allplayers: {
     [id: string]: Player;
   };
-  //colyseus.js room
+  // tick rate is in ms
+  private tickrate = 1000 / 60;
+  // colyseus.js room
   private room;
   private clearId;
   private aoimanager;
@@ -33,7 +35,7 @@ export class Game {
     this.allplayers = {};
     this.framesInfo = framesInfo;
     this.frameData = frameData;
-    this.clearId = setInterval(this.startGame.bind(this), 1000 / 60);
+    this.clearId = setInterval(this.gameLoop.bind(this), this.tickrate);
     this.aoimanager = new AOImanager();
     if (gameConfig.networkdebug) {
       this.render = Render.create({
@@ -47,10 +49,16 @@ export class Game {
       this.room.onMessage(messageType.playerinput, (client, playerinput) => {
         this.allplayers[client.sessionId].updatePlayerInput(playerinput);
       });
+      this.room.onMessage(messageType.playersleep, (client) => {
+        this.allplayers[client.sessionId].setInternalState({ asleep: true });
+      });
+      this.room.onMessage(messageType.playerawake, (client) => {
+        this.allplayers[client.sessionId].setInternalState({ asleep: false });
+      });
     }
   }
 
-  startGame() {
+  gameLoop() {
     for (const clientId in this.allplayers) {
       this.allplayers[clientId].update();
     }
