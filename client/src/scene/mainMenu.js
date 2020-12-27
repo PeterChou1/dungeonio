@@ -8,7 +8,12 @@ export class mainMenu extends Phaser.Scene {
     });
   }
 
-  init() {}
+  init(data) {
+    // if player is restarting
+    if (data) {
+      this.client = data.client;
+    }
+  }
 
   preload() {
     this.load.image("logo", "public/imgs/logo.png");
@@ -23,7 +28,14 @@ export class mainMenu extends Phaser.Scene {
     this.add.dom(
       this.cameras.main.centerX,
       this.cameras.main.centerY,
-      <StartMenu scene={this.scene} />
+      <StartMenu
+        start={{
+          scene: this.scene,
+          ...(this.sessionId && {
+            client: this.client,
+          }),
+        }}
+      />
     );
   }
 }

@@ -13,7 +13,7 @@ export const playerHitboxData: hitboxdata = {
   "adventurer-attack1-02": {
     label: "hitbox",
     knockback: { x: 5, y: -5 },
-    damage: 10,
+    damage: 100,
     hitstun: 100,
   },
 };
@@ -34,6 +34,26 @@ export const playerConfig = {
 export const playerStateMap = {
   clientinput: "client input",
   playerprop: "player property",
+};
+
+export const gameEvents = {
+  // animation event
+  anims: {
+    framechange: "framechange",
+    animationcomplete: "animationcomplete",
+  },
+  // stateMachine events
+  stateMachine: {
+    enter: "enter",
+    dispatchcomplete: "dispatchcomplete",
+  },
+  // body events
+  body: {
+    statechange: "statechange",
+  },
+  player: {
+    dead: "dead",
+  },
 };
 /**
  * @description Defines animation player has
@@ -86,5 +106,21 @@ export const playerAnims = [
     ],
     frameRate: 20,
     repeat: -1,
+  },
+  {
+    key: "dying",
+    frames: [
+      "mainchar",
+      { start: 0, end: 6, prefix: "adventurer-die-", zeroPad: 2 },
+    ],
+    frameRate: 10,
+  },
+  {
+    key: "dead",
+    frames: [
+      "mainchar",
+      { start: 6, end: 6, prefix: "adventurer-die-", zeroPad: 2 },
+    ],
+    frameRate: 10,
   },
 ];

@@ -2,7 +2,9 @@ import { World, Bodies, Body, Vector, Events, Render } from "matter-js";
 import {
   collisionData,
   gameConfig,
+  gameEvents,
   playerConfig,
+  messageType,
   playerHitboxData,
 } from "../../common";
 import {
@@ -14,6 +16,7 @@ import {
   AttackState,
   Hurt,
   HitStun,
+  Death,
 } from "./state";
 import { gameObject } from "./gameobject";
 import Phaser from "phaser";
@@ -39,17 +42,33 @@ type sensorConfig = {
 };
 
 type internalState = {
+  asleep: boolean; //whether or not player is asleep
+  onPlatform: boolean;
+  platformFall: boolean;
+  flipX: boolean;
+  health: number;
+};
+
+type internalStateConfig = {
   asleep?: boolean; //whether or not player is asleep
   onPlatform?: boolean;
   platformFall?: boolean;
   flipX?: boolean;
+  health?: number;
+};
+
+type attributeConfig = {
+  groundspeed?: number;
+  airspeed?: number;
+  jumpheight?: number;
+  maxhealth?: number;
 };
 
 type attributes = {
   groundspeed: number;
   airspeed: number;
   jumpheight: number;
-  health: number;
+  maxhealth: number;
 };
 
 type compoundBodyConfig = {
@@ -71,7 +90,8 @@ class PlayerBody {
   h: number;
   w: number;
   isTouching;
-  // register event emitter for when a state change happens
+  // register event emitter for when a state change to body happens
+  // ex: grab, hit
   event: EventEmitter;
   // a object keeps track of action being done to user
   private registeredActions: {
@@ -132,9 +152,14 @@ class PlayerBody {
         chamfer: { radius: 10 },
       }
     );
+    //store height and width in default body
+    this.default.config = {
+      h: this.default.bounds.max.y - this.default.bounds.min.y,
+      w: this.default.bounds.max.x - this.default.bounds.min.x,
+    };
     //console.log(this.default.inertia);
-    this.h = this.default.bounds.max.y - this.default.bounds.min.y;
-    this.w = this.default.bounds.max.x - this.default.bounds.min.x;
+    this.h = this.default.config.h;
+    this.w = this.default.config.w;
     this.sensors = {};
     this.isTouching = {};
     this.registeredActions = new Proxy(
@@ -142,7 +167,7 @@ class PlayerBody {
       {
         set: (obj, prop, value) => {
           obj[prop] = value;
-          this.event.emit("statechange", value);
+          this.event.emit(gameEvents.body.statechange, value);
           return true;
         },
       }
@@ -164,8 +189,6 @@ class PlayerBody {
     const { bodyA, bodyB } = pair;
     if (!(bodyB.id in this.registeredActions)) {
       if (bodyB.label === "hitbox") {
-        console.log("bodyB collide");
-        console.log(bodyB.config);
         this.registeredActions[bodyB.id] = {
           id: bodyB.id,
           category: "hit",
@@ -195,8 +218,8 @@ class PlayerBody {
    */
   createDefaultBody(x, y) {
     if (this.compoundBody) World.remove(this.engine.world, this.compoundBody);
-    this.h = this.default.bounds.max.y - this.default.bounds.min.y;
-    this.w = this.default.bounds.max.x - this.default.bounds.min.x;
+    this.h = this.default.config.h;
+    this.w = this.default.config.w;
     this.createSensors(this.sensorsConfig);
     this.mainBody = this.default;
     this.mainBody.onCollide(this.mainBodyCallback.bind(this));
@@ -404,8 +427,6 @@ class PlayerBody {
       });
       if (this.flipX !== this.mainBody.config.flipX) {
         Body.scale(this.compoundBody, -1, 1);
-        console.log("setting flipX");
-        console.log(this.flipX);
         this.frameData[frame].forEach(
           (body) => (body.config.flipX = this.flipX)
         );
@@ -419,12 +440,14 @@ class PlayerBody {
           this.compoundBody.positionPrev.x -= this.mainBody.centerOffset.x;
         }
       }
-      if (this.h < this.mainBody.config.orgh) {
-        this.posoffset.y = this.mainBody.centerOffset.y;
-      } else {
-        this.posoffset.y = 0;
-        this.posoffset.x = 0;
-      }
+      //if (this.default.config.h < this.mainBody.config.orgh) {
+      //  this.posoffset.y = this.mainBody.centerOffset.y
+      //  console.log('y offset');
+      //  console.log(this.posoffset.y);
+      //}
+      //else if (this.default.config.h > this.mainBody.config.orgh) {
+      //  this.posoffset.y = -(this.default.config.h - this.mainBody.config.orgh);
+      //}
       World.addBody(this.engine.world, this.compoundBody);
       Body.setPosition(this.compoundBody, { x: pos.x, y: pos.y });
       Body.setInertia(this.compoundBody, Infinity);
@@ -462,6 +485,8 @@ export class Player extends gameObject {
   world;
   engine;
   stateMachine: StateMachine;
+  // dead but not removed from world
+  private zombiemode: boolean;
   private body: PlayerBody;
   private state: internalState;
   private attributes: attributes;
@@ -475,13 +500,14 @@ export class Player extends gameObject {
     super();
     this.name = name;
     this.engine = game.engine;
+    this.zombiemode = false;
     this.aoi = game.aoimanager;
     this.client = client;
     this.id = client.sessionId;
     this.body = new PlayerBody(this.engine, x, y, game.frameData);
-    this.body.event.on("statechange", async (change) => {
-      const id = await this.stateMachine.dispatch(change);
-      this.body.deregisterAction(id);
+    this.body.event.on(gameEvents.body.statechange, async (change) => {
+      await this.stateMachine.dispatch(change);
+      this.body.deregisterAction(change.id);
     });
     const playerState = {
       idle: new IdleState(),
@@ -491,24 +517,27 @@ export class Player extends gameObject {
       attack1: new AttackState(),
       hurt: new Hurt(),
       hitstun: new HitStun(),
+      death: new Death(),
     };
     this.stateMachine = new StateMachine("idle", playerState, game.framesInfo, [
       this,
     ]);
-    this.stateMachine.anims.event.on("framechange", (frame) => {
+    this.stateMachine.anims.event.on(gameEvents.anims.framechange, (frame) => {
       this.body.setFrameBody(frame);
     });
-    this.state = {
-      onPlatform: false,
-      platformFall: false,
-      flipX: false,
-    };
     // default attributes
     this.attributes = {
       groundspeed: 5,
       airspeed: 5,
       jumpheight: 12,
-      health: 100,
+      maxhealth: 100,
+    };
+    this.state = {
+      asleep: false,
+      onPlatform: false,
+      platformFall: false,
+      flipX: false,
+      health: this.attributes.maxhealth,
     };
     this.input = {
       left_keydown: false,
@@ -548,12 +577,22 @@ export class Player extends gameObject {
     this.body.setCollidesWith(categories);
   }
 
-  setInternalState(newstate: internalState) {
+  setAttribute(newstate: attributeConfig) {
+    this.attributes = {
+      ...this.attributes,
+      ...newstate,
+    };
+  }
+
+  setInternalState(newstate: internalStateConfig) {
     if (newstate.hasOwnProperty("flipX")) {
       this.body.setFlipX(newstate.flipX);
     }
     if (this.state.asleep && newstate.asleep === false) {
       this.awakePlayer();
+    }
+    if (newstate.health === 0) {
+      this.kill();
     }
     //newstate.asleep ? this.awakePlayer()
     this.state = {
@@ -571,7 +610,11 @@ export class Player extends gameObject {
    */
   awakePlayer() {
     const currentAOI = this.aoi.getAOI(this.aoiId);
-    currentAOI.awakePlayer(this);
+    currentAOI.updatePlayer(this);
+    const adjacentAOI = this.aoi.getAdjacentAOI(this.aoiId);
+    for (const aoi of adjacentAOI) {
+      aoi.updatePlayer(this);
+    }
   }
 
   getMeta() {
@@ -579,6 +622,9 @@ export class Player extends gameObject {
       category: "player",
       name: this.name,
       id: this.id,
+      maxhealth: this.attributes.maxhealth,
+      health: this.state.health,
+      flipX: this.state.flipX,
     };
   }
   getPosition() {
@@ -602,6 +648,8 @@ export class Player extends gameObject {
     const pos = this.getPosition();
     const v = this.body.getVelocity();
     return {
+      maxhealth: this.attributes.maxhealth,
+      health: this.state.health,
       flipX: this.state.flipX,
       collisionData: this.body.getCollidesWith(),
       state: this.stateMachine.state,
@@ -613,19 +661,47 @@ export class Player extends gameObject {
   }
 
   update() {
-    this.stateMachine.step();
-    if (gameConfig.networkdebug) {
-      //console.log(this.body.isTouching);
-    } else {
-      this.aoiId = this.aoi.aoiupdate(this);
+    if (!this.zombiemode) {
+      this.stateMachine.step();
+      if (!gameConfig.networkdebug) {
+        this.aoiId = this.aoi.aoiupdate(this);
+        // if aoi id is undefined destroy player activate zombie mode
+        // and wait for player destruction
+        if (this.aoiId === undefined) {
+          this.kill();
+          this.zombiemode = true;
+        }
+      }
     }
   }
 
+  /**
+   * @description plays death animation then destroys body
+   */
+  kill() {
+    this.stateMachine.dispatch({ category: "death" });
+    this.stateMachine.event.once(
+      gameEvents.stateMachine.dispatchcomplete,
+      () => {
+        // send remove aoi to client -> cause client to leave -> trigger onLeave -> call destroy
+        this.client.send(messageType.aoiremove, {
+          id: this.id,
+        });
+      }
+    );
+  }
+  /**
+   * @description destroys player body and removes it from the world
+   */
   destroy() {
     if (!gameConfig.networkdebug) {
       console.log(`destroy player id: ${this.id} name: ${this.name}`);
-      const currentAOI = this.aoi.getAOI(this.aoiId);
-      currentAOI.removeClient(this, true);
+      if (this.aoiId) {
+        const currentAOI = this.aoi.getAOI(this.aoiId);
+        currentAOI.removeClient(this, true);
+        const adjacentAOI = this.aoi.getAdjacentAOI(this.aoiId);
+        adjacentAOI.forEach((aoi) => aoi.removeAdjacentClient(this, false));
+      }
     }
     this.body.destroy();
   }

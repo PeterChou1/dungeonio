@@ -55,6 +55,10 @@ export class AOImanager {
           //check condition for gameobject to be a player
           if (gameobject instanceof Player) {
             aoi.addClient(gameobject, true);
+            const adjacentAOI = this.getAdjacentAOI(aoi.aoiId);
+            for (const adjaoi of adjacentAOI) {
+              adjaoi.addAdjacentClient(gameobject, false);
+            }
           } else {
             aoi.addEntity(gameobject);
           }
@@ -85,14 +89,36 @@ export class AOImanager {
         for (const aoi of adjacent) {
           if (aoi.inAOI(coords.x, coords.y)) {
             if (gameobject instanceof Player) {
+              aoi.removeAdjacentClient(gameobject, true);
               aoi.addClient(gameobject);
               currentAOI.removeClient(gameobject);
+              currentAOI.addAdjacentClient(gameobject, true);
+              const newadjacent = this.getAdjacentAOI(aoi.aoiId);
+              for (const oldaoi of adjacent) {
+                if (!newadjacent.includes(oldaoi) && oldaoi !== aoi) {
+                  oldaoi.removeAdjacentClient(gameobject, false);
+                }
+              }
+              for (const newaoi of newadjacent) {
+                if (!adjacent.includes(newaoi) && newaoi !== currentAOI) {
+                  newaoi.addAdjacentClient(gameobject, false);
+                }
+              }
             } else {
               aoi.addEntity(gameobject);
               currentAOI.removeEntity(gameobject);
             }
             return aoi.aoiId;
           }
+        }
+        // if player is in no aoi then remove gameobject from every adjacent square
+        for (const aoi of adjacent) {
+          aoi.removeAdjacentClient(gameobject, false);
+        }
+        if (gameobject instanceof Player) {
+          currentAOI.removeClient(gameobject);
+        } else {
+          currentAOI.removeEntity(gameobject);
         }
       }
     }

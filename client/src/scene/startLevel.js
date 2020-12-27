@@ -33,26 +33,36 @@ export class startLevel extends Phaser.Scene {
     console.log(data);
     // get name recieved from start menu
     this.playerName = data.playerName;
+    // if data has session Id then try to restart
+    if (data.hasOwnProperty("client")) {
+      this.client = data.client;
+    }
   }
 
   async connect() {
     //const host = window.document.location.host.replace(/:.*/, '');
-    var host = window.document.location.host.replace(/:.*/, "");
-    let port;
-    // if port is 8080 or 8081 it means we are using dev environment then default to default port
-    if (location.port && location.port !== "8081" && location.port != "8080") {
-      port = `:${location.port}`;
-    } else {
-      port = "";
-    }
-    var websocket =
-      location.protocol.replace("http", "ws") + "//" + host + port;
-    console.log(location);
-    console.log(`connected to web socket protocol ${websocket}`);
-    const client = new Colyseus.Client(websocket);
-    // joined defined room
     try {
-      return await client.joinOrCreate("game", {
+      if (this.client === undefined) {
+        var host = window.document.location.host.replace(/:.*/, "");
+        let port;
+        // if port is 8080 or 8081 it means we are using dev environment then default to default port
+        if (
+          location.port &&
+          location.port !== "8081" &&
+          location.port != "8080"
+        ) {
+          port = `:${location.port}`;
+        } else {
+          port = "";
+        }
+        var websocket =
+          location.protocol.replace("http", "ws") + "//" + host + port;
+        console.log(location);
+        console.log(`connected to web socket protocol ${websocket}`);
+        this.client = new Colyseus.Client(websocket);
+        // joined defined room
+      }
+      return await this.client.joinOrCreate("game", {
         playerName: this.playerName,
       });
     } catch (e) {
@@ -77,7 +87,10 @@ export class startLevel extends Phaser.Scene {
     // random number generated for network latency test
     this.randlatency = 50; //randomInteger(0, 500);
     console.log("random latency (client) ", this.randlatency);
+    // unique id of room
     this.sessionId = gameConfig.networkdebug ? "test" : this.room.sessionId;
+    // unique id of session
+    this.roomId = gameConfig.networkdebug ? "test" : this.room.id;
     //console.log('joined room with sessionId ', this.sessionId);
     this.keys = this.input.keyboard.addKeys({
       up: KeyCodes.W,
@@ -204,6 +217,7 @@ export class startLevel extends Phaser.Scene {
     this.allplayers = {};
     this.room.onMessage(messageType.aoiadd, (entity) => {
       if (!(entity in this.allplayers)) {
+        console.log("aoi add");
         console.log(`--Player added with id: ${entity.id}--`);
         // NOTE: simulation coordinates differ by 25
         entity.y -= 25;
@@ -212,7 +226,10 @@ export class startLevel extends Phaser.Scene {
           entity.x,
           entity.y,
           entity.id,
-          entity.name
+          entity.name,
+          entity.flipX,
+          entity.maxhealth,
+          entity.health
         );
         //this.localplayer = new LocalPlayer(this, player.x, player.y, 2);
         if (entity.id === this.sessionId) {
@@ -222,10 +239,12 @@ export class startLevel extends Phaser.Scene {
           const width = this.gamelayer.ground.width;
           this.matter.world.setBounds(0, 0, width, height);
           this.cameras.main.setBounds(0, 0, width, height);
+          //this.cameras.main.setZoom(0.5);
           this.cameras.main.startFollow(this.allplayers[entity.id].sprite);
         }
       }
     });
+
     this.room.onMessage(messageType.aoiupdate, (entities) => {
       console.log("aoi update");
       for (const id in entities) {
@@ -238,6 +257,8 @@ export class startLevel extends Phaser.Scene {
             flipX: entities[id].flipX,
             collisionData: entities[id].collisionData,
             state: entities[id].state,
+            maxhealth: entities[id].maxhealth,
+            health: entities[id].health,
           });
         }
       }
@@ -246,13 +267,26 @@ export class startLevel extends Phaser.Scene {
       console.log("aoi remove");
       this.allplayers[entity.id].destroy();
       delete this.allplayers[entity.id];
+      if (entity.id === this.sessionId) {
+        // if id equal this session id that means player died destroy all player and leave
+        this.room.removeAllListeners();
+        this.room.leave();
+        for (const id in this.allplayers) {
+          if (id !== this.sessionId) {
+            this.allplayers[id].destroy();
+            delete this.allplayers[id];
+          }
+        }
+        this.scene.start("deadScreen", {
+          client: this.client,
+        });
+      }
     });
 
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         console.log("hidden player");
-        // TODO: if AI enemies are added delete those too
-        // delete every character not main character
+        // TODO: if AI enemies are added AI enemies must be deleted too
         for (const id in this.allplayers) {
           if (id !== this.sessionId) {
             this.allplayers[id].destroy();
@@ -261,7 +295,6 @@ export class startLevel extends Phaser.Scene {
         }
         this.room.send(messageType.playersleep);
       } else {
-        console.log("awake player");
         this.room.send(messageType.playerawake);
       }
     });
@@ -315,7 +348,8 @@ export class startLevel extends Phaser.Scene {
         flipX: state.flipX,
         collisionData: state.collisionData,
         state: state.state,
-        misc: state,
+        maxhealth: state.maxhealth,
+        health: state.health,
       });
       const state2 = this.serverinstance.manualGetState("test2");
       this.testplayer2.updatePlayer({
@@ -324,7 +358,8 @@ export class startLevel extends Phaser.Scene {
         flipX: state2.flipX,
         collisionData: state2.collisionData,
         state: state2.state,
-        misc: state2,
+        maxhealth: state2.maxhealth,
+        health: state2.health,
       });
     }
   }

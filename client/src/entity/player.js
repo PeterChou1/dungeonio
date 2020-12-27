@@ -5,8 +5,13 @@ const { Body, Bodies } = Phaser.Physics.Matter.Matter;
 const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
 
 export default class Player {
-  constructor(scene, x, y, key, playerName) {
+  constructor(scene, x, y, key, playerName, flipX, maxhealth, health) {
     console.log(`player name: ${playerName} joined`);
+    // meta attributes on player
+    this.meta = {
+      maxhealth: maxhealth,
+      health: health,
+    };
     this.scene = scene;
     this.sprite = scene.matter.add.sprite(
       x,
@@ -24,6 +29,7 @@ export default class Player {
     this.sprite.setExistingBody(this.mainBody);
     this.sprite.setFixedRotation();
     this.sprite.setPosition(x, y);
+    this.sprite.setFlipX(flipX);
 
     // default state of player values is idle
     this.playerstate = "idle";
@@ -48,7 +54,11 @@ export default class Player {
     this.sprite.anims.play(anims);
   }
 
-  updatePlayer({ x, y, flipX, collisionData, state, misc }) {
+  updatePlayer({ x, y, flipX, collisionData, state, maxhealth, health }) {
+    this.meta = {
+      maxhealth: maxhealth,
+      health: health,
+    };
     this.sprite.setFlipX(flipX);
     this.sprite.setCollidesWith(collisionData);
     if (this.playerstate !== state) {
@@ -59,7 +69,9 @@ export default class Player {
     if (gameConfig.networkdebug) {
       this.sprite.setPosition(x, y);
       this.playertext.setPosition(x, y - 50);
-      this.playertext.setText(JSON.stringify(state));
+      this.playertext.setText(
+        `x: ${x} y: ${y} flipX: ${flipX} state: ${state} maxhealth: ${maxhealth} health: ${health}`
+      );
     } else {
       if (document.hidden) {
         // when browser is hidden don't interpolate update immediately

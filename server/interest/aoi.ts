@@ -11,6 +11,10 @@ export class AOI {
   entities: {
     [id: string]: gameObject;
   };
+  // adjacent players in different AOI
+  adjacentPlayer: {
+    [id: string]: Player;
+  };
   // save states of entity used for diffing
   savedState;
   // clients in current aoi
@@ -27,6 +31,7 @@ export class AOI {
     this.savedState = {};
     this.clients = {};
     this.adjacentClient = {};
+    this.adjacentPlayer = {};
     this.width = width;
     this.height = height;
     this.x = x;
@@ -45,9 +50,9 @@ export class AOI {
     );
   }
   /**
-   * @description used to update player that navigated back to game
+   * @description update a specific player which has been sleeping to current AOI conditions
    */
-  awakePlayer(clientGameObject: Player) {
+  updatePlayer(clientGameObject: Player) {
     for (const id in this.entities) {
       if (id !== clientGameObject.id) {
         clientGameObject.client.send(messageType.aoiadd, {
@@ -56,38 +61,68 @@ export class AOI {
         });
       }
     }
-    clientGameObject.client.send(messageType.aoiupdate, {
-      [clientGameObject.id]: clientGameObject.getState(),
-    });
+
+    if (Object.values(this.entities).includes(clientGameObject)) {
+      clientGameObject.client.send(messageType.aoiupdate, {
+        [clientGameObject.id]: clientGameObject.getState(),
+      });
+    }
   }
 
   /**
    * @description adds client in current AOI for adjacent clients
+   * @param clientGameObject
+   * @param alreadyAdjacent if player is already adjacent do not send aoi adds
    */
-  addAdjacentClient(clientGameObject: Player) {
+  addAdjacentClient(clientGameObject: Player, alreadyAdjacent: boolean) {
     this.adjacentClient[clientGameObject.id] = clientGameObject.client;
-    const state = clientGameObject.getInternalState();
-    if (!state.asleep) {
-      for (const id in this.entities) {
-        clientGameObject.client.send(messageType.aoiadd, {
-          ...this.entities[id].getPosition(),
-          ...this.entities[id].getMeta(),
-        });
+    this.adjacentPlayer[clientGameObject.id] = clientGameObject;
+
+    if (!alreadyAdjacent) {
+      const state = clientGameObject.getInternalState();
+      if (!state.asleep) {
+        for (const id in this.entities) {
+          clientGameObject.client.send(messageType.aoiadd, {
+            ...this.entities[id].getPosition(),
+            ...this.entities[id].getMeta(),
+          });
+        }
+      }
+      for (const clientid in this.clients) {
+        const state = this.entities[clientid].getInternalState();
+        if (!state.asleep) {
+          this.clients[clientid].send(messageType.aoiadd, {
+            ...clientGameObject.getPosition(),
+            ...clientGameObject.getMeta(),
+          });
+        }
       }
     }
   }
   /**
    * @description remove entities in current AOI for adjacent clients
    */
-  removeAdjacentClient(clientGameObject: Player) {
+  removeAdjacentClient(clientGameObject: Player, alreadyAdjacent: boolean) {
     delete this.adjacentClient[clientGameObject.id];
+    delete this.adjacentPlayer[clientGameObject.id];
     // remove all entities within aoi for client
-    const state = clientGameObject.getInternalState();
-    if (!state.asleep) {
-      for (const id in this.entities) {
-        clientGameObject.client.send(messageType.aoiremove, {
-          id: id,
-        });
+    if (!alreadyAdjacent) {
+      const state = clientGameObject.getInternalState();
+      if (!state.asleep) {
+        for (const id in this.entities) {
+          clientGameObject.client.send(messageType.aoiremove, {
+            id: id,
+          });
+        }
+      }
+      // remove tell all other players to remove client
+      for (const clientid in this.clients) {
+        const state = this.entities[clientid].getInternalState();
+        if (!state.asleep) {
+          this.clients[clientid].send(messageType.aoiremove, {
+            id: clientGameObject.id,
+          });
+        }
       }
     }
   }
@@ -98,35 +133,36 @@ export class AOI {
    * added (used for init)
    */
   addClient(clientGameObject: Player, init?) {
-    // add to every other client within the aoi expect the ones that are asleep
-    for (const clientid in this.clients) {
-      const state = this.entities[clientid].getInternalState();
-      if (!state.asleep) {
-        this.clients[clientid].send(messageType.aoiadd, {
-          ...clientGameObject.getPosition(),
-          ...clientGameObject.getMeta(),
-        });
-      }
-    }
-    // add all entity within aoi to client
-    const state = clientGameObject.getInternalState();
-    if (!state.asleep) {
-      for (const id in this.entities) {
-        clientGameObject.client.send(messageType.aoiadd, {
-          ...this.entities[id].getPosition(),
-          ...this.entities[id].getMeta(),
-        });
-      }
-    }
-    this.clients[clientGameObject.id] = clientGameObject.client;
-    this.entities[clientGameObject.id] = clientGameObject;
-    //this.savedState[clientGameObject.id] = clientGameObject.getState();
     if (init) {
+      // add to every other client within the aoi expect the ones that are asleep
+      for (const clientid in this.clients) {
+        const state = this.entities[clientid].getInternalState();
+        if (!state.asleep) {
+          this.clients[clientid].send(messageType.aoiadd, {
+            ...clientGameObject.getPosition(),
+            ...clientGameObject.getMeta(),
+          });
+        }
+      }
+      // add all entity within aoi to client
+      const state = clientGameObject.getInternalState();
+      if (!state.asleep) {
+        for (const id in this.entities) {
+          clientGameObject.client.send(messageType.aoiadd, {
+            ...this.entities[id].getPosition(),
+            ...this.entities[id].getMeta(),
+          });
+        }
+      }
       clientGameObject.client.send(messageType.aoiadd, {
         ...clientGameObject.getPosition(),
         ...clientGameObject.getMeta(),
       });
     }
+
+    this.clients[clientGameObject.id] = clientGameObject.client;
+    this.entities[clientGameObject.id] = clientGameObject;
+    //this.savedState[clientGameObject.id] = clientGameObject.getState();
   }
 
   /**
@@ -135,30 +171,18 @@ export class AOI {
    * @param quit optional parameter used for players quiting the game
    */
   removeClient(clientGameObject: Player, quit?) {
-    if (quit) {
-      clientGameObject.client.send(messageType.aoiremove, {
-        id: clientGameObject.id,
-      });
-    }
     delete this.clients[clientGameObject.id];
     delete this.entities[clientGameObject.id];
     delete this.savedState[clientGameObject.id];
-
-    for (const clientid in this.clients) {
-      const state = this.entities[clientid].getInternalState();
-      if (!state.asleep) {
-        this.clients[clientid].send(messageType.aoiremove, {
-          id: clientGameObject.id,
-        });
-      }
-    }
-    // remove all entities within aoi for client
-    const state = clientGameObject.getInternalState();
-    if (!state.asleep) {
-      for (const id in this.entities) {
-        clientGameObject.client.send(messageType.aoiremove, {
-          id: id,
-        });
+    if (quit) {
+      console.log("aoi remove");
+      for (const clientid in this.clients) {
+        const state = this.entities[clientid].getInternalState();
+        if (!state.asleep) {
+          this.clients[clientid].send(messageType.aoiremove, {
+            id: clientGameObject.id,
+          });
+        }
       }
     }
   }
@@ -194,7 +218,7 @@ export class AOI {
     this.broadcast(messageType.aoiupdate, this.getAOIEntities());
   }
   /**
-   * Broadcast to all clients within AOI
+   * Broadcast to all adjacent and current clients within AOI
    * @param msgtype used type from messageType from globalConfig
    * @param msg
    */
@@ -205,6 +229,13 @@ export class AOI {
         const state = this.entities[clientid].getInternalState();
         if (!state.asleep) {
           this.clients[clientid].send(msgtype, msg);
+        }
+      }
+      // broadcast to adjacent aoi
+      for (const clientid in this.adjacentClient) {
+        const state = this.adjacentPlayer[clientid].getInternalState();
+        if (!state.asleep) {
+          this.adjacentClient[clientid].send(msgtype, msg);
         }
       }
     }

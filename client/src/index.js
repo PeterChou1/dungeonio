@@ -5,7 +5,8 @@ import RexUIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin";
 import { startLevel } from "./scene/startLevel";
 import { bootScene } from "./scene/boot";
 import { mainMenu } from "./scene/mainMenu";
-import { hudScene } from "./scene/hud";
+import { deadScreen } from "./scene/deadScreen";
+//import { hudScene } from "./scene/hud";
 
 const config = {
   type: Phaser.AUTO,
@@ -44,5 +45,6 @@ const game = new Phaser.Game(config);
 game.scene.add("startLevel", startLevel);
 game.scene.add("bootScene", bootScene);
 game.scene.add("mainMenu", mainMenu);
-game.scene.add("hudScene", hudScene);
+game.scene.add("deadScreen", deadScreen);
+//game.scene.add("hudScene", hudScene);
 game.scene.start("mainMenu");

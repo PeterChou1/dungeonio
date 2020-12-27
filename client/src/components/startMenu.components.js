@@ -28,11 +28,21 @@ const StartMenu = (props) => {
           <div class="control">
             <button
               onClick={() => {
-                props.scene.start("bootScene", {
+                const startdata = {
                   playerName: textbox.current.value
-                    ? textbox.current.value
+                    ? textbox.current.value.slice(0, 15)
                     : "unnamed warrior",
-                });
+                  ...(props.start.sessionId && {
+                    sessionId: props.start.sessionId,
+                    roomId: props.start.roomId,
+                    client: props.start.client,
+                  }),
+                };
+                if (props.start.hasOwnProperty("sessionId")) {
+                  props.start.scene.start("startLevel", startdata);
+                } else {
+                  props.start.scene.start("bootScene", startdata);
+                }
               }}
               class="button is-primary"
             >

@@ -1,4 +1,4 @@
-import { collisionData, playerAnims } from "../../common";
+import { collisionData, gameEvents } from "../../common";
 import { EventEmitter } from "events";
 import { Player } from "./player";
 
@@ -7,6 +7,9 @@ type hitConfig = {
   damage: number;
   hitstun: number;
   flipX: boolean;
+};
+type eventDeath = {
+  category: "death";
 };
 type eventHit = {
   id: number;
@@ -21,9 +24,11 @@ type eventGrab = {
   };
 };
 
-type PossibleStates = {
+export type event = eventHit | eventGrab | eventDeath;
+
+export interface PossibleStates {
   [key: string]: State;
-};
+}
 
 export abstract class State {
   stateMachine: StateMachine;
@@ -32,8 +37,6 @@ export abstract class State {
   //deregister any events and clean up state and quit
   abstract quit();
 }
-
-export type event = eventHit | eventGrab;
 
 /**
  * @description used to minick animation frames used for setting hitbox
@@ -72,9 +75,9 @@ class MockAnimsManager {
   frameExecution() {
     this.duration -= this.anims.interval;
     this.frame = this.anims.frames[this.duration / this.anims.interval];
-    this.event.emit("framechange", this.frame);
+    this.event.emit(gameEvents.anims.framechange, this.frame);
     if (this.duration === 0) {
-      this.event.emit("animationcomplete");
+      this.event.emit(gameEvents.anims.animationcomplete, this.key);
       if (this.repeat > 0) {
         this.repeat -= 1;
       } else if (this.repeat === 0) {
@@ -113,32 +116,56 @@ export class StateMachine {
    * dispatches events to state machine which forces it to transition to
    * a certain state
    * @param events
-   * @return {Promise<number>} id when event dispatch is finished
+   * @return {Promise<boolean>} whether dispatch event succeeded or failed
    */
-  async dispatch(event: event): Promise<number> {
+  async dispatch(event: event): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      console.log("recieved event");
-      console.log(event);
-      switch (event.category) {
-        case "hit":
-          this.stateArgs.push(event.eventConfig);
-          this.transition("hurt");
-          const callback = (state) => {
-            if (state !== "hurt" && state !== "hitstun") {
-              this.stateArgs = this.stateArgs.slice(0, 1);
-              this.event.emit("dispatchcomplete");
-              resolve(event.id);
-            }
-          };
-          this.event.on("enter", callback);
-          this.event.once("dispatchcomplete", () => {
-            this.event.off("enter", callback);
-          });
-
-          break;
-        case "grab":
-          resolve(event.id);
-          break;
+      // you can't cheat death
+      if (this.state !== "death") {
+        // quit current state and transition to new state
+        console.log("dispatch event");
+        console.log(event);
+        this.possibleStates[this.state].quit();
+        switch (event.category) {
+          case "hit":
+            this.stateArgs.push(event.eventConfig);
+            this.transition("hurt");
+            const hitresolve = (state) => {
+              if (state !== "hurt" && state !== "hitstun") {
+                this.stateArgs = this.stateArgs.slice(0, 1);
+                this.event.off(gameEvents.stateMachine.enter, hitresolve);
+                this.event.emit(gameEvents.stateMachine.dispatchcomplete);
+                resolve(true);
+              }
+            };
+            this.event.on(gameEvents.stateMachine.enter, hitresolve);
+            //this.event.once(gameEvents.stateMachine.dispatchcomplete, () => {
+            //  this.event.off(gameEvents.stateMachine.enter, callback);
+            //});
+            break;
+          case "death":
+            this.transition("death");
+            const deathresolve = (anims) => {
+              if (anims === "dead") {
+                this.anims.event.off(
+                  gameEvents.anims.animationcomplete,
+                  deathresolve
+                );
+                this.event.emit(gameEvents.stateMachine.dispatchcomplete);
+                resolve(true);
+              }
+            };
+            this.anims.event.on(
+              gameEvents.anims.animationcomplete,
+              deathresolve
+            );
+            break;
+          case "grab":
+            resolve(true);
+            break;
+        }
+      } else {
+        resolve(false);
       }
     });
   }
@@ -162,7 +189,7 @@ export class StateMachine {
 export class IdleState extends State {
   enter(player: Player) {
     this.stateMachine.anims.play("idle");
-    this.stateMachine.event.emit("enter", "idle");
+    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "idle");
     player.setVelocity(0);
   }
 
@@ -209,7 +236,7 @@ export class IdleState extends State {
 export class RunState extends State {
   enter(player: Player) {
     this.stateMachine.anims.play("run");
-    this.stateMachine.event.emit("enter", "run");
+    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "run");
     //player.awakeplayer();
   }
   execute(player: Player) {
@@ -263,7 +290,7 @@ export class RunState extends State {
 export class FallState extends State {
   enter(player: Player) {
     this.stateMachine.anims.play("fall");
-    this.stateMachine.event.emit("enter", "fall");
+    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "fall");
   }
   execute(player: Player) {
     const clientinput = player.input;
@@ -296,13 +323,19 @@ export class JumpState extends State {
       this.stateMachine.transition("fall");
       return;
     };
-    this.stateMachine.anims.event.once("animationcomplete", this.callback);
+    this.stateMachine.anims.event.once(
+      gameEvents.anims.animationcomplete,
+      this.callback
+    );
   }
 
   execute(player) {}
 
   quit() {
-    this.stateMachine.anims.event.off("animationcomplete", this.callback);
+    this.stateMachine.anims.event.off(
+      gameEvents.anims.animationcomplete,
+      this.callback
+    );
   }
 }
 
@@ -310,46 +343,71 @@ export class AttackState extends State {
   callback;
   enter(player: Player) {
     this.stateMachine.anims.play("attack1");
-    this.stateMachine.event.emit("enter", "attack1");
+    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "attack1");
     this.callback = () => {
       this.stateMachine.transition("idle");
       return;
     };
-    this.stateMachine.anims.event.once("animationcomplete", this.callback);
+    this.stateMachine.anims.event.once(
+      gameEvents.anims.animationcomplete,
+      this.callback
+    );
   }
 
   execute(player: Player) {}
 
   quit() {
-    this.stateMachine.anims.event.off("animationcomplete", this.callback);
+    this.stateMachine.anims.event.off(
+      gameEvents.anims.animationcomplete,
+      this.callback
+    );
   }
 }
 
 export class Hurt extends State {
+  callback;
   enter(player: Player, hitconfig: hitConfig) {
     this.stateMachine.anims.play("hurt");
-    this.stateMachine.event.emit("enter", "hurt");
+    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "hurt");
     console.log(hitconfig);
     if (hitconfig.flipX) {
       player.setVelocity(-hitconfig.knockback.x, hitconfig.knockback.y);
     } else {
       player.setVelocity(hitconfig.knockback.x, hitconfig.knockback.y);
     }
-    this.stateMachine.anims.event.once("animationcomplete", () => {
-      this.stateMachine.transition("hitstun");
+
+    this.callback = () => {
+      const state = player.getInternalState();
+      const dmgdealt = state.health - hitconfig.damage;
+      const newhealth = dmgdealt >= 0 ? dmgdealt : 0;
+      player.setInternalState({ health: newhealth });
+      if (newhealth > 0) {
+        this.stateMachine.transition("hitstun");
+      }
       return;
-    });
+    };
+    this.stateMachine.anims.event.once(
+      gameEvents.anims.animationcomplete,
+      this.callback
+    );
   }
   execute(player: Player, hitconfig: hitConfig) {}
 
-  quit() {}
+  quit() {
+    this.stateMachine.anims.event.off(
+      gameEvents.anims.animationcomplete,
+      this.callback
+    );
+  }
 }
 
 export class HitStun extends State {
+  timerhandle;
+
   enter(player: Player, hitconfig: hitConfig) {
     this.stateMachine.anims.play("hitstun");
-    this.stateMachine.event.emit("enter", "hitstun");
-    setTimeout(() => {
+    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "hitstun");
+    this.timerhandle = setTimeout(() => {
       const isTouching = player.getIsTouching();
       if (isTouching.bottom) {
         this.stateMachine.transition("idle");
@@ -360,6 +418,25 @@ export class HitStun extends State {
   }
 
   execute(player: Player, hitconfig: hitConfig) {}
+
+  quit() {
+    clearTimeout(this.timerhandle);
+  }
+}
+
+export class Death extends State {
+  enter(player: Player) {
+    this.stateMachine.anims.play("dying");
+    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "death");
+    this.stateMachine.anims.event.once(
+      gameEvents.anims.animationcomplete,
+      () => {
+        this.stateMachine.anims.play("dead");
+      }
+    );
+  }
+
+  execute(player: Player) {}
 
   quit() {}
 }
