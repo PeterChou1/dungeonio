@@ -12,9 +12,9 @@ type hitboxdata = {
 export const playerHitboxData: hitboxdata = {
   "adventurer-attack1-02": {
     label: "hitbox",
-    knockback: { x: 5, y: -5 },
-    damage: 100,
-    hitstun: 100,
+    knockback: { x: 50, y: -50 },
+    damage: 10,
+    hitstun: 100000,
   },
 };
 

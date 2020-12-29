@@ -3,19 +3,22 @@ import { Player } from "./player";
 import { messageType, gameConfig } from "../../common/config/globalConfig";
 import { AOImanager } from "../interest/aoi.manager";
 import { Engine, World, Render, Events } from "matter-js";
+
+const Colyseus = require("colyseus.js");
 //declare document for injection into client side code
 declare let document: any;
 /**
  * Core game engine loop
  */
 export class Game {
+  private id;
   private engine;
   // stores simulate player instances
   private allplayers: {
     [id: string]: Player;
   };
   // tick rate is in ms
-  private tickrate = 1000 / 60;
+  private tickrate = 1000 / 100;
   // colyseus.js room
   private room;
   private clearId;
@@ -85,7 +88,7 @@ export class Game {
         }.bind(this)
       );
     } else if (!gameConfig.networkdebug) {
-      this.room.state.addPlayer(client.sessionId, name, 100, 100);
+      this.room.state.addPlayer(client.sessionId, name);
     }
   }
 

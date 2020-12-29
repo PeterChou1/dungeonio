@@ -282,6 +282,13 @@ export class startLevel extends Phaser.Scene {
         });
       }
     });
+    // if client got booted for whatever reason
+    this.room.onLeave((code) => {
+      console.log(`client kicked code: ${code}`);
+      this.scene.start("mainMenu", {
+        client: this.client,
+      });
+    });
 
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {

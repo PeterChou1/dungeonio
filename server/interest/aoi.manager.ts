@@ -116,7 +116,7 @@ export class AOImanager {
           aoi.removeAdjacentClient(gameobject, false);
         }
         if (gameobject instanceof Player) {
-          currentAOI.removeClient(gameobject);
+          currentAOI.removeClient(gameobject, true);
         } else {
           currentAOI.removeEntity(gameobject);
         }
