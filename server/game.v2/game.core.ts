@@ -18,7 +18,7 @@ export class Game {
     [id: string]: Player;
   };
   // tick rate is in ms
-  private tickrate = 1000 / 100;
+  private tickrate = 1000 / 60;
   // colyseus.js room
   private room;
   private clearId;
