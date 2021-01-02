@@ -3,8 +3,8 @@ import { Player } from "./player";
 import { messageType, gameConfig } from "../../common/config/globalConfig";
 import { AOImanager } from "../interest/aoi.manager";
 import { Engine, World, Render, Events } from "matter-js";
+const NanoTimer = require('nanotimer');
 
-const Colyseus = require("colyseus.js");
 //declare document for injection into client side code
 declare let document: any;
 /**
@@ -17,12 +17,18 @@ export class Game {
   private allplayers: {
     [id: string]: Player;
   };
-  // tick rate is in ms
+  // tick rate is in ms 
+  //(Game loop)
   private tickrate = 1000 / 60;
+  //(Broad cast loop)
+  private updaterate = 1000 / 10;
+  // game timer
+  private gametimer;
+  // update timer for broadcast to client
+  private updatetimer;
   // colyseus.js room
   private room;
-  private clearId;
-  private aoimanager;
+  private aoimanager : AOImanager;
   // frame data of player character
   private framesInfo;
   private frameData;
@@ -34,11 +40,20 @@ export class Game {
   }
 
   private constructor(engine, framesInfo, frameData, room?) {
+    
     this.engine = engine;
     this.allplayers = {};
     this.framesInfo = framesInfo;
     this.frameData = frameData;
-    this.clearId = setInterval(this.gameLoop.bind(this), this.tickrate);
+    this.gametimer = new NanoTimer();
+    this.updatetimer = new NanoTimer();
+    console.log(`running at tick rate ${Math.trunc(this.tickrate)}m`);
+    if (gameConfig.networkdebug) {
+      setInterval(this.updateGame.bind(this), this.tickrate);
+    } else {
+      this.updatetimer.setInterval(this.broadcastClients.bind(this), '', `${Math.trunc(this.updaterate)}m`);
+      this.gametimer.setInterval(this.updateGame.bind(this), '', `${Math.trunc(this.tickrate)}m`);
+    }
     this.aoimanager = new AOImanager();
     if (gameConfig.networkdebug) {
       this.render = Render.create({
@@ -61,12 +76,17 @@ export class Game {
     }
   }
 
-  gameLoop() {
+  updateGame(delta = 16) {
     for (const clientId in this.allplayers) {
       this.allplayers[clientId].update();
     }
-    Engine.update(this.engine);
+    Engine.update(this.engine, delta);
   }
+
+  broadcastClients()  {
+    this.aoimanager.aoibroadcast();
+  }
+
 
   manualUpdateInput(clientId, playerinput) {
     this.allplayers[clientId].updatePlayerInput(playerinput);
@@ -103,6 +123,7 @@ export class Game {
   destroy() {
     World.clear(this.engine.world);
     Engine.clear(this.engine);
-    clearInterval(this.clearId);
+    this.gametimer.clearInterval();
+    this.updatetimer.clearInterval();
   }
 }

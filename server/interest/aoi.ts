@@ -36,9 +36,6 @@ export class AOI {
     this.height = height;
     this.x = x;
     this.y = y;
-
-    //console.log(`id x:${this.aoiId.x} y: ${this.aoiId.y} aoi x:${x} y:${y}`);
-    this.clearId = setInterval(this.updateEntity.bind(this), 100);
   }
 
   inAOI(x, y) {
@@ -209,14 +206,7 @@ export class AOI {
       id: entity.id,
     });
   }
-  /**
-   * @description Update loop for current AOI instanitate on start up
-   * and shutdown on destruction
-   */
-  private updateEntity() {
-    //console.log(`update entity aoi (x:${this.aoiId.x} y:${this.aoiId.y})`);
-    this.broadcast(messageType.aoiupdate, this.getAOIEntities());
-  }
+
   /**
    * Broadcast to all adjacent and current clients within AOI
    * @param msgtype used type from messageType from globalConfig
@@ -254,8 +244,5 @@ export class AOI {
       this.savedState[id] = newState;
     }
     return entities;
-  }
-  destroy() {
-    clearInterval(this.clearId);
   }
 }

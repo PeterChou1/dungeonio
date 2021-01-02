@@ -1,5 +1,7 @@
+import { messageType } from "../../common";
 import { Player } from "../game.v2/player";
 import { AOI } from "./aoi";
+
 
 export class AOImanager {
   static directions = [
@@ -123,6 +125,16 @@ export class AOImanager {
       }
     }
   }
+  /**
+   * @description scans every aoi and broadcast updates to their respective clients
+   */
+  aoibroadcast() {
+    for (const row of this.aoi) {
+      for (const aoiCell of row) {
+        aoiCell.broadcast(messageType.aoiupdate, aoiCell.getAOIEntities());;
+      }
+    }
+  }
 
   getAOI(id: { x: number; y: number }) {
     return this.aoi[id.x][id.y];
@@ -142,15 +154,5 @@ export class AOImanager {
       }
     }
     return adjacent;
-  }
-  /**
-   * @description clears all update lops within each AOI
-   */
-  destroy() {
-    for (const row of this.aoi) {
-      for (const aoiCell of row) {
-        aoiCell.destroy();
-      }
-    }
   }
 }
