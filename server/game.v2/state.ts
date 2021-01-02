@@ -71,9 +71,14 @@ class MockAnimsManager {
       this.anims.interval
     );
   }
+  /**
+   * @description return current key of animation return null if no animation is playing
+   */
+  getKey() {
+    return this.key;
+  }
 
   frameExecution() {
-    console.log(this.key);
     this.duration -= this.anims.interval;
     this.frame = this.anims.frames[this.duration / this.anims.interval];
     this.event.emit(gameEvents.anims.framechange, this.frame);
@@ -138,6 +143,7 @@ export class StateMachine {
             this.transition("hurt");
             const hitresolve = (state) => {
               if (state !== "hurt" && state !== "hitstun") {
+                console.log('hitresolve ', state);
                 this.stateArgs = this.stateArgs.slice(0, 1);
                 this.event.off(gameEvents.stateMachine.enter, hitresolve);
                 this.event.emit(gameEvents.stateMachine.dispatchcomplete);
@@ -192,6 +198,8 @@ export class StateMachine {
   }
 
   destroy() {
+    this.anims.event.removeAllListeners();
+    this.event.removeAllListeners();
     this.anims.destroy();
   }
 
@@ -199,6 +207,7 @@ export class StateMachine {
 
 export class IdleState extends State {
   enter(player: Player) {
+    this.stateMachine.anims.play('idle');
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "idle");
     player.setVelocity(0);
   }
@@ -247,6 +256,7 @@ export class IdleState extends State {
 
 export class WalkState extends State {
   enter(player: Player) {
+    this.stateMachine.anims.play('walk');
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "walk");
     //player.awakeplayer();
   }
@@ -309,6 +319,7 @@ export class WalkState extends State {
 
 export class RunState extends State {
   enter(player: Player) {
+    this.stateMachine.anims.play('run');
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "run");
     //player.awakeplayer();
   }
@@ -369,10 +380,12 @@ export class RunState extends State {
 
 export class FallState extends State {
   enter(player: Player) {
+    this.stateMachine.anims.play('idle');
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "fall");
   }
   execute(player: Player) {
     const clientinput = player.input;
+    const clientrepeats = player.inputrepeats;
     const isTouching = player.getIsTouching();
     const attributes = player.getAttributes();
 
@@ -380,6 +393,11 @@ export class FallState extends State {
       player.setVelocityX(attributes.airspeed);
     } else if (clientinput.left.isDown && !isTouching.left) {
       player.setVelocityX(-attributes.airspeed);
+    }
+
+    if (clientinput.attack.isDown && clientrepeats.attack === 0) {
+      this.stateMachine.transition("airattack1");
+
     }
     if (isTouching.bottom) {
       //////console.log(player.body.onFloor());
@@ -397,9 +415,9 @@ export class JumpState extends State {
     this.stateMachine.anims.play("jump");
     //player.awakeplayer();
     const attributes = player.getAttributes();
-    player.setVelocityY(-attributes.jumpheight);
     this.callback = () => {
-      this.stateMachine.transition("fall");
+      player.setVelocityY(-attributes.jumpheight);
+      setTimeout(() => {this.stateMachine.transition("fall");}, 100);
       return;
     };
     this.stateMachine.anims.event.once(
@@ -560,6 +578,42 @@ export class Attack3State extends State {
   }
 }
 
+export class AirAttack1 extends State {
+  callback;
+  enter(player: Player) {
+    this.stateMachine.anims.play("airattack1");
+    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "airattack1");
+    player.setVelocityY(1);
+    this.callback = () => {
+      const isTouching = player.getIsTouching();
+      if (isTouching.bottom) {
+        //console.log('idle player not touching ground transitioning');
+        this.stateMachine.transition("idle");
+      } else {
+        this.stateMachine.transition("fall");
+      }
+      return;
+    };
+    this.stateMachine.anims.event.once(
+      gameEvents.anims.animationcomplete,
+      this.callback
+    );
+  }
+
+  execute(player: Player) {
+    const isTouching = player.getIsTouching();
+    if (isTouching.bottom) {
+      //console.log('idle player not touching ground transitioning');
+      this.stateMachine.transition("idle");
+    }
+    return;
+  }
+
+  quit() {
+
+  }
+}
+
 
 export class Hurt extends State {
   callback;
@@ -602,7 +656,9 @@ export class HitStun extends State {
   timerhandle;
 
   enter(player: Player, hitconfig: hitConfig) {
+    this.stateMachine.anims.play('hitstun');
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "hitstun");
+    console.log(hitconfig)
     this.timerhandle = setTimeout(() => {
       const isTouching = player.getIsTouching();
       if (isTouching.bottom) {

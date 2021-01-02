@@ -18,6 +18,7 @@ import {
   Attack2State,
   Attack3State,
   DashAttack,
+  AirAttack1,
   Hurt,
   HitStun,
   Death,
@@ -106,8 +107,6 @@ class PlayerBody {
   };
   // offset for sensors
   private sensoroffset = { x: 0, y: 0 };
-  // offset for position
-  private posoffset = { x: 0, y: 0 };
   // keep track if player is flipped or not
   private flipX = false;
   private sensors;
@@ -369,10 +368,10 @@ class PlayerBody {
     }
   }
 
-  private getInternalPosition() {
+  getInternalPosition() {
     return {
-      x: Math.trunc(this.compoundBody.position.x + this.posoffset.x),
-      y: Math.trunc(this.compoundBody.position.y + this.posoffset.y),
+      x: Math.trunc(this.compoundBody.position.x),
+      y: Math.trunc(this.compoundBody.position.y),
     };
   }
 
@@ -468,21 +467,13 @@ class PlayerBody {
           this.compoundBody.positionPrev.x -= this.mainBody.centerOffset.x;
         }
       }
-      //if (this.default.config.h < this.mainBody.config.orgh) {
-      //  this.posoffset.y = this.mainBody.centerOffset.y
-      //  console.log('y offset');
-      //  console.log(this.posoffset.y);
-      //}
-      //else if (this.default.config.h > this.mainBody.config.orgh) {
-      //  this.posoffset.y = -(this.default.config.h - this.mainBody.config.orgh);
-      //}
       World.addBody(this.engine.world, this.compoundBody);
       Body.setPosition(this.compoundBody, { x: pos.x, y: pos.y });
       Body.setInertia(this.compoundBody, Infinity);
       Body.setVelocity(this.compoundBody, { x: v.velocityX, y: v.velocityY });
     } else if (this.mainBody !== this.default) {
+      console.log('create default body');
       const pos = this.getInternalPosition();
-      this.posoffset = { x: 0, y: 0 };
       this.sensoroffset = {
         x: this.default.position.x,
         y: this.default.position.y,
@@ -550,6 +541,7 @@ export class Player extends gameObject {
       attack2: new Attack2State(),
       attack3: new Attack3State(),
       dashattack: new DashAttack(),
+      airattack1: new AirAttack1(),
       hurt: new Hurt(),
       hitstun: new HitStun(),
       death: new Death(),

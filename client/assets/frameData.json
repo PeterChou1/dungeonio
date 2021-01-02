@@ -14,7 +14,22 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": []
+		"fixtures": [
+			{
+				"label": "hitbox",
+				"isSensor": true,
+				"vertices": [
+					[ { "x":24, "y":3 }, { "x":24, "y":36 }, { "x":37, "y":36 }, { "x":37, "y":3 } ]
+				]
+			},
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":8, "y":12 }, { "x":8, "y":31 }, { "x":31, "y":31 }, { "x":31, "y":12 } ]
+				]
+			}
+		]
 	},
 	"adventurer-attack1-00": {
 		"type": "fromPhysicsEditor",
@@ -267,6 +282,13 @@
 				"vertices": [
 					[ { "x":14, "y":10 }, { "x":14, "y":33 }, { "x":34, "y":33 }, { "x":34, "y":10 } ]
 				]
+			},
+			{
+				"label": "hitbox",
+				"isSensor": true,
+				"vertices": [
+					[ { "x":2, "y":5 }, { "x":2, "y":26 }, { "x":48, "y":26 }, { "x":48, "y":5 } ]
+				]
 			}
 		]
 	},
@@ -332,7 +354,22 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": []
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":16, "y":8 }, { "x":16, "y":33 }, { "x":34, "y":33 }, { "x":34, "y":8 } ]
+				]
+			},
+			{
+				"label": "hitbox",
+				"isSensor": true,
+				"vertices": [
+					[ { "x":22, "y":4 }, { "x":22, "y":35 }, { "x":50, "y":35 }, { "x":50, "y":4 } ]
+				]
+			}
+		]
 	},
 	"adventurer-air-attack2-01": {
 		"type": "fromPhysicsEditor",
@@ -348,7 +385,15 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": []
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":16, "y":8 }, { "x":16, "y":33 }, { "x":34, "y":33 }, { "x":34, "y":8 } ]
+				]
+			}
+		]
 	},
 	"adventurer-air-attack2-02": {
 		"type": "fromPhysicsEditor",
@@ -364,7 +409,15 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": []
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":16, "y":8 }, { "x":16, "y":33 }, { "x":34, "y":33 }, { "x":34, "y":8 } ]
+				]
+			}
+		]
 	},
 	"adventurer-air-attack-3-end-00": {
 		"type": "fromPhysicsEditor",
@@ -380,7 +433,36 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": []
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":18, "y":36 }, { "x":33, "y":36 }, { "x":33, "y":16 }, { "x":18, "y":16 } ]
+				]
+			},
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":13, "y":21 }, { "x":13, "y":37 }, { "x":35, "y":37 }, { "x":35, "y":21 } ]
+				]
+			},
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":4, "y":10 }, { "x":4, "y":33 }, { "x":17, "y":33 }, { "x":17, "y":10 } ]
+				]
+			},
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":32, "y":10 }, { "x":32, "y":33 }, { "x":38, "y":33 }, { "x":38, "y":10 } ]
+				]
+			}
+		]
 	},
 	"adventurer-air-attack-3-end-01": {
 		"type": "fromPhysicsEditor",
@@ -396,7 +478,15 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": []
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":18, "y":36 }, { "x":33, "y":36 }, { "x":33, "y":16 }, { "x":18, "y":16 } ]
+				]
+			}
+		]
 	},
 	"adventurer-air-attack-3-end-02": {
 		"type": "fromPhysicsEditor",
@@ -412,7 +502,15 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": []
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":16, "y":36 }, { "x":33, "y":36 }, { "x":33, "y":15 }, { "x":16, "y":15 } ]
+				]
+			}
+		]
 	},
 	"adventurer-air-attack3-loop-00": {
 		"type": "fromPhysicsEditor",
@@ -428,7 +526,22 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": []
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":8, "y":12 }, { "x":8, "y":31 }, { "x":31, "y":31 }, { "x":31, "y":12 } ]
+				]
+			},
+			{
+				"label": "hitbox",
+				"isSensor": true,
+				"vertices": [
+					[ { "x":24, "y":3 }, { "x":24, "y":36 }, { "x":37, "y":36 }, { "x":37, "y":3 } ]
+				]
+			}
+		]
 	},
 	"adventurer-air-attack3-loop-01": {
 		"type": "fromPhysicsEditor",
@@ -444,7 +557,22 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": []
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":8, "y":12 }, { "x":8, "y":31 }, { "x":31, "y":31 }, { "x":31, "y":12 } ]
+				]
+			},
+			{
+				"label": "hitbox",
+				"isSensor": true,
+				"vertices": [
+					[ { "x":24, "y":3 }, { "x":24, "y":36 }, { "x":37, "y":36 }, { "x":37, "y":3 } ]
+				]
+			}
+		]
 	},
 	"adventurer-crnr-clmb-01": {
 		"type": "fromPhysicsEditor",

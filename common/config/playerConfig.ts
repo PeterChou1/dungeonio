@@ -10,6 +10,36 @@ type hitboxdata = {
  * @description describes hitbox data
  */
 export const playerHitboxData: hitboxdata = {
+  "adventurer-air-attack1-01" : {
+    label: "hitbox",
+    knockback: { x: 5, y : -5},
+    damage: 5,
+    hitstun: 200
+  },
+  "adventurer-air-attack2-00" : {
+    label: "hitbox",
+    knockback: { x: 5, y : -5},
+    damage: 5,
+    hitstun: 200
+  },
+  "adventurer-air-attack3-loop-00" : {
+    label: "hitbox",
+    knockback: { x: 5, y : -5},
+    damage: 5,
+    hitstun: 200
+  },
+  "adventurer-air-attack3-loop-01" : {
+    label: "hitbox",
+    knockback: { x: 5, y : -5},
+    damage: 5,
+    hitstun: 200
+  },
+  "adventurer-air-attack-3-end-00" : {
+    label: "hitbox",
+    knockback: { x: 5, y : -5},
+    damage: 5,
+    hitstun: 200
+  },
   "adventurer-attack1-02": {
     label: "hitbox",
     knockback: { x: -3, y: 0 },
@@ -80,13 +110,20 @@ export const gameEvents = {
     dead: "dead",
   },
 };
+
+type anims = {
+  key: string,
+  frames: [string, {end: number, prefix: string, zeroPad: number, start?: number}],
+  frameRate: number,
+  repeat: number
+}
 /**
  * @description Defines animation player has
  * NOTE: duration frames * 1000 ms / frameRate
  * example: jump = 4 * 1000 / 10 = 400ms
  * Also used to create animation client side
  */
-export const playerAnims = [
+export const playerAnims : Array<anims> = [
   {
     key: "walk",
     frames: ["mainchar", { end: 5, prefix: "adventurer-run-", zeroPad: 2 }],
@@ -108,7 +145,7 @@ export const playerAnims = [
   {
     key: "jump",
     frames: ["mainchar", { end: 3, prefix: "adventurer-jump-", zeroPad: 2 }],
-    frameRate: 10,
+    frameRate: 20,
     repeat: 0,
   },
   {
@@ -133,6 +170,13 @@ export const playerAnims = [
     key: "attack3",
     frames:  ["mainchar", { end: 5, prefix: "adventurer-attack3-", zeroPad: 2 }],
     frameRate: 10,
+    repeat: 0
+  },
+
+  {
+    key: "airattack1",
+    frames: ["mainchar", {end : 3, prefix: "adventurer-air-attack1-", zeroPad: 2}],
+    frameRate: 5,
     repeat: 0
   },
   {
