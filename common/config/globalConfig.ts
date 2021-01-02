@@ -37,3 +37,8 @@ export const messageType = {
   aoiupdate: 5, // update gameobject in player area of interest
   aoiremove: 6, // remove gameobject in player area of interest
 };
+
+
+export const frontEndEvent = {
+  uiupdate : 0 // updates which effect HUD scene
+}

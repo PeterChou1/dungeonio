@@ -10,10 +10,14 @@ import {
 import {
   StateMachine,
   IdleState,
+  WalkState,
   RunState,
   JumpState,
   FallState,
   AttackState,
+  Attack2State,
+  Attack3State,
+  DashAttack,
   Hurt,
   HitStun,
   Death,
@@ -23,6 +27,7 @@ import Phaser from "phaser";
 import { AOImanager } from "../interest/aoi.manager";
 import { EventEmitter } from "events";
 import { event } from "./state";
+import { registerCollisionCallback } from "../utils/utils"
 
 const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
 
@@ -60,6 +65,7 @@ type internalStateConfig = {
 type attributeConfig = {
   groundspeed?: number;
   airspeed?: number;
+  runspeed?: number;
   jumpheight?: number;
   maxhealth?: number;
 };
@@ -67,6 +73,7 @@ type attributeConfig = {
 type attributes = {
   groundspeed: number;
   airspeed: number;
+  runspeed: number;
   jumpheight: number;
   maxhealth: number;
 };
@@ -106,13 +113,17 @@ class PlayerBody {
   private sensors;
   private collidesWith;
   private sensorsConfig: sensorConfig = {
+    virtualbody:  {
+      pos: ({h}) => ({x: 0, y: (h / 2) - (playerConfig.dim.h / 2)}),
+      dim: () => ({w: playerConfig.dim.w, h: playerConfig.dim.h})
+    },
     nearbottom: {
       pos: ({ h }) => ({ x: 0, y: h }),
       dim: ({ w }) => ({ w: w, h: 50 }),
     },
     bottom: {
       pos: ({ h }) => ({ x: 0, y: h / 2 }),
-      dim: ({ w }) => ({ w: w / 1.5, h: 4 }),
+      dim: ({ w }) => ({ w: w / 1.5, h: 10 }),
     },
     left: {
       pos: ({ w }) => ({ x: -w / 2, y: 0 }),
@@ -121,12 +132,14 @@ class PlayerBody {
     right: {
       pos: ({ w }) => ({ x: w / 2, y: 0 }),
       dim: ({ h }) => ({ w: 10, h: h * 0.75 }),
-    },
+    }
   };
   private frameData;
   private mainBody;
   // default matterjs body used if no custom body is used
   private default;
+  // body used to derived position from 
+  private positionalBody;
   // main matterjs body
   private compoundBody;
   private compoundBodyConfig: compoundBodyConfig = {
@@ -172,7 +185,6 @@ class PlayerBody {
         },
       }
     );
-    console.log(this.registeredActions);
     this.createSensors(this.sensorsConfig);
     this.createDefaultBody(x, y);
     Events.on(this.engine, "beforeUpdate", () => {
@@ -187,16 +199,19 @@ class PlayerBody {
    */
   private mainBodyCallback(pair) {
     const { bodyA, bodyB } = pair;
-    if (!(bodyB.id in this.registeredActions)) {
-      if (bodyB.label === "hitbox") {
-        this.registeredActions[bodyB.id] = {
-          id: bodyB.id,
+    const hitboxbody = this.mainBody === bodyA ? bodyB : bodyA;
+    if (!(hitboxbody.id in this.registeredActions)) {
+      if (hitboxbody.label === "hitbox") {
+        console.log('hitbox collided with mainbody');
+        console.log(hitboxbody.config);
+        this.registeredActions[hitboxbody.id] = {
+          id: hitboxbody.id,
           category: "hit",
           eventConfig: {
-            knockback: bodyB.config.knockback,
-            damage: bodyB.config.damage,
-            hitstun: bodyB.config.hitstun,
-            flipX: bodyB.config.flipX,
+            knockback: hitboxbody.config.knockback,
+            damage: hitboxbody.config.damage,
+            hitstun: hitboxbody.config.hitstun,
+            flipX: hitboxbody.config.flipX,
           },
         };
       }
@@ -325,6 +340,7 @@ class PlayerBody {
           0,
           frameData[frameName]
         );
+        //scale body by two to be visible
         Body.scale(frameBody, 2, 2);
         this.frameData[frameName] = frameBody.parts.slice(
           1,
@@ -332,6 +348,8 @@ class PlayerBody {
         );
         // set custom configuration for body
         for (const bodyparts of this.frameData[frameName]) {
+          //add collision callbacks
+          registerCollisionCallback(bodyparts);
           bodyparts["config"] = {
             flipX: false,
             orgh: frameBody.bounds.max.y - frameBody.bounds.min.y,
@@ -351,10 +369,17 @@ class PlayerBody {
     }
   }
 
-  getPosition() {
+  private getInternalPosition() {
     return {
       x: Math.trunc(this.compoundBody.position.x + this.posoffset.x),
       y: Math.trunc(this.compoundBody.position.y + this.posoffset.y),
+    };
+  }
+
+  getPosition() {
+    return {
+      x: Math.trunc(this.sensors.virtualbody.position.x),
+      y: Math.trunc(this.sensors.virtualbody.position.y),
     };
   }
 
@@ -409,11 +434,14 @@ class PlayerBody {
    * @param frame
    */
   setFrameBody(frame) {
-    //console.log(frame);
     if (this.frameData[frame]) {
+      var pos = this.getInternalPosition();
+      var v = this.getVelocity();
       World.remove(this.engine.world, this.compoundBody);
-      var pos = this.getPosition();
       this.mainBody = this.frameData[frame][0];
+      this.mainBody.onCollide(this.mainBodyCallback.bind(this));
+      this.mainBody.onCollideActive(this.mainBodyCallback.bind(this));
+      this.mainBody.onCollideEnd(this.mainBodyCallback.bind(this));
       this.h = this.mainBody.config.h;
       this.w = this.mainBody.config.w;
       this.sensoroffset = {
@@ -451,9 +479,9 @@ class PlayerBody {
       World.addBody(this.engine.world, this.compoundBody);
       Body.setPosition(this.compoundBody, { x: pos.x, y: pos.y });
       Body.setInertia(this.compoundBody, Infinity);
-      Body.setVelocity(this.compoundBody, { x: 0, y: 0 });
+      Body.setVelocity(this.compoundBody, { x: v.velocityX, y: v.velocityY });
     } else if (this.mainBody !== this.default) {
-      const pos = this.getPosition();
+      const pos = this.getInternalPosition();
       this.posoffset = { x: 0, y: 0 };
       this.sensoroffset = {
         x: this.default.position.x,
@@ -490,7 +518,10 @@ export class Player extends gameObject {
   private body: PlayerBody;
   private state: internalState;
   private attributes: attributes;
+  // current player input
   input;
+  // repeating 
+  inputrepeats;
   client;
   name: string;
   aoiId: { x: number; y: number };
@@ -511,10 +542,14 @@ export class Player extends gameObject {
     });
     const playerState = {
       idle: new IdleState(),
+      walk: new WalkState(),
       run: new RunState(),
       jump: new JumpState(),
       fall: new FallState(),
       attack1: new AttackState(),
+      attack2: new Attack2State(),
+      attack3: new Attack3State(),
+      dashattack: new DashAttack(),
       hurt: new Hurt(),
       hitstun: new HitStun(),
       death: new Death(),
@@ -528,6 +563,7 @@ export class Player extends gameObject {
     // default attributes
     this.attributes = {
       groundspeed: 5,
+      runspeed: 7,
       airspeed: 5,
       jumpheight: 12,
       maxhealth: 100,
@@ -539,17 +575,40 @@ export class Player extends gameObject {
       flipX: false,
       health: this.attributes.maxhealth,
     };
+
+    // track if input repeats
+    this.inputrepeats = {
+      left : 0,
+      right : 0,
+      up : 0,
+      down : 0,
+      attack : 0
+    }
     this.input = {
-      left_keydown: false,
-      right_keydown: false,
-      up_keydown: false,
-      down_keydown: false,
-      attack_keydown: false,
-      left_keyup: true,
-      right_keyup: true,
-      up_keyup: true,
-      down_keyup: true,
-      attack_keyup: true,
+      left: {
+        isDown : false,
+        isUp : true,
+      },
+      right: {
+        isDown : false,
+        isUp : true,
+      },
+      up: {
+        isDown : false,
+        isUp : true,
+      },
+      down: {
+        isDown : false,
+        isUp: true,
+      },
+      run: {
+        isDown: false,
+        isUp: true
+      },
+      attack: {
+        isDown : false,
+        isUp : true,
+      }
     };
     //console.log('--aoi init--');
     if (!gameConfig.networkdebug) {
@@ -557,8 +616,20 @@ export class Player extends gameObject {
     }
   }
 
+  /**
+   * @description compares inputs set internal counter if it repeats resets to zero if it doesnt
+   */
+  private compareInputs() {
+    for (const keycode in this.input) {
+      if (this.input[keycode].isDown) {
+        this.inputrepeats[keycode] += 1;
+      } else if (this.input[keycode].isUp) {
+        this.inputrepeats[keycode] = 0;
+      }
+    }
+  }
   updatePlayerInput(playerinput) {
-    this.input = playerinput;
+    this.input = {...this.input, ...playerinput};
   }
 
   setVelocity(vx: number, vy?: number) {
@@ -663,6 +734,7 @@ export class Player extends gameObject {
   update() {
     if (!this.zombiemode) {
       this.stateMachine.step();
+      this.compareInputs();
       if (!gameConfig.networkdebug) {
         this.aoiId = this.aoi.aoiupdate(this);
         // if aoi id is undefined destroy player activate zombie mode

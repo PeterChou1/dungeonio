@@ -24,16 +24,18 @@ export class startLevel extends Phaser.Scene {
         },
       },
     });
-
-    //this.socket = io();
-    ////console.log(this.socket);
   }
 
   init(data) {
     console.log(data);
     // get name recieved from start menu
     this.playerName = data.playerName;
-    // if data has session Id then try to restart
+    // launch hud scene
+    this.scene.launch("hudScene", {
+      playerName : this.playerName,
+      key : this.scene.key
+    });
+    // if a client is provided use that
     if (data.hasOwnProperty("client")) {
       this.client = data.client;
     }
@@ -87,9 +89,9 @@ export class startLevel extends Phaser.Scene {
     // random number generated for network latency test
     this.randlatency = 50; //randomInteger(0, 500);
     console.log("random latency (client) ", this.randlatency);
-    // unique id of room
-    this.sessionId = gameConfig.networkdebug ? "test" : this.room.sessionId;
     // unique id of session
+    this.sessionId = gameConfig.networkdebug ? "test" : this.room.sessionId;
+    // unique id of room
     this.roomId = gameConfig.networkdebug ? "test" : this.room.id;
     //console.log('joined room with sessionId ', this.sessionId);
     this.keys = this.input.keyboard.addKeys({
@@ -98,25 +100,27 @@ export class startLevel extends Phaser.Scene {
       left: KeyCodes.A,
       right: KeyCodes.D,
       attack: KeyCodes.P,
+      run: KeyCodes.SHIFT,
       ...(gameConfig.networkdebug && {
         up_p2: KeyCodes.UP,
         down_p2: KeyCodes.DOWN,
         left_p2: KeyCodes.LEFT,
         right_p2: KeyCodes.RIGHT,
         attack_p2: KeyCodes.SPACE,
+        run_p2: KeyCodes.NUMPAD_ZERO
       }),
     });
     // request Id of the last request sent to server
     this.curreqId = 0;
     // attach listener to keyboard inputs
     // TODO: detach listener on destruction
-    for (var prop in this.keys) {
+    for (const prop in this.keys) {
       if (Object.prototype.hasOwnProperty.call(this.keys, prop)) {
-        this.keys[prop].on("down", () => {
-          this.updatePlayerInput();
+        this.keys[prop].on("down", (key) => {
+          this.updatePlayerInput(prop, key);
         });
-        this.keys[prop].on("up", () => {
-          this.updatePlayerInput();
+        this.keys[prop].on("up", (key) => {
+          this.updatePlayerInput(prop, key);
         });
       }
     }
@@ -130,24 +134,23 @@ export class startLevel extends Phaser.Scene {
       //inject server instance into client side
       this.serverinstance = await Game.createGame();
       this.serverinstance.addPlayer({ sessionId: "test" }, "test");
-      this.testplayer2 = new Player(this, 200, 200, "test", "test");
+      this.testplayer = new Player(this, 200, 200, "test", "test");
       this.serverinstance.addPlayer({ sessionId: "test2" }, "test2");
-      this.testplayer = new Player(this, 100, 200, "test2", "test2");
+      this.testplayer2 = new Player(this, 100, 200, "test2", "test2");
       const height = this.gamelayer.ground.height;
       const width = this.gamelayer.ground.width;
       this.matter.world.setBounds(0, 0, width, height);
       this.cameras.main.setBounds(0, 0, width, height);
       this.cameras.main.startFollow(this.testplayer.sprite);
+      this.cameras.main.roundPixels = true;
     }
-    // set initial input
-    this.updatePlayerInput();
   }
 
   setuplevel() {
     this.map = this.add.tilemap("map");
     this.gametile = {
       mainlev: this.map.addTilesetImage("mainlevbuild", "tiles"),
-      background: this.map.addTilesetImage("background_obj", "background"),
+      background: this.map.addTilesetImage("background_obj_extruded", "background"),
     };
 
     this.gamelayer = {
@@ -220,7 +223,7 @@ export class startLevel extends Phaser.Scene {
         console.log("aoi add");
         console.log(`--Player added with id: ${entity.id}--`);
         // NOTE: simulation coordinates differ by 25
-        entity.y -= 25;
+        //entity.y -= 25;
         this.allplayers[entity.id] = new Player(
           this,
           entity.x,
@@ -250,7 +253,7 @@ export class startLevel extends Phaser.Scene {
       for (const id in entities) {
         if (id in this.allplayers) {
           // NOTE: simulation coordinates differ by 25
-          entities[id].y -= 25;
+          //entities[id].y -= 25;
           this.allplayers[id].updatePlayer({
             x: entities[id].x,
             y: entities[id].y,
@@ -277,6 +280,11 @@ export class startLevel extends Phaser.Scene {
             delete this.allplayers[id];
           }
         }
+        this.input.keyboard.removeAllListeners();
+        for (const prop in this.keys) {
+          this.input.keyboard.removeCapture(this.keys[prop].keyCode);
+        }
+        this.scene.stop("hudScene");
         this.scene.start("deadScreen", {
           client: this.client,
         });
@@ -285,6 +293,12 @@ export class startLevel extends Phaser.Scene {
     // if client got booted for whatever reason
     this.room.onLeave((code) => {
       console.log(`client kicked code: ${code}`);
+      this.room.removeAllListeners();
+      this.input.keyboard.removeAllListeners();
+      for (const prop in this.keys) {
+        this.input.keyboard.removeCapture(this.keys[prop].keyCode);
+      }
+      this.scene.stop("hudScene");
       this.scene.start("mainMenu", {
         client: this.client,
       });
@@ -307,19 +321,13 @@ export class startLevel extends Phaser.Scene {
     });
   }
 
-  updatePlayerInput() {
+  updatePlayerInput(prop, key) {
     const req = {
-      left_keydown: this.keys.left.isDown,
-      right_keydown: this.keys.right.isDown,
-      up_keydown: this.keys.up.isDown,
-      down_keydown: this.keys.down.isDown,
-      attack_keydown: this.keys.attack.isDown,
-      left_keyup: this.keys.left.isUp,
-      right_keyup: this.keys.right.isUp,
-      up_keyup: this.keys.up.isUp,
-      down_keyup: this.keys.down.isUp,
-      attack_keyup: this.keys.attack.isUp,
-    };
+      [prop] : {
+        isDown : key.isDown,
+        isUp : key.isUp
+      }
+    }
     // increment curr req Id for next request
     this.curreqId++;
     if (gameConfig.simulatelatency) {
@@ -327,19 +335,59 @@ export class startLevel extends Phaser.Scene {
         this.room.send(messageType.playerinput, req);
       }, this.randlatency);
     } else if (gameConfig.networkdebug) {
-      const req_p2 = {
-        left_keydown: this.keys.left_p2.isDown,
-        right_keydown: this.keys.right_p2.isDown,
-        up_keydown: this.keys.up_p2.isDown,
-        down_keydown: this.keys.down_p2.isDown,
-        attack_keydown: this.keys.attack_p2.isDown,
-        left_keyup: this.keys.left_p2.isUp,
-        right_keyup: this.keys.right_p2.isUp,
-        up_keyup: this.keys.up_p2.isUp,
-        down_keyup: this.keys.down_p2.isUp,
-        attack_keyup: this.keys.attack_p2.isUp,
+      const req_p1 = {
+        left: {
+          isDown : this.keys.left.isDown,
+          isUp : this.keys.left.isUp
+        },
+        right: {
+          isDown : this.keys.right.isDown,
+          isUp : this.keys.right.isUp
+        },
+        up : {
+          isDown : this.keys.up.isDown,
+          isUp : this.keys.up.isUp
+        },
+        down : {
+          isDown : this.keys.down.isDown,
+          isUp : this.keys.down.isUp
+        },
+        run : {
+          isDown : this.keys.run.isDown,
+          isUp: this.keys.run.isUp
+        },
+        attack : {
+          isDown : this.keys.attack.isDown,
+          isUp : this.keys.attack.isUp
+        }
       };
-      this.serverinstance.manualUpdateInput("test", req);
+      const req_p2 = {
+        left: {
+          isDown : this.keys.left_p2.isDown,
+          isUp : this.keys.left_p2.isUp
+        },
+        right: {
+          isDown : this.keys.right_p2.isDown,
+          isUp : this.keys.right_p2.isUp
+        },
+        up : {
+          isDown : this.keys.up_p2.isDown,
+          isUp : this.keys.up_p2.isUp
+        },
+        down : {
+          isDown : this.keys.down_p2.isDown,
+          isUp : this.keys.down_p2.isUp
+        },
+        run : {
+          isDown : this.keys.run_p2.isDown,
+          isUp: this.keys.run_p2.isUp
+        },
+        attack : {
+          isDown : this.keys.attack_p2.isDown,
+          isUp : this.keys.attack_p2.isUp
+        }
+      };
+      this.serverinstance.manualUpdateInput("test", req_p1);
       this.serverinstance.manualUpdateInput("test2", req_p2);
     } else {
       this.room.send(messageType.playerinput, req);
@@ -351,7 +399,7 @@ export class startLevel extends Phaser.Scene {
       const state = this.serverinstance.manualGetState("test");
       this.testplayer.updatePlayer({
         x: state.x,
-        y: state.y - 25,
+        y: state.y,
         flipX: state.flipX,
         collisionData: state.collisionData,
         state: state.state,
@@ -361,7 +409,7 @@ export class startLevel extends Phaser.Scene {
       const state2 = this.serverinstance.manualGetState("test2");
       this.testplayer2.updatePlayer({
         x: state2.x,
-        y: state2.y - 25,
+        y: state2.y,
         flipX: state2.flipX,
         collisionData: state2.collisionData,
         state: state2.state,

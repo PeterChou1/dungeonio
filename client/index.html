@@ -3,9 +3,21 @@
   <head>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
     <link rel="stylesheet" href="//cdn.materialdesignicons.com/4.4.95/css/materialdesignicons.min.css">
+    <!-- load custom fonts here -->
+    <style media='screen' type='text/css'>
+      @font-face {
+        font-family: uifont;
+        src: url('public/fonts/uifont.ttf');
+        font-weight:400;
+        font-weight:normal;
+      }
+    </style>
     <meta charset="utf-8">
   </head>
   <body>
+    <!-- makes custom font load in html -->
+    <div style="font-family:uifont; position:absolute; left:-1000px; visibility:hidden;">.</div>
+    <!-- debug purposes -->
     <div style="display:flex">
       <div id="game">
       </div>

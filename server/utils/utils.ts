@@ -1,8 +1,23 @@
+
+
 interface Action {
   callback: (...args) => any | void;
   args: Array<any>;
 }
-const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
+
+export const registerCollisionCallback = (body) => {
+  body.onCollide = function (cb) {
+    body._mceOC = cb;
+  };
+  body.onCollideEnd = function (cb) {
+    body._mceOCE = cb;
+  };
+  body.onCollideActive = function (cb) {
+    body._mceOCA = cb;
+  };
+  return body;
+}
+
 
 export class ActionQueue {
   items: Array<Action>;

@@ -1,40 +1,8 @@
 {
 	"generator_info": "Shape definitions generated with PhysicsEditor. Visit https://www.codeandweb.com/physicseditor",
-	"adventurer-idle-2-00": {
+	"adventurer-air-attack3-rdy-00": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-idle-2-00",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.01,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-idle-03": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-idle-03",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.01,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-wall-slide-01": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-wall-slide-01",
+		"label": "adventurer-air-attack3-rdy-00",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -48,9 +16,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-wall-slide-00": {
+	"adventurer-attack1-00": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-wall-slide-00",
+		"label": "adventurer-attack1-00",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -62,11 +30,19 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": []
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":15, "y":13 }, { "x":15, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":13 } ]
+				]
+			}
+		]
 	},
-	"adventurer-swrd-shte-01": {
+	"adventurer-attack1-01": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-swrd-shte-01",
+		"label": "adventurer-attack1-01",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -78,367 +54,61 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": []
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":15, "y":15 }, { "x":15, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":15 } ]
+				]
+			}
+		]
 	},
-	"adventurer-swrd-shte-02": {
+	"adventurer-attack1-02": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-swrd-shte-02",
+		"label": "adventurer-attack1-02",
 		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-swrd-shte-03": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-swrd-shte-03",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-swrd-drw-01": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-swrd-drw-01",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-swrd-drw-02": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-swrd-drw-02",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-swrd-drw-03": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-swrd-drw-03",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-swrd-shte-00": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-swrd-shte-00",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-stand-01": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-stand-01",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-stand-02": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-stand-02",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-swrd-drw-00": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-swrd-drw-00",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-smrslt-03": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-smrslt-03",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-stand-00": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-stand-00",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-slide-01": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-slide-01",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-smrslt-00": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-smrslt-00",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-smrslt-01": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-smrslt-01",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-smrslt-02": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-smrslt-02",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-run-05": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-run-05",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-slide-00": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-slide-00",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-run-02": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-run-02",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.01,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-run-03": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-run-03",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-ladder-climb-02": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-ladder-climb-02",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-ladder-climb-03": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-ladder-climb-03",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-run-00": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-run-00",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.01,
-		"frictionStatic": 0,
-		"collisionFilter": {
-			"group": 0,
-			"category": 0,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-jump-03": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-jump-03",
-		"isStatic": false,
-		"density": 0.10000000149011612,
+		"density": 0.1,
 		"restitution": 0,
 		"friction": 0.1,
+		"frictionAir": 0.01,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":15, "y":11 }, { "x":15, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":11 } ]
+				]
+			},
+			{
+				"label": "hitbox",
+				"isSensor": true,
+				"vertices": [
+					[ { "x":22, "y":0 }, { "x":22, "y":31 }, { "x":44, "y":31 }, { "x":44, "y":0 } ]
+				]
+			},
+			{
+				"label": "hitbox",
+				"isSensor": true,
+				"vertices": [
+					[ { "x":50, "y":29 }, { "x":50, "y":4 }, { "x":41, "y":4 }, { "x":41, "y":29 } ]
+				]
+			}
+		]
+	},
+	"adventurer-attack1-03": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-attack1-03",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
 		"frictionAir": 0.009999999776482582,
 		"frictionStatic": 0.5,
 		"collisionFilter": {
@@ -446,11 +116,211 @@
 			"category": 1,
 			"mask": 255
 		},
-		"fixtures": []
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":15, "y":11 }, { "x":15, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":11 } ]
+				]
+			}
+		]
 	},
-	"adventurer-ladder-climb-00": {
+	"adventurer-attack1-04": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-ladder-climb-00",
+		"label": "adventurer-attack1-04",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":15, "y":11 }, { "x":15, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":11 } ]
+				]
+			}
+		]
+	},
+	"adventurer-attack2-00": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-attack2-00",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":15, "y":11 }, { "x":15, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":11 } ]
+				]
+			}
+		]
+	},
+	"adventurer-attack2-01": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-attack2-01",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":15, "y":11 }, { "x":15, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":11 } ]
+				]
+			}
+		]
+	},
+	"adventurer-attack2-02": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-attack2-02",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":15, "y":11 }, { "x":15, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":11 } ]
+				]
+			}
+		]
+	},
+	"adventurer-air-attack1-00": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-air-attack1-00",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":14, "y":10 }, { "x":14, "y":33 }, { "x":34, "y":33 }, { "x":34, "y":10 } ]
+				]
+			}
+		]
+	},
+	"adventurer-air-attack1-01": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-air-attack1-01",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":14, "y":10 }, { "x":14, "y":33 }, { "x":34, "y":33 }, { "x":34, "y":10 } ]
+				]
+			}
+		]
+	},
+	"adventurer-air-attack1-02": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-air-attack1-02",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":14, "y":10 }, { "x":14, "y":33 }, { "x":34, "y":33 }, { "x":34, "y":10 } ]
+				]
+			}
+		]
+	},
+	"adventurer-air-attack1-03": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-air-attack1-03",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":14, "y":10 }, { "x":14, "y":33 }, { "x":34, "y":33 }, { "x":34, "y":10 } ]
+				]
+			}
+		]
+	},
+	"adventurer-air-attack2-00": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-air-attack2-00",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -464,9 +334,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-ladder-climb-01": {
+	"adventurer-air-attack2-01": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-ladder-climb-01",
+		"label": "adventurer-air-attack2-01",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -480,9 +350,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-cast-loop-03": {
+	"adventurer-air-attack2-02": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-cast-loop-03",
+		"label": "adventurer-air-attack2-02",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -496,9 +366,73 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-crnr-clmb-00": {
+	"adventurer-air-attack-3-end-00": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-crnr-clmb-00",
+		"label": "adventurer-air-attack-3-end-00",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-air-attack-3-end-01": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-air-attack-3-end-01",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-air-attack-3-end-02": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-air-attack-3-end-02",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-air-attack3-loop-00": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-air-attack3-loop-00",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-air-attack3-loop-01": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-air-attack3-loop-01",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -515,6 +449,442 @@
 	"adventurer-crnr-clmb-01": {
 		"type": "fromPhysicsEditor",
 		"label": "adventurer-crnr-clmb-01",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-crnr-clmb-02": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-crnr-clmb-02",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-crnr-clmb-03": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-crnr-clmb-03",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-crnr-clmb-04": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-crnr-clmb-04",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-crnr-grb-00": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-crnr-grb-00",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-crnr-grb-01": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-crnr-grb-01",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-crnr-grb-02": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-crnr-grb-02",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-crnr-grb-03": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-crnr-grb-03",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-crnr-jmp-00": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-crnr-jmp-00",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-crnr-jmp-01": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-crnr-jmp-01",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-attack2-03": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-attack2-03",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":15, "y":17 }, { "x":15, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":17 } ]
+				]
+			},
+			{
+				"label": "hitbox",
+				"isSensor": true,
+				"vertices": [
+					[ { "x":27, "y":6 }, { "x":27, "y":35 }, { "x":50, "y":35 }, { "x":50, "y":6 } ]
+				]
+			},
+			{
+				"label": "hitbox",
+				"isSensor": true,
+				"vertices": [
+					[ { "x":11, "y":25 }, { "x":11, "y":34 }, { "x":37, "y":34 }, { "x":37, "y":25 } ]
+				]
+			}
+		]
+	},
+	"adventurer-attack2-04": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-attack2-04",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":15, "y":16 }, { "x":15, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":16 } ]
+				]
+			}
+		]
+	},
+	"adventurer-attack2-05": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-attack2-05",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":15, "y":15 }, { "x":15, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":15 } ]
+				]
+			}
+		]
+	},
+	"adventurer-attack3-00": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-attack3-00",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":19, "y":11 }, { "x":19, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":11 } ]
+				]
+			}
+		]
+	},
+	"adventurer-attack3-01": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-attack3-01",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":19, "y":11 }, { "x":19, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":11 } ]
+				]
+			}
+		]
+	},
+	"adventurer-attack3-02": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-attack3-02",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":15, "y":15 }, { "x":15, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":15 } ]
+				]
+			},
+			{
+				"label": "hitbox",
+				"isSensor": true,
+				"vertices": [
+					[ { "x":2, "y":25 }, { "x":2, "y":34 }, { "x":50, "y":34 }, { "x":50, "y":25 } ]
+				]
+			},
+			{
+				"label": "hitbox",
+				"isSensor": true,
+				"vertices": [
+					[ { "x":18, "y":9 }, { "x":18, "y":28 }, { "x":50, "y":28 }, { "x":50, "y":9 } ]
+				]
+			}
+		]
+	},
+	"adventurer-attack3-03": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-attack3-03",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":15, "y":15 }, { "x":15, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":15 } ]
+				]
+			}
+		]
+	},
+	"adventurer-attack3-04": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-attack3-04",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":15, "y":15 }, { "x":15, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":15 } ]
+				]
+			}
+		]
+	},
+	"adventurer-attack3-05": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-attack3-05",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":15, "y":15 }, { "x":15, "y":36 }, { "x":34, "y":36 }, { "x":34, "y":15 } ]
+				]
+			}
+		]
+	},
+	"adventurer-cast-00": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-cast-00",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-cast-01": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-cast-01",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-cast-02": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-cast-02",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -576,9 +946,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-attack3-05": {
+	"adventurer-cast-loop-02": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack3-05",
+		"label": "adventurer-cast-loop-02",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -592,57 +962,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-hurt-02": {
+	"adventurer-cast-loop-03": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-hurt-02",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.1,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-idle-00": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-idle-00",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.1,
-		"frictionAir": 0.1,
-		"frictionStatic": 0,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-fall-00": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-fall-00",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 0,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-hurt-00": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-hurt-00",
+		"label": "adventurer-cast-loop-03",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -656,25 +978,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-hurt-01": {
+	"adventurer-crnr-clmb-00": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-hurt-01",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.01,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-die-05": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-die-05",
+		"label": "adventurer-crnr-clmb-00",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -688,9 +994,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-die-06": {
+	"adventurer-items-02": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-die-06",
+		"label": "adventurer-items-02",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -704,9 +1010,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-die-03": {
+	"adventurer-jump-00": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-die-03",
+		"label": "adventurer-jump-00",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -720,9 +1026,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-die-04": {
+	"adventurer-jump-01": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-die-04",
+		"label": "adventurer-jump-01",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -736,9 +1042,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-die-00": {
+	"adventurer-jump-02": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-die-00",
+		"label": "adventurer-jump-02",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -752,9 +1058,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-die-01": {
+	"adventurer-jump-03": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-die-01",
+		"label": "adventurer-jump-03",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -768,9 +1074,57 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-die-02": {
+	"adventurer-ladder-climb-00": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-die-02",
+		"label": "adventurer-ladder-climb-00",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-ladder-climb-01": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-ladder-climb-01",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-ladder-climb-02": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-ladder-climb-02",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-ladder-climb-03": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-ladder-climb-03",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -848,9 +1202,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-crnr-grb-03": {
+	"adventurer-die-00": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-crnr-grb-03",
+		"label": "adventurer-die-00",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -864,9 +1218,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-crnr-jmp-00": {
+	"adventurer-die-01": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-crnr-jmp-00",
+		"label": "adventurer-die-01",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -880,9 +1234,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-crnr-jmp-01": {
+	"adventurer-die-02": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-crnr-jmp-01",
+		"label": "adventurer-die-02",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -896,9 +1250,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-crnr-grb-00": {
+	"adventurer-die-03": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-crnr-grb-00",
+		"label": "adventurer-die-03",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -912,9 +1266,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-crnr-grb-01": {
+	"adventurer-die-04": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-crnr-grb-01",
+		"label": "adventurer-die-04",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -928,9 +1282,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-crnr-grb-02": {
+	"adventurer-die-05": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-crnr-grb-02",
+		"label": "adventurer-die-05",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -944,9 +1298,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-crnr-clmb-02": {
+	"adventurer-die-06": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-crnr-clmb-02",
+		"label": "adventurer-die-06",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -960,33 +1314,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-attack1-04": {
+	"adventurer-fall-00": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack1-04",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "hurtbox",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":14, "y":10 }, { "x":14, "y":37 }, { "x":34, "y":37 }, { "x":34, "y":10 } ]
-				]
-			}
-		]
-	},
-	"adventurer-air-attack3-loop-01": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-air-attack3-loop-01",
+		"label": "adventurer-fall-00",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -1000,9 +1330,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-air-attack3-rdy-00": {
+	"adventurer-fall-01": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-air-attack3-rdy-00",
+		"label": "adventurer-fall-01",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -1016,33 +1346,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-attack1-01": {
+	"adventurer-hurt-00": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack1-01",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "hurtbox",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":14, "y":15 }, { "x":14, "y":37 }, { "x":34, "y":37 }, { "x":34, "y":15 } ]
-				]
-			}
-		]
-	},
-	"adventurer-air-attack2-01": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-air-attack2-01",
+		"label": "adventurer-hurt-00",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -1056,9 +1362,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-air-attack2-02": {
+	"adventurer-hurt-01": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-air-attack2-02",
+		"label": "adventurer-hurt-01",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -1072,9 +1378,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-air-attack3-loop-00": {
+	"adventurer-hurt-02": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-air-attack3-loop-00",
+		"label": "adventurer-hurt-02",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -1088,96 +1394,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-air-attack1-01": {
+	"adventurer-idle-00": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-air-attack1-01",
-		"isStatic": false,
-		"density": 0.1,
-		"restitution": 0,
-		"friction": 0.1,
-		"frictionAir": 0.01,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "hitbox",
-				"isSensor": true,
-				"vertices": [
-					[ { "x":47, "y":23 }, { "x":48, "y":14 }, { "x":40, "y":6 }, { "x":25, "y":4 }, { "x":24, "y":11 }, { "x":23, "y":26 }, { "x":39, "y":27 } ],
-					[ { "x":2, "y":4 }, { "x":4, "y":14 }, { "x":23, "y":26 }, { "x":24, "y":11 } ]
-				]
-			},
-			{
-				"label": "hurtbox",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":11, "y":33 }, { "x":26, "y":30 }, { "x":36, "y":15 }, { "x":29, "y":9 }, { "x":19, "y":13 } ]
-				]
-			}
-		]
-	},
-	"adventurer-air-attack1-02": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-air-attack1-02",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "hurtbox",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":15, "y":33 }, { "x":27, "y":32 }, { "x":35, "y":16 }, { "x":31, "y":9 }, { "x":21, "y":14 } ]
-				]
-			},
-			{
-				"label": "hitbox",
-				"isSensor": true,
-				"vertices": [
-					[ { "x":14, "y":7 }, { "x":0, "y":-2 }, { "x":15, "y":23 } ]
-				]
-			}
-		]
-	},
-	"adventurer-air-attack1-03": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-air-attack1-03",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":15, "y":34 }, { "x":26, "y":33 }, { "x":32, "y":11 }, { "x":27, "y":8 }, { "x":21, "y":12 } ]
-				]
-			}
-		]
-	},
-	"adventurer-air-attack2-00": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-air-attack2-00",
+		"label": "adventurer-idle-00",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -1191,289 +1410,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-air-attack1-00": {
+	"adventurer-idle-01": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-air-attack1-00",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":33, "y":13 }, { "x":25, "y":9 }, { "x":15, "y":36 }, { "x":25, "y":32 } ]
-				]
-			}
-		]
-	},
-	"adventurer-air-attack-3-end-02": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-air-attack-3-end-02",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-air-attack-3-end-00": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-air-attack-3-end-00",
-		"isStatic": false,
-		"density": 0.1,
-		"restitution": 0,
-		"friction": 0.1,
-		"frictionAir": 0.01,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-air-attack-3-end-01": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-air-attack-3-end-01",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-cast-00": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-cast-00",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-cast-01": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-cast-01",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-cast-02": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-cast-02",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-attack3-02": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack3-02",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-attack3-03": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack3-03",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-attack3-04": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack3-04",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-attack2-04": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack2-04",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-attack2-05": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack2-05",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-attack3-00": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack3-00",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-attack3-01": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack3-01",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-attack2-00": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack2-00",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-attack2-01": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack2-01",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-attack2-02": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack2-02",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-attack2-03": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack2-03",
+		"label": "adventurer-idle-01",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -1493,9 +1432,25 @@
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
-		"friction": 0.1,
-		"frictionAir": 0.1,
-		"frictionStatic": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-idle-2-00": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-idle-2-00",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
 		"collisionFilter": {
 			"group": 0,
 			"category": 1,
@@ -1542,7 +1497,7 @@
 		"density": 0.10000000149011612,
 		"restitution": 0,
 		"friction": 0.10000000149011612,
-		"frictionAir": 0.01,
+		"frictionAir": 0.009999999776482582,
 		"frictionStatic": 0.5,
 		"collisionFilter": {
 			"group": 0,
@@ -1551,25 +1506,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-jump-00": {
+	"adventurer-stand-00": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-jump-00",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.01,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": []
-	},
-	"adventurer-jump-01": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-jump-01",
+		"label": "adventurer-stand-00",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -1583,9 +1522,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-jump-02": {
+	"adventurer-stand-01": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-jump-02",
+		"label": "adventurer-stand-01",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -1599,64 +1538,9 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-attack1-00": {
+	"adventurer-stand-02": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack1-00",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.01,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "hurtbox",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":14, "y":13 }, { "x":14, "y":37 }, { "x":34, "y":37 }, { "x":34, "y":13 } ]
-				]
-			}
-		]
-	},
-	"adventurer-attack1-02": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack1-02",
-		"isStatic": false,
-		"density": 0.1,
-		"restitution": 0,
-		"friction": 0.1,
-		"frictionAir": 0.01,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "hurtbox",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":14, "y":10 }, { "x":14, "y":37 }, { "x":34, "y":37 }, { "x":34, "y":10 } ]
-				]
-			},
-			{
-				"label": "hitbox",
-				"isSensor": true,
-				"vertices": [
-					[ { "x":53, "y":23 }, { "x":40, "y":-5 }, { "x":23, "y":2 }, { "x":36, "y":31 } ]
-				]
-			}
-		]
-	},
-	"adventurer-fall-01": {
-		"type": "fromPhysicsEditor",
-		"label": "adventurer-fall-01",
+		"label": "adventurer-stand-02",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -1665,7 +1549,183 @@
 		"frictionStatic": 0.5,
 		"collisionFilter": {
 			"group": 0,
-			"category": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-swrd-drw-00": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-swrd-drw-00",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-swrd-drw-01": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-swrd-drw-01",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-swrd-drw-02": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-swrd-drw-02",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-swrd-drw-03": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-swrd-drw-03",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-swrd-shte-00": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-swrd-shte-00",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-swrd-shte-01": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-swrd-shte-01",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-swrd-shte-02": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-swrd-shte-02",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-swrd-shte-03": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-swrd-shte-03",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-wall-slide-00": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-wall-slide-00",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-wall-slide-01": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-wall-slide-01",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-run-00": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-run-00",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
 			"mask": 255
 		},
 		"fixtures": []
@@ -1673,6 +1733,38 @@
 	"adventurer-run-01": {
 		"type": "fromPhysicsEditor",
 		"label": "adventurer-run-01",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-run-02": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-run-02",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-run-03": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-run-03",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -1702,9 +1794,25 @@
 		},
 		"fixtures": []
 	},
-	"adventurer-attack1-03": {
+	"adventurer-run-05": {
 		"type": "fromPhysicsEditor",
-		"label": "adventurer-attack1-03",
+		"label": "adventurer-run-05",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-slide-00": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-slide-00",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -1718,12 +1826,114 @@
 		},
 		"fixtures": [
 			{
-				"label": "hurtbox",
+				"label": "",
 				"isSensor": false,
 				"vertices": [
-					[ { "x":14, "y":10 }, { "x":14, "y":37 }, { "x":34, "y":37 }, { "x":34, "y":10 } ]
+					[ { "x":10, "y":21 }, { "x":10, "y":37 }, { "x":32, "y":37 }, { "x":32, "y":21 } ]
+				]
+			},
+			{
+				"label": "hitbox",
+				"isSensor": true,
+				"vertices": [
+					[ { "x":24, "y":37 }, { "x":42, "y":37 }, { "x":42, "y":27 }, { "x":24, "y":27 } ]
 				]
 			}
 		]
+	},
+	"adventurer-slide-01": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-slide-01",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": [
+			{
+				"label": "",
+				"isSensor": false,
+				"vertices": [
+					[ { "x":10, "y":21 }, { "x":10, "y":37 }, { "x":32, "y":37 }, { "x":32, "y":21 } ]
+				]
+			},
+			{
+				"label": "hitbox",
+				"isSensor": true,
+				"vertices": [
+					[ { "x":24, "y":37 }, { "x":42, "y":37 }, { "x":42, "y":27 }, { "x":24, "y":27 } ]
+				]
+			}
+		]
+	},
+	"adventurer-smrslt-00": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-smrslt-00",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-smrslt-01": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-smrslt-01",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-smrslt-02": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-smrslt-02",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
+	},
+	"adventurer-smrslt-03": {
+		"type": "fromPhysicsEditor",
+		"label": "adventurer-smrslt-03",
+		"isStatic": false,
+		"density": 0.10000000149011612,
+		"restitution": 0,
+		"friction": 0.10000000149011612,
+		"frictionAir": 0.009999999776482582,
+		"frictionStatic": 0.5,
+		"collisionFilter": {
+			"group": 0,
+			"category": 1,
+			"mask": 255
+		},
+		"fixtures": []
 	}
 }

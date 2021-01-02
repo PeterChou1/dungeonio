@@ -1,6 +1,3 @@
-import _ from "lodash";
-// utilities functions
-const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
 
 export const createanims = (scene, anims) => {
   // deep clone anims to prevent mutation if

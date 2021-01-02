@@ -1,8 +1,8 @@
-import { StateMachine, SimulatedStateMachine } from "../state/stateMachine";
-import { getplayerstate, getsimplayerState } from "../state/playerState";
-import { gameConfig, playerConfig } from "../../../common";
+import e from "cors";
+import { gameConfig, frontEndEvent } from "../../../common";
+import { HealthBar } from "../ui/healthbar";
 const { Body, Bodies } = Phaser.Physics.Matter.Matter;
-const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
+
 
 export default class Player {
   constructor(scene, x, y, key, playerName, flipX, maxhealth, health) {
@@ -22,39 +22,36 @@ export default class Player {
     this.playerId = key;
     this.matterFrameData = {};
     //this.generateBodyFrames();
-    //  keeps track of server updates positions by server for interpolation purposes
+    // keeps track of server updates positions by server for interpolation purposes
     this.serverInterpolation = [];
     this.sprite.setScale(2);
-    this.mainBody = Bodies.rectangle(0, 0, 2, 2, { chamfer: 10 });
-    this.sprite.setExistingBody(this.mainBody);
-    this.sprite.setFixedRotation();
+    //this.mainBody = Bodies.rectangle(0, 0, 100, 2000, { chamfer: 10 });
+    //this.sprite.setExistingBody(this.mainBody);
+    //this.sprite.setFixedRotation();
     this.sprite.setPosition(x, y);
     this.sprite.setFlipX(flipX);
-
     // default state of player values is idle
     this.playerstate = "idle";
-    this.playanimation(this.playerstate);
-    //this.disablegravity();
+    this.sprite.anims.play(this.playerstate);
+    this.scene.events.on("update", this.entityinterpolate, this);
+    // if its player instaniate health bar
     this.playertext = scene.add.text(x, y - 50, playerName);
     this.playertext.setOrigin(0.5, 0.5);
-    this.scene.events.on("update", this.entityinterpolate, this);
+    if (this.scene.sessionId !== this.playerId) {
+      this.hp = new HealthBar(scene, x - 50, y - 75, 100, 0.25, true);
+    }
   }
 
-  //generateBodyFrames() {
-  //  for (const frameName of this.scene.frameNames) {
-  //    this.matterFrameData[frameName] = PhysicsEditorParser.parseBody(
-  //      0,
-  //      0,
-  //      this.scene.frameData[frameName]
-  //    );
-  //  }
-  //}
 
-  playanimation(anims) {
-    this.sprite.anims.play(anims);
-  }
 
   updatePlayer({ x, y, flipX, collisionData, state, maxhealth, health }) {
+    if (this.scene.sessionId !== this.playerId) {
+      this.hp.animateToFill(health / maxhealth);
+    } else {
+      this.scene.events.emit(frontEndEvent.uiupdate, {
+        maxhealth, health 
+      });
+    }
     this.meta = {
       maxhealth: maxhealth,
       health: health,
@@ -62,7 +59,7 @@ export default class Player {
     this.sprite.setFlipX(flipX);
     this.sprite.setCollidesWith(collisionData);
     if (this.playerstate !== state) {
-      this.playanimation(state);
+      this.sprite.anims.play(state);
     }
     this.playerstate = state;
     let serverInterpolation = [];
@@ -77,6 +74,7 @@ export default class Player {
         // when browser is hidden don't interpolate update immediately
         this.sprite.setPosition(x, y);
         this.playertext.setPosition(x, y - 50);
+        this.hp.setPosition(x - 45, y - 75);
       } else {
         for (let i = 0; i <= 1; i += 0.25) {
           let xInterp = Phaser.Math.Interpolation.Linear([this.sprite.x, x], i);
@@ -99,12 +97,15 @@ export default class Player {
     if (this.serverInterpolation.length > 0) {
       const coord = this.serverInterpolation.shift();
       this.sprite.setPosition(coord.x, coord.y);
-      //@ts-ignore
+      if (this.scene.sessionId !== this.playerId) {
+        this.hp.setPosition(coord.x - 50, coord.y - 75);
+      }
       if (gameConfig.networkdebug && this.scene.sessionId === this.playerId) {
         //console.log(misc);
         this.playertext.setPosition(coord.x - 200, coord.y - 100);
       } else {
         this.playertext.setPosition(coord.x, coord.y - 50);
+        
       }
     }
   }
@@ -132,6 +133,10 @@ export default class Player {
 
   destroy() {
     //this.sprite.world.off("beforeupdate", this.cancelgravity, this);
+    console.log(this.hp);
+    if (this.scene.sessionId !== this.playerId) {
+      this.hp.destroy();
+    }
     this.sprite.destroy();
     this.scene.events.off("update", this.entityinterpolate, this);
     this.playertext.destroy();

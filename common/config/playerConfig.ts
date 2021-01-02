@@ -12,10 +12,34 @@ type hitboxdata = {
 export const playerHitboxData: hitboxdata = {
   "adventurer-attack1-02": {
     label: "hitbox",
-    knockback: { x: 5, y: -5 },
-    damage: 10,
-    hitstun: 100,
+    knockback: { x: -3, y: 0 },
+    damage: 2,
+    hitstun: 200,
   },
+  "adventurer-attack2-03" : {
+    label: "hitbox",
+    knockback: { x: 0, y: 0 },
+    damage: 2,
+    hitstun: 100
+  },
+  "adventurer-attack3-02" : {
+    label: "hitbox",
+    knockback: { x: 5, y: -3 },
+    damage: 5,
+    hitstun: 100
+  },
+  "adventurer-slide-00" : {
+    label: "hitbox",
+    knockback: { x: 5, y: -5},
+    damage: 2,
+    hitstun: 100
+  },
+  "adventurer-slide-01" : {
+    label: "hitbox",
+    knockback: { x: 5, y: -5 },
+    damage: 5,
+    hitstun: 100
+  }
 };
 
 export const playerConfig = {
@@ -63,9 +87,15 @@ export const gameEvents = {
  */
 export const playerAnims = [
   {
-    key: "run",
+    key: "walk",
     frames: ["mainchar", { end: 5, prefix: "adventurer-run-", zeroPad: 2 }],
     frameRate: 10,
+    repeat: -1,
+  },
+  {
+    key: "run",
+    frames: ["mainchar", { end: 5, prefix: "adventurer-run-", zeroPad: 2 }],
+    frameRate: 20,
     repeat: -1,
   },
   {
@@ -93,6 +123,24 @@ export const playerAnims = [
     repeat: 0,
   },
   {
+    key: "attack2",
+    frames: ["mainchar", { end: 5, prefix: "adventurer-attack2-", zeroPad: 2 }],
+    frameRate: 10,
+    repeat: 0
+  },
+  {
+    key: "attack3",
+    frames:  ["mainchar", { end: 5, prefix: "adventurer-attack3-", zeroPad: 2 }],
+    frameRate: 10,
+    repeat: 0
+  },
+  {
+    key: "dashattack",
+    frames: ["mainchar", { end: 1, prefix: "adventurer-slide-", zeroPad: 2 }],
+    frameRate: 10,
+    repeat: -1
+  },
+  {
     key: "hurt",
     frames: ["mainchar", { end: 2, prefix: "adventurer-hurt-", zeroPad: 2 }],
     frameRate: 10,
@@ -108,7 +156,7 @@ export const playerAnims = [
     repeat: -1,
   },
   {
-    key: "dying",
+    key: "death",
     frames: [
       "mainchar",
       { start: 0, end: 6, prefix: "adventurer-die-", zeroPad: 2 },

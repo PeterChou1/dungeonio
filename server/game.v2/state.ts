@@ -77,11 +77,11 @@ class MockAnimsManager {
     this.frame = this.anims.frames[this.duration / this.anims.interval];
     this.event.emit(gameEvents.anims.framechange, this.frame);
     if (this.duration === 0) {
-      this.event.emit(gameEvents.anims.animationcomplete, this.key);
       if (this.repeat > 0) {
         this.repeat -= 1;
       } else if (this.repeat === 0) {
         clearInterval(this.clearId);
+        this.event.emit(gameEvents.anims.animationcomplete, this.key);
       } else if (this.repeat === -1) {
         this.duration = this.anims.duration;
       }
@@ -123,8 +123,6 @@ export class StateMachine {
       // you can't cheat death
       if (this.state !== "death") {
         // quit current state and transition to new state
-        console.log("dispatch event");
-        console.log(event);
         this.possibleStates[this.state].quit();
         switch (event.category) {
           case "hit":
@@ -196,6 +194,7 @@ export class IdleState extends State {
   execute(player: Player) {
     //const cursors = scene.input.keyboard.createCursorKeys();
     const clientinput = player.input;
+    const clientrepeats = player.inputrepeats;
     const isTouching = player.getIsTouching();
     const state = player.getInternalState();
     ////console.log(isTouching.bottom);
@@ -205,12 +204,12 @@ export class IdleState extends State {
       return;
     }
     ////console.log('idle state');
-    if (clientinput.left_keydown || clientinput.right_keydown) {
+    if (clientinput.left.isDown || clientinput.right.isDown) {
       ////console.log('left');
-      this.stateMachine.transition("run");
+      this.stateMachine.transition("walk");
       return;
     }
-    if (clientinput.up_keydown && isTouching.bottom) {
+    if (clientinput.up.isDown && isTouching.bottom) {
       ////console.log('jump');
       if (state.onPlatform) {
         player.setInternalState({ onPlatform: false });
@@ -219,13 +218,13 @@ export class IdleState extends State {
       this.stateMachine.transition("jump");
       return;
     }
-    if (clientinput.down_keydown && state.onPlatform) {
+    if (clientinput.down.isDown && state.onPlatform) {
       player.setCollidesWith([collisionData.category.hard]);
       player.setInternalState({ onPlatform: false, platformFall: true });
       this.stateMachine.transition("fall");
       return;
     }
-    if (clientinput.attack_keydown) {
+    if (clientinput.attack.isDown && clientrepeats.attack === 0) {
       this.stateMachine.transition("attack1");
     }
   }
@@ -233,29 +232,35 @@ export class IdleState extends State {
   quit() {}
 }
 
-export class RunState extends State {
+
+export class WalkState extends State {
   enter(player: Player) {
-    this.stateMachine.anims.play("run");
-    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "run");
+    this.stateMachine.anims.play("walk");
+    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "walk");
     //player.awakeplayer();
   }
   execute(player: Player) {
     const clientinput = player.input;
+    const clientrepeats = player.inputrepeats;
     const isTouching = player.getIsTouching();
     const state = player.getInternalState();
     const attributes = player.getAttributes();
 
-    if (clientinput.left_keydown) {
+    if (clientinput.left.isDown) {
       //console.log('going left');
       player.setInternalState({ flipX: true });
       player.setVelocityX(-attributes.groundspeed);
-    } else if (clientinput.right_keydown) {
+    } else if (clientinput.right.isDown) {
       //console.log('going right');
       player.setInternalState({ flipX: false });
       player.setVelocityX(attributes.groundspeed);
     }
 
-    if (clientinput.up_keydown && isTouching.bottom) {
+    if (clientinput.run.isDown) {
+      this.stateMachine.transition("run");
+    }
+
+    if (clientinput.up.isDown && isTouching.bottom) {
       if (state.onPlatform) {
         player.setInternalState({ onPlatform: false });
         player.setCollidesWith([collisionData.category.hard]);
@@ -267,17 +272,18 @@ export class RunState extends State {
       return;
     }
 
-    if (clientinput.down_keydown && state.onPlatform) {
+    if (clientinput.down.isDown && state.onPlatform) {
       // reset player to only collide with hard platform
       player.setCollidesWith([collisionData.category.hard]);
       player.setInternalState({ onPlatform: false });
       this.stateMachine.transition("fall");
       return;
     }
-    // transition to idle if left and right key are not pressed
-    ////console.log('----keys-----');
-    ////console.log(attributes.right_keyup && attributes.left_keyup);
-    if (clientinput.right_keyup && clientinput.left_keyup) {
+    if (clientinput.attack.isDown && clientrepeats.attack === 0) {
+      this.stateMachine.transition("attack1");
+    }
+
+    if (clientinput.right.isUp && clientinput.left.isUp) {
       //console.log('transition to idle');
       this.stateMachine.transition("idle");
       return;
@@ -285,6 +291,70 @@ export class RunState extends State {
   }
 
   quit() {}
+
+}
+
+
+
+export class RunState extends State {
+  enter(player: Player) {
+    this.stateMachine.anims.play("run");
+    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "run");
+    //player.awakeplayer();
+  }
+  execute(player: Player) {
+    const clientinput = player.input;
+    const clientrepeats = player.inputrepeats;
+    const isTouching = player.getIsTouching();
+    const state = player.getInternalState();
+    const attributes = player.getAttributes();
+
+    if (clientinput.left.isDown) {
+      //console.log('going left');
+      player.setInternalState({ flipX: true });
+      player.setVelocityX(-attributes.runspeed);
+    } else if (clientinput.right.isDown) {
+      //console.log('going right');
+      player.setInternalState({ flipX: false });
+      player.setVelocityX(attributes.runspeed);
+    }
+
+    if (clientinput.run.isUp) {
+      this.stateMachine.transition("walk");
+    }
+
+    if (clientinput.up.isDown && isTouching.bottom) {
+      if (state.onPlatform) {
+        player.setInternalState({ onPlatform: false });
+        player.setCollidesWith([collisionData.category.hard]);
+      }
+      this.stateMachine.transition("jump");
+      return;
+    } else if (!isTouching.nearbottom) {
+      this.stateMachine.transition("fall");
+      return;
+    }
+
+    if (clientinput.down.isDown && state.onPlatform) {
+      // reset player to only collide with hard platform
+      player.setCollidesWith([collisionData.category.hard]);
+      player.setInternalState({ onPlatform: false });
+      this.stateMachine.transition("fall");
+      return;
+    }
+    if (clientinput.attack.isDown && clientrepeats.attack === 0) {
+      this.stateMachine.transition("dashattack");
+    }
+
+    if (clientinput.right.isUp && clientinput.left.isUp) {
+      //console.log('transition to idle');
+      this.stateMachine.transition("idle");
+      return;
+    }
+  }
+
+  quit() {}
+  
 }
 
 export class FallState extends State {
@@ -297,9 +367,9 @@ export class FallState extends State {
     const isTouching = player.getIsTouching();
     const attributes = player.getAttributes();
 
-    if (clientinput.right_keydown && !isTouching.right) {
+    if (clientinput.right.isDown && !isTouching.right) {
       player.setVelocityX(attributes.airspeed);
-    } else if (clientinput.left_keydown && !isTouching.left) {
+    } else if (clientinput.left.isDown && !isTouching.left) {
       player.setVelocityX(-attributes.airspeed);
     }
     if (isTouching.bottom) {
@@ -339,11 +409,121 @@ export class JumpState extends State {
   }
 }
 
+
+export class DashAttack extends State {
+  clearId;
+  dashcount = 0;
+  enter(player: Player) {
+    this.stateMachine.anims.play("dashattack");
+    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "dashattack");
+    this.clearId = setTimeout(() => {
+      const clientinput = player.input;
+      if (clientinput.attack.isDown && this.dashcount < 1) {
+        this.dashcount += 1;
+        this.stateMachine.transition("dashattack");
+      } else {
+        this.dashcount = 0;
+        this.stateMachine.transition("idle");
+      }
+    }, 200)
+  }
+
+  execute(player: Player) {
+    const state = player.getInternalState();
+    const attributes = player.getAttributes();
+    const isTouching = player.getIsTouching();
+    if (state.flipX && !isTouching.left) {
+      player.setVelocityX(-attributes.runspeed);
+    } else if (!isTouching.right) {
+      player.setVelocityX(attributes.runspeed);
+    }
+  }
+
+  quit() {
+    clearTimeout(this.clearId);
+  }
+}
 export class AttackState extends State {
   callback;
   enter(player: Player) {
     this.stateMachine.anims.play("attack1");
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "attack1");
+    this.callback = () => {
+      const clientinput = player.input;
+      if (clientinput.attack.isDown) {
+        console.log('attack2');
+        this.stateMachine.transition("attack2");
+      } else {
+        this.stateMachine.transition("idle");
+      }
+      return;
+    };
+    this.stateMachine.anims.event.once(
+      gameEvents.anims.animationcomplete,
+      this.callback
+    );
+  }
+
+  execute(player: Player) {
+    const isTouching = player.getIsTouching();
+    if (!isTouching.nearbottom && !isTouching.bottom) {
+      //console.log('idle player not touching ground transitioning');
+      this.stateMachine.transition("fall");
+      return;
+    }
+  }
+
+  quit() {
+    this.stateMachine.anims.event.off(
+      gameEvents.anims.animationcomplete,
+      this.callback
+    );
+  }
+}
+
+
+export class Attack2State extends State {
+  callback;
+  enter(player: Player) {
+    this.stateMachine.anims.play("attack2");
+    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "attack2");
+    this.callback = () => {
+      const clientinput = player.input;
+      if (clientinput.attack.isDown) {
+        this.stateMachine.transition("attack3");
+      } else {
+        this.stateMachine.transition("idle");
+      }
+      return;
+    };
+    this.stateMachine.anims.event.once(
+      gameEvents.anims.animationcomplete,
+      this.callback
+    );
+  }
+
+  execute(player: Player) {
+    const isTouching = player.getIsTouching();
+    if (!isTouching.nearbottom && !isTouching.bottom) {
+      //console.log('idle player not touching ground transitioning');
+      this.stateMachine.transition("fall");
+      return;
+    }
+  }
+
+  quit() {
+    this.stateMachine.anims.event.off(
+      gameEvents.anims.animationcomplete,
+      this.callback
+    );
+  }
+}
+
+export class Attack3State extends State {
+  callback;
+  enter(player: Player) {
+    this.stateMachine.anims.play("attack3");
+    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "attack3");
     this.callback = () => {
       this.stateMachine.transition("idle");
       return;
@@ -354,7 +534,14 @@ export class AttackState extends State {
     );
   }
 
-  execute(player: Player) {}
+  execute(player: Player) {
+    const isTouching = player.getIsTouching();
+    if (!isTouching.nearbottom && !isTouching.bottom) {
+      //console.log('idle player not touching ground transitioning');
+      this.stateMachine.transition("fall");
+      return;
+    }
+  }
 
   quit() {
     this.stateMachine.anims.event.off(
@@ -363,6 +550,7 @@ export class AttackState extends State {
     );
   }
 }
+
 
 export class Hurt extends State {
   callback;
@@ -426,7 +614,7 @@ export class HitStun extends State {
 
 export class Death extends State {
   enter(player: Player) {
-    this.stateMachine.anims.play("dying");
+    this.stateMachine.anims.play("death");
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "death");
     this.stateMachine.anims.event.once(
       gameEvents.anims.animationcomplete,
@@ -439,4 +627,5 @@ export class Death extends State {
   execute(player: Player) {}
 
   quit() {}
+  
 }
