@@ -73,19 +73,26 @@ class MockAnimsManager {
   }
 
   frameExecution() {
+    console.log(this.key);
     this.duration -= this.anims.interval;
     this.frame = this.anims.frames[this.duration / this.anims.interval];
     this.event.emit(gameEvents.anims.framechange, this.frame);
     if (this.duration === 0) {
       if (this.repeat > 0) {
+        this.event.emit(gameEvents.anims.animationrepeat, this.key);
         this.repeat -= 1;
       } else if (this.repeat === 0) {
         clearInterval(this.clearId);
         this.event.emit(gameEvents.anims.animationcomplete, this.key);
       } else if (this.repeat === -1) {
+        this.event.emit(gameEvents.anims.animationrepeat, this.key);
         this.duration = this.anims.duration;
       }
     }
+  }
+
+  destroy() {
+    clearInterval(this.clearId);
   }
 }
 
@@ -119,6 +126,7 @@ export class StateMachine {
    * @return {Promise<boolean>} whether dispatch event succeeded or failed
    */
   async dispatch(event: event): Promise<boolean> {
+    console.log('dispatched called');
     return new Promise((resolve, reject) => {
       // you can't cheat death
       if (this.state !== "death") {
@@ -146,7 +154,7 @@ export class StateMachine {
             const deathresolve = (anims) => {
               if (anims === "dead") {
                 this.anims.event.off(
-                  gameEvents.anims.animationcomplete,
+                  gameEvents.stateMachine.dispatchcomplete,
                   deathresolve
                 );
                 this.event.emit(gameEvents.stateMachine.dispatchcomplete);
@@ -154,7 +162,7 @@ export class StateMachine {
               }
             };
             this.anims.event.on(
-              gameEvents.anims.animationcomplete,
+              gameEvents.anims.animationrepeat,
               deathresolve
             );
             break;
@@ -182,11 +190,15 @@ export class StateMachine {
     this.state = newState;
     this.possibleStates[this.state].enter(...this.stateArgs, ...enterArgs);
   }
+
+  destroy() {
+    this.anims.destroy();
+  }
+
 }
 
 export class IdleState extends State {
   enter(player: Player) {
-    this.stateMachine.anims.play("idle");
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "idle");
     player.setVelocity(0);
   }
@@ -235,7 +247,6 @@ export class IdleState extends State {
 
 export class WalkState extends State {
   enter(player: Player) {
-    this.stateMachine.anims.play("walk");
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "walk");
     //player.awakeplayer();
   }
@@ -298,7 +309,6 @@ export class WalkState extends State {
 
 export class RunState extends State {
   enter(player: Player) {
-    this.stateMachine.anims.play("run");
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "run");
     //player.awakeplayer();
   }
@@ -359,7 +369,6 @@ export class RunState extends State {
 
 export class FallState extends State {
   enter(player: Player) {
-    this.stateMachine.anims.play("fall");
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "fall");
   }
   execute(player: Player) {
@@ -593,7 +602,6 @@ export class HitStun extends State {
   timerhandle;
 
   enter(player: Player, hitconfig: hitConfig) {
-    this.stateMachine.anims.play("hitstun");
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "hitstun");
     this.timerhandle = setTimeout(() => {
       const isTouching = player.getIsTouching();

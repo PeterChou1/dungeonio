@@ -747,6 +747,7 @@ export class Player extends gameObject {
     }
   }
 
+
   /**
    * @description plays death animation then destroys body
    */
@@ -762,6 +763,7 @@ export class Player extends gameObject {
       }
     );
   }
+
   /**
    * @description destroys player body and removes it from the world
    */
@@ -775,6 +777,7 @@ export class Player extends gameObject {
         adjacentAOI.forEach((aoi) => aoi.removeAdjacentClient(this, false));
       }
     }
+    this.stateMachine.destroy();
     this.body.destroy();
   }
 }

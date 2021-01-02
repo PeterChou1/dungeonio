@@ -65,6 +65,7 @@ export const gameEvents = {
   anims: {
     framechange: "framechange",
     animationcomplete: "animationcomplete",
+    animationrepeat: "animationrepeat"
   },
   // stateMachine events
   stateMachine: {
@@ -162,6 +163,7 @@ export const playerAnims = [
       { start: 0, end: 6, prefix: "adventurer-die-", zeroPad: 2 },
     ],
     frameRate: 10,
+    repeat: 0
   },
   {
     key: "dead",
@@ -170,5 +172,6 @@ export const playerAnims = [
       { start: 6, end: 6, prefix: "adventurer-die-", zeroPad: 2 },
     ],
     frameRate: 10,
+    repeat: -1
   },
 ];

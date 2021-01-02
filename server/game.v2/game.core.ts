@@ -4,7 +4,6 @@ import { messageType, gameConfig } from "../../common/config/globalConfig";
 import { AOImanager } from "../interest/aoi.manager";
 import { Engine, World, Render, Events } from "matter-js";
 const NanoTimer = require('nanotimer');
-
 //declare document for injection into client side code
 declare let document: any;
 /**
@@ -18,9 +17,9 @@ export class Game {
     [id: string]: Player;
   };
   // tick rate is in ms 
-  //(Game loop)
+  //(Game loop) 60fps
   private tickrate = 1000 / 60;
-  //(Broad cast loop)
+  //(Broad cast loop) per 100ms
   private updaterate = 1000 / 10;
   // game timer
   private gametimer;
