@@ -14,6 +14,13 @@ export const gameConfig = {
   },
 };
 
+/**
+ * @description maps category id to class 
+ */
+export const entityCategory = {
+
+}
+
 // collision detection
 export const collisionData = {
   category: {

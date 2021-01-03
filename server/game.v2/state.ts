@@ -658,15 +658,26 @@ export class HitStun extends State {
   enter(player: Player, hitconfig: hitConfig) {
     this.stateMachine.anims.play('hitstun');
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "hitstun");
-    console.log(hitconfig)
-    this.timerhandle = setTimeout(() => {
-      const isTouching = player.getIsTouching();
-      if (isTouching.bottom) {
-        this.stateMachine.transition("idle");
-      } else {
-        this.stateMachine.transition("fall");
-      }
-    }, hitconfig.hitstun);
+    if (!hitconfig) {
+      console.log(hitconfig)
+      this.timerhandle = setTimeout(() => {
+        const isTouching = player.getIsTouching();
+        if (isTouching.bottom) {
+          this.stateMachine.transition("idle");
+        } else {
+          this.stateMachine.transition("fall");
+        }
+      }, hitconfig.hitstun);
+    } else {
+      this.timerhandle = setTimeout(() => {
+        const isTouching = player.getIsTouching();
+        if (isTouching.bottom) {
+          this.stateMachine.transition("idle");
+        } else {
+          this.stateMachine.transition("fall");
+        }
+      }, 200);
+    }
   }
 
   execute(player: Player, hitconfig: hitConfig) {}

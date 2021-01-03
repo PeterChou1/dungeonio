@@ -5,8 +5,30 @@ const { Body, Bodies } = Phaser.Physics.Matter.Matter;
 
 
 export default class Player {
-  constructor(scene, x, y, key, playerName, flipX, maxhealth, health) {
+  /**
+   * 
+   * @param {*} scene 
+   * @param {*} x 
+   * @param {*} y 
+   * @param {*} key 
+   * @param {*} playerName 
+   * @param {*} flipX whether or not the player is flip horizontally
+   * @param {*} maxhealth 
+   * @param {*} health 
+   * @param {*} isawake set player to awake or asleep mode
+   */
+  constructor(
+    scene, 
+    x, y, 
+    key, 
+    playerName, 
+    flipX, 
+    maxhealth, 
+    health, 
+    isawake = true
+  ) {
     console.log(`player name: ${playerName} joined`);
+    this.isawake = isawake;
     // meta attributes on player
     this.meta = {
       maxhealth: maxhealth,
@@ -40,6 +62,37 @@ export default class Player {
     if (this.scene.sessionId !== this.playerId) {
       this.hp = new HealthBar(scene, x - 50, y - 75, 100, 0.25, true);
     }
+    if (this.isawake) {
+      this.setAwake();
+    } else{
+      this.setAsleep();
+    }
+
+  }
+
+  /**
+   * @desciption set aoi id
+   */
+  getAOIid() {
+    return this.aoiId;
+  }
+
+  setAOIid(x, y) {
+    this.aoiId = {x: x, y: y};
+  }
+
+  /**
+   * @description sets player character into slient sleep mode
+   */
+  setAsleep() {
+
+  }
+  
+  /**
+   * @description sets player asleep
+   */
+  setAwake() {
+
   }
 
 
@@ -112,23 +165,6 @@ export default class Player {
 
   getPlayerState() {
     return this.playerstate;
-  }
-
-  disablegravity() {
-    this.sprite.world.on("beforeupdate", this.cancelgravity, this);
-  }
-
-  enablegravity() {
-    this.sprite.world.off("beforeupdate", this.cancelgravity, this);
-  }
-
-  cancelgravity() {
-    var gravity = this.sprite.world.localWorld.gravity;
-    var body = this.sprite.body;
-    Body.applyForce(body, body.position, {
-      x: -gravity.x * gravity.scale * body.mass,
-      y: -gravity.y * gravity.scale * body.mass,
-    });
   }
 
   destroy() {
