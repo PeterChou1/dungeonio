@@ -658,8 +658,7 @@ export class HitStun extends State {
   enter(player: Player, hitconfig: hitConfig) {
     this.stateMachine.anims.play('hitstun');
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "hitstun");
-    if (!hitconfig) {
-      console.log(hitconfig)
+    if (hitconfig !== undefined) {
       this.timerhandle = setTimeout(() => {
         const isTouching = player.getIsTouching();
         if (isTouching.bottom) {
