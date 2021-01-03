@@ -43,13 +43,13 @@ export const playerHitboxData: hitboxdata = {
   "adventurer-attack1-02": {
     label: "hitbox",
     knockback: { x: -3, y: 0 },
-    damage: 2,
+    damage: 5,
     hitstun: 200,
   },
   "adventurer-attack2-03" : {
     label: "hitbox",
     knockback: { x: 0, y: 0 },
-    damage: 2,
+    damage: 5,
     hitstun: 100
   },
   "adventurer-attack3-02" : {
