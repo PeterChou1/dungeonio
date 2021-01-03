@@ -20,7 +20,7 @@ export class Game {
   //(Game loop) 60fps
   private tickrate = 1000 / 60;
   //(Broad cast loop) per 100ms
-  private updaterate = 1000 / 10;
+  private updaterate = 1000 / 30;
   // game timer
   private gametimer;
   // update timer for broadcast to client
