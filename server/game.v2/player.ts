@@ -137,8 +137,6 @@ class PlayerBody {
   private mainBody;
   // default matterjs body used if no custom body is used
   private default;
-  // body used to derived position from 
-  private positionalBody;
   // main matterjs body
   private compoundBody;
   private compoundBodyConfig: compoundBodyConfig = {
@@ -201,8 +199,6 @@ class PlayerBody {
     const hitboxbody = this.mainBody === bodyA ? bodyB : bodyA;
     if (!(hitboxbody.id in this.registeredActions)) {
       if (hitboxbody.label === "hitbox") {
-        console.log('hitbox collided with mainbody');
-        console.log(hitboxbody.config);
         this.registeredActions[hitboxbody.id] = {
           id: hitboxbody.id,
           category: "hit",
@@ -472,7 +468,6 @@ class PlayerBody {
       Body.setInertia(this.compoundBody, Infinity);
       Body.setVelocity(this.compoundBody, { x: v.velocityX, y: v.velocityY });
     } else if (this.mainBody !== this.default) {
-      console.log('create default body');
       const pos = this.getInternalPosition();
       this.sensoroffset = {
         x: this.default.position.x,
@@ -494,6 +489,7 @@ class PlayerBody {
   }
 
   destroy() {
+    this.event.removeAllListeners();
     Events.off(this.compoundBody);
     World.remove(this.engine.world, this.compoundBody);
   }
@@ -511,7 +507,7 @@ export class Player extends gameObject {
   private attributes: attributes;
   // current player input
   input;
-  // repeating 
+  // track repeating inputs 
   inputrepeats;
   client;
   name: string;
@@ -574,6 +570,7 @@ export class Player extends gameObject {
       right : 0,
       up : 0,
       down : 0,
+      run : 0,
       attack : 0
     }
     this.input = {
@@ -715,7 +712,7 @@ export class Player extends gameObject {
       health: this.state.health,
       flipX: this.state.flipX,
       collisionData: this.body.getCollidesWith(),
-      state: this.stateMachine.state,
+      anims: this.stateMachine.anims.getKey(),
       velocityX: v.velocityX,
       velocityY: v.velocityY,
       x: pos.x,
@@ -748,10 +745,8 @@ export class Player extends gameObject {
     this.stateMachine.event.once(
       gameEvents.stateMachine.dispatchcomplete,
       () => {
-        // send remove aoi to client -> cause client to leave -> trigger onLeave -> call destroy
-        this.client.send(messageType.aoiremove, {
-          id: this.id,
-        });
+        // send kill request to client -> cause client to leave -> trigger onLeave -> call destroy
+        this.client.send(messageType.kill);
       }
     );
   }
@@ -764,9 +759,9 @@ export class Player extends gameObject {
       console.log(`destroy player id: ${this.id} name: ${this.name}`);
       if (this.aoiId) {
         const currentAOI = this.aoi.getAOI(this.aoiId);
-        currentAOI.removeClient(this, true);
+        currentAOI.removeClient(this);
         const adjacentAOI = this.aoi.getAdjacentAOI(this.aoiId);
-        adjacentAOI.forEach((aoi) => aoi.removeAdjacentClient(this, false));
+        adjacentAOI.forEach((aoi) => aoi.removeAdjacentClient(this));
       }
     }
     this.stateMachine.destroy();

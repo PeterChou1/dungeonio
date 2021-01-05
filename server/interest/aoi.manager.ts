@@ -91,14 +91,14 @@ export class AOImanager {
         for (const aoi of adjacent) {
           if (aoi.inAOI(coords.x, coords.y)) {
             if (gameobject instanceof Player) {
-              aoi.removeAdjacentClient(gameobject, true);
+              aoi.removeAdjacentClient(gameobject);
               aoi.addClient(gameobject);
               currentAOI.removeClient(gameobject);
               currentAOI.addAdjacentClient(gameobject, true);
               const newadjacent = this.getAdjacentAOI(aoi.aoiId);
               for (const oldaoi of adjacent) {
                 if (!newadjacent.includes(oldaoi) && oldaoi !== aoi) {
-                  oldaoi.removeAdjacentClient(gameobject, false);
+                  oldaoi.removeAdjacentClient(gameobject);
                 }
               }
               for (const newaoi of newadjacent) {
@@ -115,10 +115,10 @@ export class AOImanager {
         }
         // if player is in no aoi then remove gameobject from every adjacent square
         for (const aoi of adjacent) {
-          aoi.removeAdjacentClient(gameobject, false);
+          aoi.removeAdjacentClient(gameobject);
         }
         if (gameobject instanceof Player) {
-          currentAOI.removeClient(gameobject, true);
+          currentAOI.removeClient(gameobject);
         } else {
           currentAOI.removeEntity(gameobject);
         }

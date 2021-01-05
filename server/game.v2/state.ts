@@ -131,7 +131,6 @@ export class StateMachine {
    * @return {Promise<boolean>} whether dispatch event succeeded or failed
    */
   async dispatch(event: event): Promise<boolean> {
-    console.log('dispatched called');
     return new Promise((resolve, reject) => {
       // you can't cheat death
       if (this.state !== "death") {
@@ -380,7 +379,7 @@ export class RunState extends State {
 
 export class FallState extends State {
   enter(player: Player) {
-    this.stateMachine.anims.play('idle');
+    this.stateMachine.anims.play('fall');
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "fall");
   }
   execute(player: Player) {

@@ -50,20 +50,9 @@ export class AOI {
    * @description update a specific player which has been sleeping to current AOI conditions
    */
   updatePlayer(clientGameObject: Player) {
-    for (const id in this.entities) {
-      if (id !== clientGameObject.id) {
-        clientGameObject.client.send(messageType.aoiadd, {
-          ...this.entities[id].getPosition(),
-          ...this.entities[id].getMeta(),
-        });
-      }
-    }
-
-    if (Object.values(this.entities).includes(clientGameObject)) {
-      clientGameObject.client.send(messageType.aoiupdate, {
-        [clientGameObject.id]: clientGameObject.getState(),
-      });
-    }
+    clientGameObject.client.send(messageType.aoiupdate,
+      this.getAOIEntities(false) 
+    );
   }
 
   /**
@@ -78,19 +67,15 @@ export class AOI {
     if (!alreadyAdjacent) {
       const state = clientGameObject.getInternalState();
       if (!state.asleep) {
-        for (const id in this.entities) {
-          clientGameObject.client.send(messageType.aoiadd, {
-            ...this.entities[id].getPosition(),
-            ...this.entities[id].getMeta(),
-          });
-        }
+        clientGameObject.client.send(messageType.aoiupdate,
+          this.getAOIEntities(false) 
+        );
       }
       for (const clientid in this.clients) {
         const state = this.entities[clientid].getInternalState();
         if (!state.asleep) {
-          this.clients[clientid].send(messageType.aoiadd, {
-            ...clientGameObject.getPosition(),
-            ...clientGameObject.getMeta(),
+          this.clients[clientid].send(messageType.aoiupdate, {
+            [clientGameObject.id]: clientGameObject.getState()
           });
         }
       }
@@ -99,31 +84,13 @@ export class AOI {
   /**
    * @description remove entities in current AOI for adjacent clients
    */
-  removeAdjacentClient(clientGameObject: Player, alreadyAdjacent: boolean) {
+  removeAdjacentClient(clientGameObject: Player) {
     delete this.adjacentClient[clientGameObject.id];
     delete this.adjacentPlayer[clientGameObject.id];
-    // remove all entities within aoi for client
-    if (!alreadyAdjacent) {
-      const state = clientGameObject.getInternalState();
-      if (!state.asleep) {
-        for (const id in this.entities) {
-          clientGameObject.client.send(messageType.aoiremove, {
-            id: id,
-          });
-        }
-      }
-      // remove tell all other players to remove client
-      for (const clientid in this.clients) {
-        const state = this.entities[clientid].getInternalState();
-        if (!state.asleep) {
-          this.clients[clientid].send(messageType.aoiremove, {
-            id: clientGameObject.id,
-          });
-        }
-      }
-    }
   }
-  /**
+
+
+  /** MARKED
    * @description should be used for adding a client (real player) to current AOI only
    * @param clientGameObject
    * @param init optional parameter which will broadcast add player to client being
@@ -135,28 +102,19 @@ export class AOI {
       for (const clientid in this.clients) {
         const state = this.entities[clientid].getInternalState();
         if (!state.asleep) {
-          this.clients[clientid].send(messageType.aoiadd, {
-            ...clientGameObject.getPosition(),
-            ...clientGameObject.getMeta(),
+          this.clients[clientid].send(messageType.aoiupdate, {
+            [clientGameObject.id]: clientGameObject.getState()
           });
         }
       }
-      // add all entity within aoi to client
-      const state = clientGameObject.getInternalState();
-      if (!state.asleep) {
-        for (const id in this.entities) {
-          clientGameObject.client.send(messageType.aoiadd, {
-            ...this.entities[id].getPosition(),
-            ...this.entities[id].getMeta(),
-          });
-        }
-      }
-      clientGameObject.client.send(messageType.aoiadd, {
-        ...clientGameObject.getPosition(),
-        ...clientGameObject.getMeta(),
+      // send all entity within aoi to client
+      clientGameObject.client.send(messageType.aoiupdate,
+        this.getAOIEntities(false) 
+      );
+      clientGameObject.client.send(messageType.aoiupdate, {
+        [clientGameObject.id]: clientGameObject.getState()
       });
     }
-
     this.clients[clientGameObject.id] = clientGameObject.client;
     this.entities[clientGameObject.id] = clientGameObject;
     //this.savedState[clientGameObject.id] = clientGameObject.getState();
@@ -167,21 +125,21 @@ export class AOI {
    * @param clientGameObject
    * @param quit optional parameter used for players quiting the game
    */
-  removeClient(clientGameObject: Player, quit?) {
+  removeClient(clientGameObject: Player) { //quit?) {
     delete this.clients[clientGameObject.id];
     delete this.entities[clientGameObject.id];
     delete this.savedState[clientGameObject.id];
-    if (quit) {
-      console.log("aoi remove");
-      for (const clientid in this.clients) {
-        const state = this.entities[clientid].getInternalState();
-        if (!state.asleep) {
-          this.clients[clientid].send(messageType.aoiremove, {
-            id: clientGameObject.id,
-          });
-        }
-      }
-    }
+    //if (quit) {
+    //  console.log("aoi remove");
+    //  for (const clientid in this.clients) {
+    //    const state = this.entities[clientid].getInternalState();
+    //    if (!state.asleep) {
+    //      this.clients[clientid].send(messageType.aoiremove, {
+    //        id: clientGameObject.id,
+    //      });
+    //    }
+    //  }
+    //}
   }
   /**
    * @description used for non-player entity broadcast to all clients within AOI that an
@@ -230,18 +188,21 @@ export class AOI {
       }
     }
   }
+
   /**
    * @description get all entity within AOI that have changed state
+   * @param unique whether or not to only return states that have changed
    * @returns {array} of all state within aoi
    */
-  getAOIEntities() {
+  getAOIEntities(unique = true) {
     const entities = {};
     for (const id in this.entities) {
       const newState = this.entities[id].getState();
-      if (JSON.stringify(newState) !== JSON.stringify(this.savedState[id])) {
+      if (!unique || JSON.stringify(newState) !== JSON.stringify(this.savedState[id])) {
         entities[id] = newState;
       }
       this.savedState[id] = newState;
+
     }
     return entities;
   }

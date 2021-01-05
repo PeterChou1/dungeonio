@@ -110,6 +110,15 @@ export class HealthBar {
         return this;
     }
 
+    setHidden() {
+        const images = [this.middle, this.rightCap, this.leftCap, this.midBg, this.rightBg, this.leftBg];
+        images.forEach(cap => cap.setActive(false).setVisible(false));
+    }
+
+    setVisible() {
+        const images = [this.middle, this.rightCap, this.leftCap, this.midBg, this.rightBg, this.leftBg];
+        images.forEach(cap => cap.setActive(true).setVisible(true));
+    }
 
     animateToFill(fill, duration = 1000) {
         const newpercent =  Math.max(0, Math.min(1, fill));

@@ -18,6 +18,6 @@ export class GameState extends Schema {
     this.players[id].playerName = name;
   }
   removePlayer(id) {
-    delete this.players[id];
+     delete this.players[id];
   }
 }

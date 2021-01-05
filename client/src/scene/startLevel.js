@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import Player from "../entity/player";
+import { AOImanagerClient } from "../interest/aoi.manager";
 import {
   gameConfig,
   collisionData,
@@ -20,7 +21,8 @@ export class startLevel extends Phaser.Scene {
         default: "matter",
         matter: {
           debug: gameConfig.debug,
-          gravity: { y: 0 }, // set 0 to disable gravity
+          // game is completely controlled by server no need for gravity
+          gravity: { y: 0 }, 
         },
       },
     });
@@ -77,6 +79,7 @@ export class startLevel extends Phaser.Scene {
   }
 
   async create() {
+    this.setuplevel();
     if (!gameConfig.networkdebug) {
       this.room = await this.connect();
       this.setupnetwork();
@@ -124,8 +127,6 @@ export class startLevel extends Phaser.Scene {
         });
       }
     }
-    // track all players in game
-    this.setuplevel();
     // debug purposes
     if (gameConfig.debug) {
       this.matter.world.createDebugGraphic();
@@ -134,14 +135,15 @@ export class startLevel extends Phaser.Scene {
       //inject server instance into client side
       this.serverinstance = await Game.createGame();
       this.serverinstance.addPlayer({ sessionId: "test" }, "test");
-      this.testplayer = new Player(this, 200, 200, "test", "test");
+      this.testplayer = new Player(this, 200, 200, "test", "test", false, 100, 100, this.aoiclient, true);
       this.serverinstance.addPlayer({ sessionId: "test2" }, "test2");
-      this.testplayer2 = new Player(this, 100, 200, "test2", "test2");
+      this.testplayer2 = new Player(this, 100, 200, "test2", "test2", false, 100, 100, this.aoiclient, true);
       const height = this.gamelayer.ground.height;
       const width = this.gamelayer.ground.width;
       this.matter.world.setBounds(0, 0, width, height);
       this.cameras.main.setBounds(0, 0, width, height);
       this.cameras.main.startFollow(this.testplayer.sprite);
+      this.aoiclient.setMain(this.testplayer);
       this.cameras.main.roundPixels = true;
     }
   }
@@ -214,90 +216,81 @@ export class startLevel extends Phaser.Scene {
         }
       }
     });
+    this.aoiclient = new AOImanagerClient(this.gamelayer.ground.height, this.gamelayer.ground.width);
   }
 
   setupnetwork() {
     this.allplayers = {};
-    this.room.onMessage(messageType.aoiadd, (entity) => {
-      if (!(entity in this.allplayers)) {
-        console.log("aoi add");
-        console.log(`--Player added with id: ${entity.id}--`);
-        // NOTE: simulation coordinates differ by 25
-        //entity.y -= 25;
-        this.allplayers[entity.id] = new Player(
-          this,
-          entity.x,
-          entity.y,
-          entity.id,
-          entity.name,
-          entity.flipX,
-          entity.maxhealth,
-          entity.health
-        );
-        //this.localplayer = new LocalPlayer(this, player.x, player.y, 2);
-        if (entity.id === this.sessionId) {
-          // follow player
-          //console.log('camera followed player');
-          const height = this.gamelayer.ground.height;
-          const width = this.gamelayer.ground.width;
-          this.matter.world.setBounds(0, 0, width, height);
-          this.cameras.main.setBounds(0, 0, width, height);
-          //this.cameras.main.setZoom(0.5);
-          this.cameras.main.startFollow(this.allplayers[entity.id].sprite);
-        }
+    this.room.state.players.onAdd = (config, key) => {
+      console.log(`--Player added with id: ${key} added--`);
+      this.allplayers[key] = new Player(
+        this,
+        0,
+        0,
+        key,
+        config.playerName,
+        false,
+        100,
+        100,
+        this.aoiclient
+      );
+      if (key === this.sessionId) {
+        this.aoiclient.setMain(this.allplayers[key]);
+        const height = this.gamelayer.ground.height;
+        const width = this.gamelayer.ground.width;
+        this.matter.world.setBounds(0, 0, width, height);
+        this.cameras.main.setBounds(0, 0, width, height);
+        this.cameras.main.startFollow(this.allplayers[key].sprite);
       }
-    });
+    }
+    this.room.state.players.onRemove = (player, key) =>  {
+      console.log(`--player with id: ${key} removed--`);
+      this.allplayers[key].destroy();
+      delete this.allplayers[key];
+    }
 
     this.room.onMessage(messageType.aoiupdate, (entities) => {
-      console.log("aoi update");
+      //console.log("aoi update");
       for (const id in entities) {
         if (id in this.allplayers) {
-          // NOTE: simulation coordinates differ by 25
-          //entities[id].y -= 25;
+          if (!this.allplayers[id].awake) {
+            this.allplayers[id].setAwake();
+          }
           this.allplayers[id].updatePlayer({
             x: entities[id].x,
             y: entities[id].y,
             flipX: entities[id].flipX,
             collisionData: entities[id].collisionData,
-            state: entities[id].state,
+            anims: entities[id].anims,
             maxhealth: entities[id].maxhealth,
             health: entities[id].health,
           });
+        } else {
+          throw `entity id: not recognized: ${id}`;
         }
       }
     });
-    this.room.onMessage(messageType.aoiremove, (entity) => {
-      console.log("aoi remove");
-      this.allplayers[entity.id].destroy();
-      delete this.allplayers[entity.id];
-      if (entity.id === this.sessionId) {
-        // if id equal this session id that means player died destroy all player and leave
-        this.room.removeAllListeners();
-        this.room.leave();
-        for (const id in this.allplayers) {
-          if (id !== this.sessionId) {
-            this.allplayers[id].destroy();
-            delete this.allplayers[id];
-          }
-        }
-        this.input.keyboard.removeAllListeners();
-        for (const prop in this.keys) {
-          this.input.keyboard.removeCapture(this.keys[prop].keyCode);
-        }
-        this.scene.stop("hudScene");
-        this.scene.start("deadScreen", {
-          client: this.client,
-        });
+
+    this.room.onMessage(messageType.kill, () => {
+      // if id equal this session id that means player died destroy all player and leave
+      this.room.removeAllListeners();
+      this.room.leave();
+      for (const id in this.allplayers) {
+        this.allplayers[id].destroy();
+        delete this.allplayers[id];
       }
-    });
+      this.deactiveCaptures();
+      this.scene.stop("hudScene");
+      this.scene.start("deadScreen", {
+        client: this.client,
+      });
+    })
+
     // if client got booted for whatever reason
     this.room.onLeave((code) => {
       console.log(`client kicked code: ${code}`);
       this.room.removeAllListeners();
-      this.input.keyboard.removeAllListeners();
-      for (const prop in this.keys) {
-        this.input.keyboard.removeCapture(this.keys[prop].keyCode);
-      }
+      this.deactiveCaptures();
       this.scene.stop("hudScene");
       this.scene.start("mainMenu", {
         client: this.client,
@@ -307,18 +300,29 @@ export class startLevel extends Phaser.Scene {
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         console.log("hidden player");
-        // TODO: if AI enemies are added AI enemies must be deleted too
+        // TODO: if AI enemies are added AI enemies must be set asleep too
         for (const id in this.allplayers) {
           if (id !== this.sessionId) {
-            this.allplayers[id].destroy();
-            delete this.allplayers[id];
+            this.allplayers[id].setAsleep();
           }
         }
         this.room.send(messageType.playersleep);
       } else {
+        console.log('set awake player');
         this.room.send(messageType.playerawake);
       }
     });
+  }
+
+  /**
+   * @description deactive capturing for keys
+   */
+  deactiveCaptures() {
+    this.input.keyboard.removeAllListeners();
+    for (const prop in this.keys) {
+      this.input.keyboard.removeCapture(this.keys[prop].keyCode);
+    }
+
   }
 
   updatePlayerInput(prop, key) {
@@ -402,7 +406,7 @@ export class startLevel extends Phaser.Scene {
         y: state.y,
         flipX: state.flipX,
         collisionData: state.collisionData,
-        state: state.state,
+        anims: state.anims,
         maxhealth: state.maxhealth,
         health: state.health,
       });
@@ -412,7 +416,7 @@ export class startLevel extends Phaser.Scene {
         y: state2.y,
         flipX: state2.flipX,
         collisionData: state2.collisionData,
-        state: state2.state,
+        anims: state2.anims,
         maxhealth: state2.maxhealth,
         health: state2.health,
       });

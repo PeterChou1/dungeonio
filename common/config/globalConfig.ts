@@ -36,13 +36,13 @@ export const collisionData = {
 };
 
 export const messageType = {
-  move: 0, // message for player movement
-  playerinput: 1,
-  playersleep: 2, // when player navigates away from tab
-  playerawake: 3, // when user navigates back to tab
-  aoiadd: 4, // add gameobject to aoi
-  aoiupdate: 5, // update gameobject in player area of interest
-  aoiremove: 6, // remove gameobject in player area of interest
+  playerinput: 0,
+  playersleep: 1, // when player navigates away from tab
+  playerawake: 2, // when user navigates back to tab
+  aoiadd: 3, // add gameobject to aoi
+  aoiupdate: 4, // update gameobject in player area of interest
+  aoiremove: 5, // remove gameobject in player area of interest
+  kill: 6
 };
 
 
