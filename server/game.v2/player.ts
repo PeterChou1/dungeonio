@@ -28,7 +28,7 @@ import Phaser from "phaser";
 import { AOImanager } from "../interest/aoi.manager";
 import { EventEmitter } from "events";
 import { event } from "./state";
-import { registerCollisionCallback } from "../utils/utils"
+import { registerCollisionCallback } from "../utils/utils";
 
 const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
 
@@ -112,9 +112,9 @@ class PlayerBody {
   private sensors;
   private collidesWith;
   private sensorsConfig: sensorConfig = {
-    virtualbody:  {
-      pos: ({h}) => ({x: 0, y: (h / 2) - (playerConfig.dim.h / 2)}),
-      dim: () => ({w: playerConfig.dim.w, h: playerConfig.dim.h})
+    virtualbody: {
+      pos: ({ h }) => ({ x: 0, y: h / 2 - playerConfig.dim.h / 2 }),
+      dim: () => ({ w: playerConfig.dim.w, h: playerConfig.dim.h }),
     },
     nearbottom: {
       pos: ({ h }) => ({ x: 0, y: h }),
@@ -131,7 +131,7 @@ class PlayerBody {
     right: {
       pos: ({ w }) => ({ x: w / 2, y: 0 }),
       dim: ({ h }) => ({ w: 10, h: h * 0.75 }),
-    }
+    },
   };
   private frameData;
   private mainBody;
@@ -429,52 +429,54 @@ class PlayerBody {
    * @param frame
    */
   setFrameBody(frame) {
-    if (this.frameData[frame]) {
-      var pos = this.getInternalPosition();
-      var v = this.getVelocity();
-      World.remove(this.engine.world, this.compoundBody);
-      this.mainBody = this.frameData[frame][0];
-      this.mainBody.onCollide(this.mainBodyCallback.bind(this));
-      this.mainBody.onCollideActive(this.mainBodyCallback.bind(this));
-      this.mainBody.onCollideEnd(this.mainBodyCallback.bind(this));
-      this.h = this.mainBody.config.h;
-      this.w = this.mainBody.config.w;
-      this.sensoroffset = {
-        x: this.mainBody.position.x,
-        y: this.mainBody.position.y,
-      };
-      this.createSensors(this.sensorsConfig);
-      this.compoundBody = Body.create({
-        parts: [...this.frameData[frame], ...Object.values(this.sensors)],
-        ...this.compoundBodyConfig,
-      });
-      if (this.flipX !== this.mainBody.config.flipX) {
-        Body.scale(this.compoundBody, -1, 1);
-        this.frameData[frame].forEach(
-          (body) => (body.config.flipX = this.flipX)
-        );
-      }
-      if (this.w < this.mainBody.config.orgw) {
-        if (this.flipX) {
-          this.compoundBody.position.x += this.mainBody.centerOffset.x;
-          this.compoundBody.positionPrev.x += this.mainBody.centerOffset.x;
-        } else {
-          this.compoundBody.position.x -= this.mainBody.centerOffset.x;
-          this.compoundBody.positionPrev.x -= this.mainBody.centerOffset.x;
+    setImmediate(() => {
+      if (this.frameData[frame]) {
+        var pos = this.getInternalPosition();
+        var v = this.getVelocity();
+        World.remove(this.engine.world, this.compoundBody);
+        this.mainBody = this.frameData[frame][0];
+        this.mainBody.onCollide(this.mainBodyCallback.bind(this));
+        this.mainBody.onCollideActive(this.mainBodyCallback.bind(this));
+        this.mainBody.onCollideEnd(this.mainBodyCallback.bind(this));
+        this.h = this.mainBody.config.h;
+        this.w = this.mainBody.config.w;
+        this.sensoroffset = {
+          x: this.mainBody.position.x,
+          y: this.mainBody.position.y,
+        };
+        this.createSensors(this.sensorsConfig);
+        this.compoundBody = Body.create({
+          parts: [...this.frameData[frame], ...Object.values(this.sensors)],
+          ...this.compoundBodyConfig,
+        });
+        if (this.flipX !== this.mainBody.config.flipX) {
+          Body.scale(this.compoundBody, -1, 1);
+          this.frameData[frame].forEach(
+            (body) => (body.config.flipX = this.flipX)
+          );
         }
+        if (this.w < this.mainBody.config.orgw) {
+          if (this.flipX) {
+            this.compoundBody.position.x += this.mainBody.centerOffset.x;
+            this.compoundBody.positionPrev.x += this.mainBody.centerOffset.x;
+          } else {
+            this.compoundBody.position.x -= this.mainBody.centerOffset.x;
+            this.compoundBody.positionPrev.x -= this.mainBody.centerOffset.x;
+          }
+        }
+        World.addBody(this.engine.world, this.compoundBody);
+        Body.setPosition(this.compoundBody, { x: pos.x, y: pos.y });
+        Body.setInertia(this.compoundBody, Infinity);
+        Body.setVelocity(this.compoundBody, { x: v.velocityX, y: v.velocityY });
+      } else if (this.mainBody !== this.default) {
+        const pos = this.getInternalPosition();
+        this.sensoroffset = {
+          x: this.default.position.x,
+          y: this.default.position.y,
+        };
+        this.createDefaultBody(pos.x, pos.y);
       }
-      World.addBody(this.engine.world, this.compoundBody);
-      Body.setPosition(this.compoundBody, { x: pos.x, y: pos.y });
-      Body.setInertia(this.compoundBody, Infinity);
-      Body.setVelocity(this.compoundBody, { x: v.velocityX, y: v.velocityY });
-    } else if (this.mainBody !== this.default) {
-      const pos = this.getInternalPosition();
-      this.sensoroffset = {
-        x: this.default.position.x,
-        y: this.default.position.y,
-      };
-      this.createDefaultBody(pos.x, pos.y);
-    }
+    });
   }
 
   /**
@@ -507,7 +509,7 @@ export class Player extends gameObject {
   private attributes: attributes;
   // current player input
   input;
-  // track repeating inputs 
+  // track repeating inputs
   inputrepeats;
   client;
   name: string;
@@ -566,38 +568,38 @@ export class Player extends gameObject {
 
     // track if input repeats
     this.inputrepeats = {
-      left : 0,
-      right : 0,
-      up : 0,
-      down : 0,
-      run : 0,
-      attack : 0
-    }
+      left: 0,
+      right: 0,
+      up: 0,
+      down: 0,
+      run: 0,
+      attack: 0,
+    };
     this.input = {
       left: {
-        isDown : false,
-        isUp : true,
+        isDown: false,
+        isUp: true,
       },
       right: {
-        isDown : false,
-        isUp : true,
+        isDown: false,
+        isUp: true,
       },
       up: {
-        isDown : false,
-        isUp : true,
+        isDown: false,
+        isUp: true,
       },
       down: {
-        isDown : false,
+        isDown: false,
         isUp: true,
       },
       run: {
         isDown: false,
-        isUp: true
+        isUp: true,
       },
       attack: {
-        isDown : false,
-        isUp : true,
-      }
+        isDown: false,
+        isUp: true,
+      },
     };
     //console.log('--aoi init--');
     if (!gameConfig.networkdebug) {
@@ -618,7 +620,7 @@ export class Player extends gameObject {
     }
   }
   updatePlayerInput(playerinput) {
-    this.input = {...this.input, ...playerinput};
+    this.input = { ...this.input, ...playerinput };
   }
 
   setVelocity(vx: number, vy?: number) {
@@ -734,7 +736,6 @@ export class Player extends gameObject {
       }
     }
   }
-
 
   /**
    * @description plays death animation then destroys body
