@@ -19,7 +19,7 @@ export class Game {
   // tick rate is in ms 
   //(Game loop) 60fps
   private tickrate = 1000 / 60;
-  //(Broad cast loop) per 100ms
+  //(Broad cast loop) per 30 updates pre second
   private updaterate = 1000 / 30;
   // game timer
   private gametimer;

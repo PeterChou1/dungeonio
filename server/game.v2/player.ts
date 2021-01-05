@@ -711,7 +711,6 @@ export class Player extends gameObject {
       maxhealth: this.attributes.maxhealth,
       health: this.state.health,
       flipX: this.state.flipX,
-      collisionData: this.body.getCollidesWith(),
       anims: this.stateMachine.anims.getKey(),
       velocityX: v.velocityX,
       velocityY: v.velocityY,
