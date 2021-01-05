@@ -25,6 +25,12 @@ export default class Player {
     awake = false
   ) {
     console.log(`player name: ${playerName} joined`);
+    // interpolated value from server
+    // keeps track of server updates positions by server for interpolation purposes
+    this.x_interp = null;
+    this.y_interp = null;
+    this.serverInterpolation = [];
+    // last server position
     this.x = x;
     this.y = y;
     this.aoi = aoi;
@@ -46,13 +52,8 @@ export default class Player {
       "adventure-idle-00"
     );
     this.playerId = key;
-    //this.generateBodyFrames();
-    // keeps track of server updates positions by server for interpolation purposes
-    this.serverInterpolation = [];
+
     this.sprite.setScale(2);
-    //this.mainBody = Bodies.rectangle(0, 0, 100, 2000, { chamfer: 10 });
-    //this.sprite.setExistingBody(this.mainBody);
-    //this.sprite.setFixedRotation();
     this.sprite.setPosition(x, y);
     this.sprite.setFlipX(flipX);
     // default animation state
@@ -94,6 +95,9 @@ export default class Player {
   setAsleep() {
     if (!this.insomniamode) {
       console.log(`player ${this.playerId} set asleep`);
+      this.serverInterpolation = [];
+      this.x_interp = null;
+      this.y_interp = null;
       this.awake = false;
       if (this.scene.sessionId !== this.playerId) {
         this.hp.setHidden();
@@ -127,8 +131,14 @@ export default class Player {
 
   }
 
-  updatePlayer({ x, y, flipX, collisionData, anims, maxhealth, health }) {
-    //console.log(`name: ${this.playerName} (x: ${x} y: ${y})`);
+  updatePlayer({ x, y, flipX, anims, maxhealth, health }) {
+    this.meta = {
+      maxhealth: maxhealth,
+      health: health,
+    };
+    this.sprite.setFlipX(flipX);
+    this.setPosition(x, y);
+    this.aoi.aoiupdate(this);
     if (this.scene.sessionId !== this.playerId) {
       this.hp.animateToFill(health / maxhealth);
     } else {
@@ -136,31 +146,51 @@ export default class Player {
         maxhealth, health 
       });
     }
-    this.meta = {
-      maxhealth: maxhealth,
-      health: health,
-    };
-    this.sprite.setFlipX(flipX);
-    this.sprite.setCollidesWith(collisionData);
     if (this.animationstate !== anims) {
       this.sprite.anims.play(anims);
       this.animationstate = anims;
     }
-    //let serverInterpolation = [];
-    this.setPosition(x, y);
-    this.playertext.setPosition(x, y - 50);
-    if (this.hp) this.hp.setPosition(x - 45, y - 75);
     if (gameConfig.networkdebug) {
       this.playertext.setText(
         `x: ${x} y: ${y} flipX: ${flipX} anims: ${anims} maxhealth: ${maxhealth} health: ${health}`
       );
     }
-    this.aoi.aoiupdate(this);
+
+    this.serverInterpolation = [];
+    if (!this.x_interp && !this.y_interp) {
+      this.x_interp = x;
+      this.y_interp = y;
+      this.serverInterpolation.push({x: x, y: y});
+    } else {
+      for (let i = 0; i <= 1; i += 0.25) {
+        let xInterp = Phaser.Math.Interpolation.Linear([this.x_interp, x], i);
+        let yInterp = Phaser.Math.Interpolation.Linear([this.y_interp, y], i);
+        //console.log(`coordinates interp x:${xInterp}  y:${yInterp}`);
+        this.serverInterpolation.push({
+          x: xInterp,
+          y: yInterp,
+        });
+      }
+    } 
   }
 
   update() {
     this.aoi.aoiupdate(this);
-    this.sprite.setPosition(this.x, this.y);
+    if (this.serverInterpolation.length > 0 && !gameConfig.networkdebug) {
+      const coord = this.serverInterpolation.shift();
+      this.sprite.setPosition(coord.x, coord.y);
+      this.x_interp = coord.x;
+      this.y_interp = coord.y;
+      this.layoutUI(coord.x, coord.y);
+    } else {
+      this.layoutUI(this.x, this.y);
+    }
+  }
+
+  layoutUI(x, y) {
+    this.sprite.setPosition(x, y);
+    this.playertext.setPosition(x, y - 50);
+    if (this.hp) this.hp.setPosition(x - 45, y - 75);
   }
 
   destroy() {
