@@ -15,13 +15,27 @@ export class bootScene extends Phaser.Scene {
 
   preload() {
     /* load ui */
-    this.load.image('left-cap', 'public/ui/barHorizontal_green_left.png');
-	  this.load.image('middle', 'public/ui/barHorizontal_green_mid.png');
-	  this.load.image('right-cap', 'public/ui/barHorizontal_green_right.png');
-	  this.load.image('left-cap-shadow', 'public/ui/barHorizontal_shadow_left.png');
-	  this.load.image('middle-shadow', 'public/ui/barHorizontal_shadow_mid.png');
-    this.load.image('right-cap-shadow', 'public/ui/barHorizontal_shadow_right.png');
-    this.load.image('Interface', 'public/tilemaps/tilesetImage/Interface.png');
+    this.load.image("left-cap-red", "public/ui/barHorizontal_red_left.png");
+    this.load.image("middle-red", "public/ui/barHorizontal_red_mid.png");
+    this.load.image("right-cap-red", "public/ui/barHorizontal_red_right.png");
+
+    this.load.image("left-cap-green", "public/ui/barHorizontal_green_left.png");
+    this.load.image("middle-green", "public/ui/barHorizontal_green_mid.png");
+    this.load.image(
+      "right-cap-green",
+      "public/ui/barHorizontal_green_right.png"
+    );
+
+    this.load.image(
+      "left-cap-shadow",
+      "public/ui/barHorizontal_shadow_left.png"
+    );
+    this.load.image("middle-shadow", "public/ui/barHorizontal_shadow_mid.png");
+    this.load.image(
+      "right-cap-shadow",
+      "public/ui/barHorizontal_shadow_right.png"
+    );
+    this.load.image("Interface", "public/tilemaps/tilesetImage/Interface.png");
     this.load.tilemapTiledJSON("uimap", "public/tilemaps/json/uimap.json");
     /* load level */
     this.load.image("tiles", "public/tilemaps/tilesetImage/mainlevbuild.png");
@@ -38,7 +52,6 @@ export class bootScene extends Phaser.Scene {
       "public/spritesheet"
     );
   }
-
 
   create() {
     this.scene.start("startLevel", {

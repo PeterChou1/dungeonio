@@ -1,29 +1,19 @@
 import { gameConfig, frontEndEvent } from "../../../common";
-import { HealthBar } from "../ui/healthbar";
+import { HealthBar } from "../ui/bar";
 
 export default class Player {
   /**
-   * @param {*} scene 
-   * @param {*} x 
-   * @param {*} y 
-   * @param {*} key 
-   * @param {*} playerName 
+   * @param {*} scene
+   * @param {*} x
+   * @param {*} y
+   * @param {*} key
+   * @param {*} playerName
    * @param {*} flipX whether or not the player is flip horizontally
-   * @param {*} maxhealth 
-   * @param {*} health 
+   * @param {*} maxhealth
+   * @param {*} health
    * @param {*} awake set player to awake or asleep mode
    */
-  constructor(
-    scene, 
-    x, y, 
-    key, 
-    playerName, 
-    flipX, 
-    maxhealth, 
-    health,
-    aoi,
-    awake = false
-  ) {
+  constructor(scene, x, y, key, playerName, aoi, awake = false) {
     console.log(`player name: ${playerName} joined`);
     // interpolated value from server
     // keeps track of server updates positions by server for interpolation purposes
@@ -39,10 +29,12 @@ export default class Player {
     this.insomniamode = false;
     this.isawake = awake;
     this.playerName = playerName;
-    // meta attributes on player
+    // meta attributes on player set to defaults
     this.meta = {
-      maxhealth: maxhealth,
-      health: health,
+      maxhealth: null,
+      health: null,
+      maxstamina: null,
+      stamina: null,
     };
     this.scene = scene;
     this.sprite = scene.matter.add.sprite(
@@ -52,10 +44,8 @@ export default class Player {
       "adventure-idle-00"
     );
     this.playerId = key;
-
     this.sprite.setScale(2);
     this.sprite.setPosition(x, y);
-    this.sprite.setFlipX(flipX);
     // default animation state
     this.animationstate = "idle";
     // if its player instaniate health bar
@@ -79,8 +69,8 @@ export default class Player {
   getPosition() {
     return {
       x: this.x,
-      y: this.y
-    }
+      y: this.y,
+    };
   }
 
   getAOIid() {
@@ -90,7 +80,6 @@ export default class Player {
   setAOIid(aoiId) {
     this.aoiId = aoiId;
   }
-
 
   setAsleep() {
     if (!this.insomniamode) {
@@ -102,11 +91,9 @@ export default class Player {
       if (this.scene.sessionId !== this.playerId) {
         this.hp.setHidden();
       }
-      this.scene.events.off('update', this.update, this);
-      this.sprite.setActive(false)
-                 .setVisible(false);
-      this.playertext.setActive(false)
-                     .setVisible(false);
+      this.scene.events.off("update", this.update, this);
+      this.sprite.setActive(false).setVisible(false);
+      this.playertext.setActive(false).setVisible(false);
     }
   }
 
@@ -117,22 +104,21 @@ export default class Player {
     if (this.scene.sessionId !== this.playerId) {
       this.hp.setVisible();
     }
-    this.scene.events.on('update', this.update, this);
-    this.sprite.setActive(true)
-               .setVisible(true);
-    this.playertext.setActive(true)
-                   .setVisible(true);
+    this.scene.events.on("update", this.update, this);
+    this.sprite.setActive(true).setVisible(true);
+    this.playertext.setActive(true).setVisible(true);
     this.insomniamode = true;
     setTimeout(() => {
       this.insomniamode = false;
-    }, 1000)
+    }, 1000);
     //console.log(`name: ${this.playerName} set wake`);
     //console.log(this.getPosition());
-
   }
 
-  updatePlayer({ x, y, flipX, anims, maxhealth, health }) {
+  updatePlayer({ x, y, flipX, anims, maxhealth, health, maxstamina, stamina }) {
     this.meta = {
+      maxstamina: maxstamina,
+      stamina: stamina,
       maxhealth: maxhealth,
       health: health,
     };
@@ -142,9 +128,7 @@ export default class Player {
     if (this.scene.sessionId !== this.playerId) {
       this.hp.animateToFill(health / maxhealth);
     } else {
-      this.scene.events.emit(frontEndEvent.uiupdate, {
-        maxhealth, health 
-      });
+      this.scene.events.emit(frontEndEvent.uiupdate, this.meta);
     }
     if (this.animationstate !== anims) {
       this.sprite.anims.play(anims);
@@ -152,7 +136,7 @@ export default class Player {
     }
     if (gameConfig.networkdebug) {
       this.playertext.setText(
-        `x: ${x} y: ${y} flipX: ${flipX} anims: ${anims} maxhealth: ${maxhealth} health: ${health}`
+        `x: ${x} y: ${y} flipX: ${flipX} anims: ${anims} \n maxhealth: ${maxhealth} health: ${health} maxstamina: ${maxstamina} stamina ${stamina}`
       );
     }
 
@@ -160,7 +144,7 @@ export default class Player {
     if (!this.x_interp && !this.y_interp) {
       this.x_interp = x;
       this.y_interp = y;
-      this.serverInterpolation.push({x: x, y: y});
+      this.serverInterpolation.push({ x: x, y: y });
     } else {
       for (let i = 0; i <= 1; i += 0.25) {
         let xInterp = Phaser.Math.Interpolation.Linear([this.x_interp, x], i);
@@ -171,7 +155,7 @@ export default class Player {
           y: yInterp,
         });
       }
-    } 
+    }
   }
 
   update() {
@@ -189,14 +173,14 @@ export default class Player {
 
   layoutUI(x, y) {
     this.sprite.setPosition(x, y);
-    this.playertext.setPosition(x, y - 50);
+    this.playertext.setPosition(x, gameConfig.networkdebug ? y - 100 : y - 50);
     if (this.hp) this.hp.setPosition(x - 45, y - 75);
   }
 
   destroy() {
     if (this.hp) this.hp.destroy();
     this.sprite.destroy();
-    this.scene.events.off('update', this.update, this);
+    this.scene.events.off("update", this.update, this);
     this.playertext.destroy();
   }
 }

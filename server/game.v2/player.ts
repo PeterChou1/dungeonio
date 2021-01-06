@@ -53,6 +53,7 @@ type internalState = {
   platformFall: boolean;
   flipX: boolean;
   health: number;
+  stamina: number;
 };
 
 type internalStateConfig = {
@@ -60,6 +61,7 @@ type internalStateConfig = {
   onPlatform?: boolean;
   platformFall?: boolean;
   flipX?: boolean;
+  stamina?: number;
   health?: number;
 };
 
@@ -68,14 +70,20 @@ type attributeConfig = {
   airspeed?: number;
   runspeed?: number;
   jumpheight?: number;
+  airaccel?: number;
+  staminaregen?: number;
+  maxstamina?: number;
   maxhealth?: number;
 };
 
 type attributes = {
   groundspeed: number;
   airspeed: number;
+  airaccel: number;
   runspeed: number;
   jumpheight: number;
+  staminaregen: number;
+  maxstamina: number;
   maxhealth: number;
 };
 
@@ -122,7 +130,7 @@ class PlayerBody {
     },
     bottom: {
       pos: ({ h }) => ({ x: 0, y: h / 2 }),
-      dim: ({ w }) => ({ w: w / 1.5, h: 10 }),
+      dim: ({ w }) => ({ w: w / 1.25, h: 10 }),
     },
     left: {
       pos: ({ w }) => ({ x: -w / 2, y: 0 }),
@@ -383,7 +391,10 @@ class PlayerBody {
   }
 
   setVelocity(vx: number, vy?: number) {
-    Body.setVelocity(this.compoundBody, { x: vx, y: vy ? vy : vx });
+    Body.setVelocity(this.compoundBody, {
+      x: vx,
+      y: typeof vy === "number" ? vy : vx,
+    });
   }
 
   setVelocityX(vx: number) {
@@ -415,8 +426,8 @@ class PlayerBody {
 
   getVelocity() {
     return {
-      velocityX: Math.trunc(this.compoundBody.velocity.x),
-      velocityY: Math.trunc(this.compoundBody.velocity.y),
+      x: this.compoundBody.velocity.x,
+      y: this.compoundBody.velocity.y,
     };
   }
 
@@ -465,9 +476,9 @@ class PlayerBody {
           }
         }
         World.addBody(this.engine.world, this.compoundBody);
-        Body.setPosition(this.compoundBody, { x: pos.x, y: pos.y });
+        Body.setPosition(this.compoundBody, pos);
         Body.setInertia(this.compoundBody, Infinity);
-        Body.setVelocity(this.compoundBody, { x: v.velocityX, y: v.velocityY });
+        Body.setVelocity(this.compoundBody, v);
       } else if (this.mainBody !== this.default) {
         const pos = this.getInternalPosition();
         this.sensoroffset = {
@@ -554,8 +565,12 @@ export class Player extends gameObject {
     this.attributes = {
       groundspeed: 5,
       runspeed: 7,
+      // max air speed character can attain
       airspeed: 5,
+      airaccel: 0.25,
       jumpheight: 12,
+      staminaregen: 0.5,
+      maxstamina: 100,
       maxhealth: 100,
     };
     this.state = {
@@ -563,6 +578,7 @@ export class Player extends gameObject {
       onPlatform: false,
       platformFall: false,
       flipX: false,
+      stamina: this.attributes.maxstamina,
       health: this.attributes.maxhealth,
     };
 
@@ -650,11 +666,25 @@ export class Player extends gameObject {
     if (newstate.hasOwnProperty("flipX")) {
       this.body.setFlipX(newstate.flipX);
     }
+    if (newstate.hasOwnProperty("health")) {
+      newstate.health = Phaser.Math.Clamp(
+        newstate.health,
+        0,
+        this.attributes.maxhealth
+      );
+      if (newstate.health === 0) {
+        this.kill();
+      }
+    }
+    if (newstate.hasOwnProperty("stamina")) {
+      newstate.stamina = Phaser.Math.Clamp(
+        newstate.stamina,
+        0,
+        this.attributes.maxstamina
+      );
+    }
     if (this.state.asleep && newstate.asleep === false) {
       this.awakePlayer();
-    }
-    if (newstate.health === 0) {
-      this.kill();
     }
     //newstate.asleep ? this.awakePlayer()
     this.state = {
@@ -689,9 +719,14 @@ export class Player extends gameObject {
       flipX: this.state.flipX,
     };
   }
+
   getPosition() {
     //console.log(`x: ${this.compoundBody.position.x} y: ${this.compoundBody.position.y}`);
     return this.body.getPosition();
+  }
+
+  getVelocity() {
+    return this.body.getVelocity();
   }
 
   getIsTouching() {
@@ -708,14 +743,13 @@ export class Player extends gameObject {
 
   getState() {
     const pos = this.getPosition();
-    const v = this.body.getVelocity();
     return {
       maxhealth: this.attributes.maxhealth,
       health: this.state.health,
+      maxstamina: this.attributes.maxstamina,
+      stamina: this.state.stamina,
       flipX: this.state.flipX,
       anims: this.stateMachine.anims.getKey(),
-      velocityX: v.velocityX,
-      velocityY: v.velocityY,
       x: pos.x,
       y: pos.y,
     };

@@ -22,7 +22,7 @@ export class startLevel extends Phaser.Scene {
         matter: {
           debug: gameConfig.debug,
           // game is completely controlled by server no need for gravity
-          gravity: { y: 0 }, 
+          gravity: { y: 0 },
         },
       },
     });
@@ -34,8 +34,8 @@ export class startLevel extends Phaser.Scene {
     this.playerName = data.playerName;
     // launch hud scene
     this.scene.launch("hudScene", {
-      playerName : this.playerName,
-      key : this.scene.key
+      playerName: this.playerName,
+      key: this.scene.key,
     });
     // if a client is provided use that
     if (data.hasOwnProperty("client")) {
@@ -110,7 +110,7 @@ export class startLevel extends Phaser.Scene {
         left_p2: KeyCodes.LEFT,
         right_p2: KeyCodes.RIGHT,
         attack_p2: KeyCodes.SPACE,
-        run_p2: KeyCodes.NUMPAD_ZERO
+        run_p2: KeyCodes.NUMPAD_ZERO,
       }),
     });
     // request Id of the last request sent to server
@@ -135,9 +135,25 @@ export class startLevel extends Phaser.Scene {
       //inject server instance into client side
       this.serverinstance = await Game.createGame();
       this.serverinstance.addPlayer({ sessionId: "test" }, "test");
-      this.testplayer = new Player(this, 200, 200, "test", "test", false, 100, 100, this.aoiclient, true);
+      this.testplayer = new Player(
+        this,
+        200,
+        200,
+        "test",
+        "test",
+        this.aoiclient,
+        true
+      );
       this.serverinstance.addPlayer({ sessionId: "test2" }, "test2");
-      this.testplayer2 = new Player(this, 100, 200, "test2", "test2", false, 100, 100, this.aoiclient, true);
+      this.testplayer2 = new Player(
+        this,
+        100,
+        200,
+        "test2",
+        "test2",
+        this.aoiclient,
+        true
+      );
       const height = this.gamelayer.ground.height;
       const width = this.gamelayer.ground.width;
       this.matter.world.setBounds(0, 0, width, height);
@@ -152,7 +168,10 @@ export class startLevel extends Phaser.Scene {
     this.map = this.add.tilemap("map");
     this.gametile = {
       mainlev: this.map.addTilesetImage("mainlevbuild", "tiles"),
-      background: this.map.addTilesetImage("background_obj_extruded", "background"),
+      background: this.map.addTilesetImage(
+        "background_obj_extruded",
+        "background"
+      ),
     };
 
     this.gamelayer = {
@@ -216,7 +235,10 @@ export class startLevel extends Phaser.Scene {
         }
       }
     });
-    this.aoiclient = new AOImanagerClient(this.gamelayer.ground.height, this.gamelayer.ground.width);
+    this.aoiclient = new AOImanagerClient(
+      this.gamelayer.ground.height,
+      this.gamelayer.ground.width
+    );
   }
 
   setupnetwork() {
@@ -229,9 +251,6 @@ export class startLevel extends Phaser.Scene {
         0,
         key,
         config.playerName,
-        false,
-        100,
-        100,
         this.aoiclient
       );
       if (key === this.sessionId) {
@@ -242,12 +261,12 @@ export class startLevel extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, width, height);
         this.cameras.main.startFollow(this.allplayers[key].sprite);
       }
-    }
-    this.room.state.players.onRemove = (player, key) =>  {
+    };
+    this.room.state.players.onRemove = (player, key) => {
       console.log(`--player with id: ${key} removed--`);
       this.allplayers[key].destroy();
       delete this.allplayers[key];
-    }
+    };
 
     this.room.onMessage(messageType.aoiupdate, (entities) => {
       //console.log("aoi update");
@@ -261,6 +280,8 @@ export class startLevel extends Phaser.Scene {
             y: entities[id].y,
             flipX: entities[id].flipX,
             anims: entities[id].anims,
+            maxstamina: entities[id].maxstamina,
+            stamina: entities[id].stamina,
             maxhealth: entities[id].maxhealth,
             health: entities[id].health,
           });
@@ -283,7 +304,7 @@ export class startLevel extends Phaser.Scene {
       this.scene.start("deadScreen", {
         client: this.client,
       });
-    })
+    });
 
     // if client got booted for whatever reason
     this.room.onLeave((code) => {
@@ -307,7 +328,7 @@ export class startLevel extends Phaser.Scene {
         }
         this.room.send(messageType.playersleep);
       } else {
-        console.log('set awake player');
+        console.log("set awake player");
         this.room.send(messageType.playerawake);
       }
     });
@@ -321,16 +342,15 @@ export class startLevel extends Phaser.Scene {
     for (const prop in this.keys) {
       this.input.keyboard.removeCapture(this.keys[prop].keyCode);
     }
-
   }
 
   updatePlayerInput(prop, key) {
     const req = {
-      [prop] : {
-        isDown : key.isDown,
-        isUp : key.isUp
-      }
-    }
+      [prop]: {
+        isDown: key.isDown,
+        isUp: key.isUp,
+      },
+    };
     // increment curr req Id for next request
     this.curreqId++;
     if (gameConfig.simulatelatency) {
@@ -340,55 +360,55 @@ export class startLevel extends Phaser.Scene {
     } else if (gameConfig.networkdebug) {
       const req_p1 = {
         left: {
-          isDown : this.keys.left.isDown,
-          isUp : this.keys.left.isUp
+          isDown: this.keys.left.isDown,
+          isUp: this.keys.left.isUp,
         },
         right: {
-          isDown : this.keys.right.isDown,
-          isUp : this.keys.right.isUp
+          isDown: this.keys.right.isDown,
+          isUp: this.keys.right.isUp,
         },
-        up : {
-          isDown : this.keys.up.isDown,
-          isUp : this.keys.up.isUp
+        up: {
+          isDown: this.keys.up.isDown,
+          isUp: this.keys.up.isUp,
         },
-        down : {
-          isDown : this.keys.down.isDown,
-          isUp : this.keys.down.isUp
+        down: {
+          isDown: this.keys.down.isDown,
+          isUp: this.keys.down.isUp,
         },
-        run : {
-          isDown : this.keys.run.isDown,
-          isUp: this.keys.run.isUp
+        run: {
+          isDown: this.keys.run.isDown,
+          isUp: this.keys.run.isUp,
         },
-        attack : {
-          isDown : this.keys.attack.isDown,
-          isUp : this.keys.attack.isUp
-        }
+        attack: {
+          isDown: this.keys.attack.isDown,
+          isUp: this.keys.attack.isUp,
+        },
       };
       const req_p2 = {
         left: {
-          isDown : this.keys.left_p2.isDown,
-          isUp : this.keys.left_p2.isUp
+          isDown: this.keys.left_p2.isDown,
+          isUp: this.keys.left_p2.isUp,
         },
         right: {
-          isDown : this.keys.right_p2.isDown,
-          isUp : this.keys.right_p2.isUp
+          isDown: this.keys.right_p2.isDown,
+          isUp: this.keys.right_p2.isUp,
         },
-        up : {
-          isDown : this.keys.up_p2.isDown,
-          isUp : this.keys.up_p2.isUp
+        up: {
+          isDown: this.keys.up_p2.isDown,
+          isUp: this.keys.up_p2.isUp,
         },
-        down : {
-          isDown : this.keys.down_p2.isDown,
-          isUp : this.keys.down_p2.isUp
+        down: {
+          isDown: this.keys.down_p2.isDown,
+          isUp: this.keys.down_p2.isUp,
         },
-        run : {
-          isDown : this.keys.run_p2.isDown,
-          isUp: this.keys.run_p2.isUp
+        run: {
+          isDown: this.keys.run_p2.isDown,
+          isUp: this.keys.run_p2.isUp,
         },
-        attack : {
-          isDown : this.keys.attack_p2.isDown,
-          isUp : this.keys.attack_p2.isUp
-        }
+        attack: {
+          isDown: this.keys.attack_p2.isDown,
+          isUp: this.keys.attack_p2.isUp,
+        },
       };
       this.serverinstance.manualUpdateInput("test", req_p1);
       this.serverinstance.manualUpdateInput("test2", req_p2);
@@ -407,6 +427,8 @@ export class startLevel extends Phaser.Scene {
         anims: state.anims,
         maxhealth: state.maxhealth,
         health: state.health,
+        maxstamina: state.maxstamina,
+        stamina: state.stamina,
       });
       const state2 = this.serverinstance.manualGetState("test2");
       this.testplayer2.updatePlayer({
@@ -416,6 +438,8 @@ export class startLevel extends Phaser.Scene {
         anims: state2.anims,
         maxhealth: state2.maxhealth,
         health: state2.health,
+        maxstamina: state2.maxstamina,
+        stamina: state2.stamina,
       });
     }
   }

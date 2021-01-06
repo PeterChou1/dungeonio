@@ -8,7 +8,6 @@ import { mainMenu } from "./scene/mainMenu";
 import { deadScreen } from "./scene/deadScreen";
 import { hudScene } from "./scene/hud";
 
-
 const config = {
   type: Phaser.AUTO,
   parent: gameConfig.networkdebug ? "game" : "phaser-container",
@@ -40,9 +39,7 @@ const config = {
     ],
   },
 };
-
 const game = new Phaser.Game(config);
-//let level = gameConfig.networkdebug ? debugLevel : startLevel;
 game.scene.add("startLevel", startLevel);
 game.scene.add("bootScene", bootScene);
 game.scene.add("mainMenu", mainMenu);

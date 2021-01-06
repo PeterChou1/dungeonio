@@ -1,6 +1,7 @@
-import { collisionData, gameEvents } from "../../common";
+import { collisionData, gameEvents, staminaCost } from "../../common";
 import { EventEmitter } from "events";
 import { Player } from "./player";
+import { Vector } from "matter-js";
 
 type hitConfig = {
   knockback: { x: number; y: number };
@@ -108,6 +109,7 @@ export class StateMachine {
   // mock animation manager to minick phaser animation manager
   anims: MockAnimsManager;
   stateArgs;
+  prevstate;
   // state the player is in
   state;
 
@@ -117,6 +119,7 @@ export class StateMachine {
     this.stateArgs = stateArgs;
     this.anims = new MockAnimsManager(frameInfo);
     this.event = new EventEmitter();
+    this.prevstate = null;
     this.state = null;
     // State instances get access to the state machine via this.stateMachine.
     for (const state of Object.values(this.possibleStates)) {
@@ -142,7 +145,7 @@ export class StateMachine {
               this.stateArgs.push(event.eventConfig);
               this.transition("hurt");
               const hitresolve = (state) => {
-                if (state !== "hurt" && state !== "hitstun") {
+                if (state !== "hurt") {
                   console.log("hitresolve ", state);
                   this.stateArgs = this.stateArgs.slice(0, 1);
                   this.event.off(gameEvents.stateMachine.enter, hitresolve);
@@ -186,6 +189,7 @@ export class StateMachine {
   step() {
     // On the first step, the state is null and we need to initialize the first state.
     if (this.state === null) {
+      this.prevstate = this.initialState;
       this.state = this.initialState;
       this.possibleStates[this.state].enter(...this.stateArgs);
     }
@@ -194,6 +198,7 @@ export class StateMachine {
   }
 
   transition(newState, ...enterArgs) {
+    this.prevstate = this.state;
     this.state = newState;
     this.possibleStates[this.state].enter(...this.stateArgs, ...enterArgs);
   }
@@ -218,6 +223,9 @@ export class IdleState extends State {
     const clientrepeats = player.inputrepeats;
     const isTouching = player.getIsTouching();
     const state = player.getInternalState();
+    const attributes = player.getAttributes();
+    const newstamina = state.stamina + attributes.staminaregen;
+    player.setInternalState({ stamina: newstamina });
     ////console.log(isTouching.bottom);
     if (!isTouching.bottom) {
       //console.log('idle player not touching ground transitioning');
@@ -245,7 +253,12 @@ export class IdleState extends State {
       this.stateMachine.transition("fall");
       return;
     }
-    if (clientinput.attack.isDown && clientrepeats.attack === 0) {
+
+    if (
+      clientinput.attack.isDown &&
+      clientrepeats.attack === 0 &&
+      newstamina >= staminaCost.attack1
+    ) {
       this.stateMachine.transition("attack1");
     }
   }
@@ -265,6 +278,8 @@ export class WalkState extends State {
     const isTouching = player.getIsTouching();
     const state = player.getInternalState();
     const attributes = player.getAttributes();
+    const newstamina = state.stamina + attributes.staminaregen;
+    player.setInternalState({ stamina: newstamina });
 
     if (clientinput.left.isDown) {
       //console.log('going left');
@@ -276,7 +291,7 @@ export class WalkState extends State {
       player.setVelocityX(attributes.groundspeed);
     }
 
-    if (clientinput.run.isDown) {
+    if (clientinput.run.isDown && newstamina >= staminaCost.runinit) {
       this.stateMachine.transition("run");
     }
 
@@ -299,7 +314,11 @@ export class WalkState extends State {
       this.stateMachine.transition("fall");
       return;
     }
-    if (clientinput.attack.isDown && clientrepeats.attack === 0) {
+    if (
+      clientinput.attack.isDown &&
+      clientrepeats.attack === 0 &&
+      newstamina >= staminaCost.attack1
+    ) {
       this.stateMachine.transition("attack1");
     }
 
@@ -325,6 +344,8 @@ export class RunState extends State {
     const isTouching = player.getIsTouching();
     const state = player.getInternalState();
     const attributes = player.getAttributes();
+    const newstamina = state.stamina - staminaCost.run;
+    player.setInternalState({ stamina: newstamina });
 
     if (clientinput.left.isDown) {
       //console.log('going left');
@@ -335,11 +356,10 @@ export class RunState extends State {
       player.setInternalState({ flipX: false });
       player.setVelocityX(attributes.runspeed);
     }
-
-    if (clientinput.run.isUp) {
+    if (clientinput.run.isUp || newstamina <= staminaCost.run) {
       this.stateMachine.transition("walk");
+      return;
     }
-
     if (clientinput.up.isDown && isTouching.bottom) {
       if (state.onPlatform) {
         player.setInternalState({ onPlatform: false });
@@ -359,7 +379,11 @@ export class RunState extends State {
       this.stateMachine.transition("fall");
       return;
     }
-    if (clientinput.attack.isDown && clientrepeats.attack === 0) {
+    if (
+      clientinput.attack.isDown &&
+      clientrepeats.attack === 0 &&
+      state.stamina >= staminaCost.dashattack
+    ) {
       this.stateMachine.transition("dashattack");
     }
 
@@ -383,14 +407,39 @@ export class FallState extends State {
     const clientrepeats = player.inputrepeats;
     const isTouching = player.getIsTouching();
     const attributes = player.getAttributes();
+    const state = player.getInternalState();
+    const newstamina = state.stamina + attributes.staminaregen;
+    player.setInternalState({ stamina: newstamina });
 
+    const v = player.getVelocity();
     if (clientinput.right.isDown && !isTouching.right) {
-      player.setVelocityX(attributes.airspeed);
+      Vector.add(v, { x: attributes.airaccel, y: 0 }, v);
+      if (Math.abs(v.x) >= attributes.airspeed) {
+        player.setVelocityX(attributes.airspeed);
+      } else {
+        player.setVelocity(v.x, v.y);
+      }
     } else if (clientinput.left.isDown && !isTouching.left) {
-      player.setVelocityX(-attributes.airspeed);
+      Vector.add(v, { x: -attributes.airaccel, y: 0 }, v);
+      if (Math.abs(v.x) >= attributes.airspeed) {
+        player.setVelocityX(-attributes.airspeed);
+      } else {
+        player.setVelocity(v.x, v.y);
+      }
     }
 
-    if (clientinput.attack.isDown && clientrepeats.attack === 0) {
+    if (
+      (clientinput.left.isDown && isTouching.left) ||
+      (clientinput.right.isDown && isTouching.right)
+    ) {
+      player.setVelocityX(0);
+    }
+
+    if (
+      clientinput.attack.isDown &&
+      clientrepeats.attack === 0 &&
+      newstamina >= staminaCost.airattack1
+    ) {
       this.stateMachine.transition("airattack1");
     }
     if (isTouching.bottom) {
@@ -410,7 +459,18 @@ export class JumpState extends State {
     //player.awakeplayer();
     const attributes = player.getAttributes();
     this.callback = () => {
+      const clientinput = player.input;
+      const vx =
+        this.stateMachine.prevstate === "run"
+          ? attributes.airspeed
+          : attributes.airspeed / 2;
+      if (clientinput.right.isDown) {
+        player.setVelocityX(vx);
+      } else if (clientinput.left.isDown) {
+        player.setVelocityX(-vx);
+      }
       player.setVelocityY(-attributes.jumpheight);
+
       setTimeout(() => {
         this.stateMachine.transition("fall");
       }, 100);
@@ -422,7 +482,7 @@ export class JumpState extends State {
     );
   }
 
-  execute(player) {}
+  execute() {}
 
   quit() {
     this.stateMachine.anims.event.off(
@@ -436,11 +496,19 @@ export class DashAttack extends State {
   clearId;
   dashcount = 0;
   enter(player: Player) {
+    const state = player.getInternalState();
+    const newstamina = state.stamina - staminaCost.dashattack;
+    player.setInternalState({ stamina: newstamina });
+
     this.stateMachine.anims.play("dashattack");
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "dashattack");
     this.clearId = setTimeout(() => {
       const clientinput = player.input;
-      if (clientinput.attack.isDown && this.dashcount < 1) {
+      if (
+        clientinput.attack.isDown &&
+        this.dashcount < 1 &&
+        newstamina >= staminaCost.dashattack
+      ) {
         this.dashcount += 1;
         this.stateMachine.transition("dashattack");
       } else {
@@ -468,12 +536,14 @@ export class DashAttack extends State {
 export class AttackState extends State {
   callback;
   enter(player: Player) {
+    const state = player.getInternalState();
+    const newstamina = state.stamina - staminaCost.attack1;
+    player.setInternalState({ stamina: newstamina });
     this.stateMachine.anims.play("attack1");
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "attack1");
     this.callback = () => {
       const clientinput = player.input;
-      if (clientinput.attack.isDown) {
-        console.log("attack2");
+      if (clientinput.attack.isDown && newstamina >= staminaCost.attack2) {
         this.stateMachine.transition("attack2");
       } else {
         this.stateMachine.transition("idle");
@@ -506,11 +576,15 @@ export class AttackState extends State {
 export class Attack2State extends State {
   callback;
   enter(player: Player) {
+    const state = player.getInternalState();
+    const newstamina = state.stamina - staminaCost.attack2;
+    player.setInternalState({ stamina: newstamina });
+
     this.stateMachine.anims.play("attack2");
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "attack2");
     this.callback = () => {
       const clientinput = player.input;
-      if (clientinput.attack.isDown) {
+      if (clientinput.attack.isDown && newstamina >= staminaCost.attack3) {
         this.stateMachine.transition("attack3");
       } else {
         this.stateMachine.transition("idle");
@@ -543,6 +617,10 @@ export class Attack2State extends State {
 export class Attack3State extends State {
   callback;
   enter(player: Player) {
+    const state = player.getInternalState();
+    const newstamina = state.stamina - staminaCost.attack3;
+    player.setInternalState({ stamina: newstamina });
+
     this.stateMachine.anims.play("attack3");
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "attack3");
     this.callback = () => {
@@ -577,7 +655,9 @@ export class AirAttack1 extends State {
   enter(player: Player) {
     this.stateMachine.anims.play("airattack1");
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "airattack1");
-    player.setVelocityY(1);
+    const state = player.getInternalState();
+    const newstamina = state.stamina - staminaCost.airattack1;
+    player.setInternalState({ stamina: newstamina });
     this.callback = () => {
       const isTouching = player.getIsTouching();
       if (isTouching.bottom) {
@@ -620,8 +700,7 @@ export class Hurt extends State {
 
     this.callback = () => {
       const state = player.getInternalState();
-      const dmgdealt = state.health - hitconfig.damage;
-      const newhealth = dmgdealt >= 0 ? dmgdealt : 0;
+      const newhealth = state.health - hitconfig.damage;
       player.setInternalState({ health: newhealth });
       if (newhealth > 0) {
         this.stateMachine.transition("hitstun");
@@ -633,7 +712,7 @@ export class Hurt extends State {
       this.callback
     );
   }
-  execute(player: Player, hitconfig: hitConfig) {}
+  execute() {}
 
   quit() {
     this.stateMachine.anims.event.off(
@@ -659,6 +738,7 @@ export class HitStun extends State {
         }
       }, hitconfig.hitstun);
     } else {
+      //TODO: sometimes hitconfig will not be passed to this classed this is a temporary solution
       this.timerhandle = setTimeout(() => {
         const isTouching = player.getIsTouching();
         if (isTouching.bottom) {
@@ -670,7 +750,7 @@ export class HitStun extends State {
     }
   }
 
-  execute(player: Player, hitconfig: hitConfig) {}
+  execute() {}
 
   quit() {
     clearTimeout(this.timerhandle);
@@ -689,7 +769,7 @@ export class Death extends State {
     );
   }
 
-  execute(player: Player) {}
+  execute() {}
 
   quit() {}
 }
