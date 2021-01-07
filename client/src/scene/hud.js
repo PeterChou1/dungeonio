@@ -2,6 +2,7 @@ import { HealthBar, StaminaBar } from "../ui/bar";
 import { frontEndEvent } from "../../../common";
 
 export class hudScene extends Phaser.Scene {
+  
   init(data) {
     this.playername = data.playerName;
     this.key = data.key;

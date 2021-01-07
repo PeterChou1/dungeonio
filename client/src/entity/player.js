@@ -31,10 +31,10 @@ export default class Player {
     this.playerName = playerName;
     // meta attributes on player set to defaults
     this.meta = {
-      maxhealth: null,
-      health: null,
-      maxstamina: null,
-      stamina: null,
+      maxhealth: 100,
+      health: 100,
+      maxstamina: 100,
+      stamina: 100,
     };
     this.scene = scene;
     this.sprite = scene.matter.add.sprite(
@@ -115,7 +115,40 @@ export default class Player {
     //console.log(this.getPosition());
   }
 
+  /**
+   * @description damage pop up indicator
+   * @param {*} damage 
+   */
+  damagePopup(damage) {
+    if (damage > 0) {
+      this.scene.floatingNumbers.createFloatingText({
+        textOptions: {
+            fontFamily: 'uifont',
+            fontSize: 20,
+            color: "#ff0000",
+            strokeThickness: 2,
+            fontWeight: "bold",
+            stroke: "#000000",
+            shadow: {
+                offsetX: 0,
+                offsetY: 0,
+                color: '#000',
+                blur: 4,
+                stroke: true,
+                fill: false
+            }
+        },
+        text: damage.toString(),
+        align: "top-center",
+        parentObject: this.sprite,
+        animation: "smoke",
+        animationEase: "Linear"
+      });
+    }
+  }
+
   updatePlayer({ x, y, flipX, anims, maxhealth, health, maxstamina, stamina }) {
+    this.damagePopup(this.meta.health - health);
     this.meta = {
       maxstamina: maxstamina,
       stamina: stamina,

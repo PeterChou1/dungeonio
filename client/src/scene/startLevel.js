@@ -9,7 +9,7 @@ import {
 } from "../../../common";
 import { createanims } from "../utils/utils";
 import { Game } from "../../../server/game.v2/game.core";
-
+import { FloatingNumbersPlugin } from "../utils/floatTextPlugin";
 const Colyseus = require("colyseus.js");
 const KeyCodes = Phaser.Input.Keyboard.KeyCodes;
 
@@ -41,6 +41,11 @@ export class startLevel extends Phaser.Scene {
     if (data.hasOwnProperty("client")) {
       this.client = data.client;
     }
+  }
+
+
+  preload() {
+    this.load.scenePlugin('floatingNumbersPlugin', FloatingNumbersPlugin, 'floatingNumbersPlugin', 'floatingNumbers');
   }
 
   async connect() {
@@ -297,6 +302,7 @@ export class startLevel extends Phaser.Scene {
       // if id equal this session id that means player died destroy all player and leave
       this.room.removeAllListeners();
       this.room.leave();
+      this.floatingNumbers.destroy();
       for (const id in this.allplayers) {
         this.allplayers[id].destroy();
         delete this.allplayers[id];
@@ -311,9 +317,10 @@ export class startLevel extends Phaser.Scene {
     // if client got booted for whatever reason
     this.room.onLeave((code) => {
       console.log(`client kicked code: ${code}`);
+      this.scene.stop("hudScene");
       this.room.removeAllListeners();
       this.deactiveCaptures();
-      this.scene.stop("hudScene");
+      this.floatingNumbers.destroy();
       location.reload();
     });
 

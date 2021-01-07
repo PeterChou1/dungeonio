@@ -120,7 +120,12 @@ type anims = {
   frameRate: number;
   repeat: number;
 };
-
+/**
+ * @description default stat
+ */
+export const defaultStats = {
+  
+}
 /**
  * @description cost of each active player action
  */

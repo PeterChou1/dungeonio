@@ -35,10 +35,6 @@ export class Game {
   private render;
   private previoustick;
   private previousdelta;
-  private hrtimeMs = function() {
-    let time = process.hrtime()
-    return time[0] * 1000 + time[1] / 1000000
-  }
 
   public static async createGame(room?): Promise<Game> {
     const { engine, framesInfo, frameData, objectgroup } = await setupGame();
@@ -51,9 +47,6 @@ export class Game {
     this.framesInfo = framesInfo;
     this.frameData = frameData;
     this.objectgroup = objectgroup;
-    this.previoustick = this.hrtimeMs();
-    this.previousdelta = this.tickrate;
-
     console.log(`running at tick rate ${Math.trunc(this.tickrate)}m`);
     if (gameConfig.networkdebug) {
       this.clearid = setInterval(this.updateGame.bind(this), this.tickrate);
@@ -64,6 +57,8 @@ export class Game {
       // run the renderer
       Render.run(this.render);
     } else {
+      this.previoustick = this.hrtimeMs();
+      this.previousdelta = this.tickrate;
       this.aoimanager = new AOImanager();
       const NanoTimer = require("nanotimer");
       this.gametimer = new NanoTimer();
@@ -91,16 +86,26 @@ export class Game {
     }
   }
 
+  private hrtimeMs() {
+    let time = process.hrtime()
+    return time[0] * 1000 + time[1] / 1000000
+  }
+
   updateGame() {
-    let now = this.hrtimeMs()
-    let delta = (now - this.previoustick);
-    let correction = (delta / this.previousdelta);
     for (const clientId in this.allplayers) {
       this.allplayers[clientId].update();
     }
-    this.previousdelta = delta;
-    this.previoustick = now;
-    Engine.update(this.engine, delta, correction);
+    if (gameConfig.networkdebug){
+      Engine.update(this.engine, 16);
+    } else {
+      let now = this.hrtimeMs()
+      let delta = (now - this.previoustick);
+      let correction = (delta / this.previousdelta);
+      this.previousdelta = delta;
+      this.previoustick = now;
+      console.log(`delta: ${delta} correction: ${correction}`)
+      Engine.update(this.engine, delta, correction);
+    }
   }
 
   broadcastClients() {
