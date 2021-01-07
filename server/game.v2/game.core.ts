@@ -33,6 +33,11 @@ export class Game {
   private frameData;
   private objectgroup;
   private render;
+  private previoustick;
+  private hrtimeMs = function() {
+    let time = process.hrtime()
+    return time[0] * 1000 + time[1] / 1000000
+  }
 
   public static async createGame(room?): Promise<Game> {
     const { engine, framesInfo, frameData, objectgroup } = await setupGame();
@@ -45,6 +50,7 @@ export class Game {
     this.framesInfo = framesInfo;
     this.frameData = frameData;
     this.objectgroup = objectgroup;
+    this.previoustick = this.hrtimeMs();
 
     console.log(`running at tick rate ${Math.trunc(this.tickrate)}m`);
     if (gameConfig.networkdebug) {
@@ -84,9 +90,13 @@ export class Game {
   }
 
   updateGame(delta = 16) {
+    let now = this.hrtimeMs()
+    let deltaAct = (now - this.previoustick);
+    //console.log(`delta: ${deltaAct}`);
     for (const clientId in this.allplayers) {
       this.allplayers[clientId].update();
     }
+    this.previoustick = now;
     Engine.update(this.engine, delta);
   }
 
@@ -134,6 +144,8 @@ export class Game {
     } else {
       this.gametimer.clearInterval();
       this.updatetimer.clearInterval();
+      //clearInterval(this.gametimer);
+      //clearInterval(this.updatetimer);
     }
   }
 }

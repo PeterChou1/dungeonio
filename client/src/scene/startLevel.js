@@ -313,7 +313,8 @@ export class startLevel extends Phaser.Scene {
       console.log(`client kicked code: ${code}`);
       this.room.removeAllListeners();
       this.deactiveCaptures();
-      this.scene.start("mainMenu");
+      this.scene.stop("hudScene");
+      location.reload();
     });
 
     document.addEventListener("visibilitychange", () => {
