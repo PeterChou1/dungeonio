@@ -15,23 +15,17 @@ export const gameConfig = {
 };
 
 /**
- * @description maps category id to class 
+ * @description maps category id to class
  */
-export const entityCategory = {
-
-}
+export const entityCategory = {};
 
 // collision detection
 export const collisionData = {
+  //NOTE: category number must be powers of 2 between [1, 2^31]
   category: {
-    hard: 0x0001, // hard platform
-    soft: 0x0002, // soft platform
-    player: 0x0003, // player category
-    noplayer: 0x0004, // cannot collide with player category
-  },
-  group: {
-    player: 1, // any object with group id 1 can interact with the player
-    noplayer: 2, // any object with group id 2 can not interact with player
+    hard: 2 ** 0, // hard platform
+    soft: 2 ** 1, // soft platform
+    player: 2 ** 2, // player category
   },
 };
 
@@ -42,10 +36,9 @@ export const messageType = {
   aoiadd: 3, // add gameobject to aoi
   aoiupdate: 4, // update gameobject in player area of interest
   aoiremove: 5, // remove gameobject in player area of interest
-  kill: 6
+  kill: 6,
 };
 
-
 export const frontEndEvent = {
-  uiupdate : 0 // updates which effect HUD scene
-}
+  uiupdate: 0, // updates which effect HUD scene
+};

@@ -128,7 +128,10 @@ export const staminaCost = {
   // inital cost of going into run state
   runinit: 20,
   run: 1,
-  airattack1: 50,
+  standroll: 10,
+  walkroll: 20,
+  runroll: 30,
+  airattack1: 30,
   dashattack: 20,
   attack1: 20,
   attack2: 20,
@@ -163,7 +166,7 @@ export const playerAnims: Array<anims> = [
   {
     key: "jump",
     frames: ["mainchar", { end: 3, prefix: "adventurer-jump-", zeroPad: 2 }],
-    frameRate: 20,
+    frameRate: 25,
     repeat: 0,
   },
   {
@@ -190,7 +193,6 @@ export const playerAnims: Array<anims> = [
     frameRate: 10,
     repeat: 0,
   },
-
   {
     key: "airattack1",
     frames: [
@@ -218,7 +220,7 @@ export const playerAnims: Array<anims> = [
       "mainchar",
       { start: 2, end: 2, prefix: "adventurer-hurt-", zeroPad: 2 },
     ],
-    frameRate: 20,
+    frameRate: 10,
     repeat: -1,
   },
   {
@@ -236,6 +238,12 @@ export const playerAnims: Array<anims> = [
       "mainchar",
       { start: 6, end: 6, prefix: "adventurer-die-", zeroPad: 2 },
     ],
+    frameRate: 10,
+    repeat: -1,
+  },
+  {
+    key: "smrslt",
+    frames: ["mainchar", { end: 4, prefix: "adventurer-smrslt-", zeroPad: 2 }],
     frameRate: 10,
     repeat: -1,
   },

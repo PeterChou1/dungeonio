@@ -11,8 +11,10 @@ import {
   StateMachine,
   IdleState,
   WalkState,
+  RollState,
   RunState,
   JumpState,
+  AirJump,
   FallState,
   AttackState,
   Attack2State,
@@ -47,13 +49,24 @@ type sensorConfig = {
   [sensorConfig: string]: configObj;
 };
 
-type internalState = {
-  asleep: boolean; //whether or not player is asleep
+type bodyState = {
   onPlatform: boolean;
   platformFall: boolean;
+};
+
+type playerState = {
+  asleep: boolean; //whether or not player is asleep
   flipX: boolean;
+  airjumps: number;
   health: number;
   stamina: number;
+};
+
+type internalState = playerState & bodyState;
+
+type bodyStateConfig = {
+  onPlatform?: boolean;
+  platformFall?: boolean;
 };
 
 type internalStateConfig = {
@@ -61,6 +74,7 @@ type internalStateConfig = {
   onPlatform?: boolean;
   platformFall?: boolean;
   flipX?: boolean;
+  airjumps?: number;
   stamina?: number;
   health?: number;
 };
@@ -69,6 +83,8 @@ type attributeConfig = {
   groundspeed?: number;
   airspeed?: number;
   runspeed?: number;
+  rolldistance?: number;
+  maxairjumps?: number;
   jumpheight?: number;
   airaccel?: number;
   staminaregen?: number;
@@ -79,7 +95,9 @@ type attributeConfig = {
 type attributes = {
   groundspeed: number;
   airspeed: number;
+  rolldistance: number;
   airaccel: number;
+  maxairjumps: number;
   runspeed: number;
   jumpheight: number;
   staminaregen: number;
@@ -92,9 +110,6 @@ type compoundBodyConfig = {
   frictionAir: number;
   friction: number;
   sleepThreshold: number;
-  collisionFilter: {
-    mask: number;
-  };
 };
 /**
  * @description handle player matterjs body
@@ -106,6 +121,10 @@ class PlayerBody {
   h: number;
   w: number;
   isTouching;
+  internalState: bodyState = {
+    onPlatform: false,
+    platformFall: false,
+  };
   // register event emitter for when a state change to body happens
   // ex: grab, hit
   event: EventEmitter;
@@ -115,10 +134,14 @@ class PlayerBody {
   };
   // offset for sensors
   private sensoroffset = { x: 0, y: 0 };
+  private collidesWith: Array<number> = [
+    collisionData.category.hard,
+    collisionData.category.player,
+  ];
+  private category: number = collisionData.category.player;
   // keep track if player is flipped or not
   private flipX = false;
   private sensors;
-  private collidesWith;
   private sensorsConfig: sensorConfig = {
     virtualbody: {
       pos: ({ h }) => ({ x: 0, y: h / 2 - playerConfig.dim.h / 2 }),
@@ -131,6 +154,38 @@ class PlayerBody {
     bottom: {
       pos: ({ h }) => ({ x: 0, y: h / 2 }),
       dim: ({ w }) => ({ w: w / 1.25, h: 10 }),
+      onCollide: (pair) => {
+        const { bodyA, bodyB } = pair;
+        const bottom = this.sensors.bottom === bodyA ? bodyB : bodyA;
+        if (
+          this.objectgroup.soft.includes(bottom) &&
+          !this.internalState.platformFall
+        ) {
+          this.internalState.onPlatform = true;
+          this.addCollidesWith([collisionData.category.soft]);
+        }
+      },
+      onCollideActive: (pair) => {
+        const { bodyA, bodyB } = pair;
+        const bottom = this.sensors.bottom === bodyA ? bodyB : bodyA;
+        if (
+          this.objectgroup.soft.includes(bottom) &&
+          this.internalState.platformFall
+        ) {
+          this.internalState.onPlatform = false;
+          this.isTouching.bottom = false;
+          this.removeCollidesWith([collisionData.category.soft]);
+        }
+      },
+      onCollideEnd: (pair) => {
+        const { bodyA, bodyB } = pair;
+        const bottom = this.sensors.bottom === bodyA ? bodyB : bodyA;
+        if (this.objectgroup.soft.includes(bottom)) {
+          this.internalState.onPlatform = false;
+          this.internalState.platformFall = false;
+          this.removeCollidesWith([collisionData.category.soft]);
+        }
+      },
     },
     left: {
       pos: ({ w }) => ({ x: -w / 2, y: 0 }),
@@ -145,6 +200,7 @@ class PlayerBody {
   private mainBody;
   // default matterjs body used if no custom body is used
   private default;
+  private objectgroup;
   // main matterjs body
   private compoundBody;
   private compoundBodyConfig: compoundBodyConfig = {
@@ -152,12 +208,10 @@ class PlayerBody {
     frictionAir: 0.02,
     friction: 0.1,
     sleepThreshold: -1,
-    collisionFilter: {
-      mask: collisionData.category.hard,
-    },
   };
 
-  constructor(engine, x, y, frameData) {
+  constructor(engine, x, y, frameData, objectgroup) {
+    this.objectgroup = objectgroup;
     this.engine = engine;
     this.event = new EventEmitter();
     this.generateframeBody(frameData);
@@ -220,12 +274,27 @@ class PlayerBody {
       }
     }
   }
+
+  setBodyState(config: bodyStateConfig) {
+    if (config.hasOwnProperty("onPlatform")) {
+      this.internalState.onPlatform = config.onPlatform;
+    }
+    if (config.hasOwnProperty("platformFall")) {
+      this.internalState.platformFall = config.platformFall;
+    }
+  }
+
+  getBodyState(): bodyState {
+    return this.internalState;
+  }
+
   /**
    * once an action is completed it must be deregistered or else that action
    * can never occur again to this player
    * @param id
    */
   deregisterAction(id: number) {
+    console.log("deregister action: ", id);
     delete this.registeredActions[id];
   }
 
@@ -247,8 +316,13 @@ class PlayerBody {
       parts: [this.default, ...Object.values(this.sensors)],
       ...this.compoundBodyConfig,
     });
+    const v = this.getVelocity();
     Body.setInertia(this.compoundBody, Infinity);
     Body.setPosition(this.compoundBody, { x: x, y: y });
+    Body.setVelocity(this.compoundBody, v);
+
+    this.setCollisionCategory(this.category);
+    this.setCollidesWith(this.collidesWith);
     World.addBody(this.engine.world, this.compoundBody);
   }
 
@@ -287,6 +361,7 @@ class PlayerBody {
       } else {
         // if there is no sensor create it
         this.sensors[sensor] = Bodies.rectangle(pos.x, pos.y, dim.w, dim.h, {
+          label: "sensor",
           isSensor: true,
         });
         this.isTouching[sensor] = false;
@@ -294,8 +369,8 @@ class PlayerBody {
         const defaultCallback = () => (this.isTouching[sensor] = true);
         if (cur.onCollision) {
           const wrapper = (pair) => {
-            cur.onCollision(pair);
             defaultCallback();
+            cur.onCollision(pair);
           };
           this.sensors[sensor].onCollide(wrapper);
           this.sensors[sensor].onCollideActive(wrapper);
@@ -303,16 +378,16 @@ class PlayerBody {
           this.sensors[sensor].onCollide(
             cur.onCollide
               ? (pair) => {
-                  cur.onCollide(pair);
                   defaultCallback();
+                  cur.onCollide(pair);
                 }
               : defaultCallback
           );
           this.sensors[sensor].onCollideActive(
             cur.onCollideActive
               ? (pair) => {
-                  cur.onCollideActive(pair);
                   defaultCallback();
+                  cur.onCollideActive(pair);
                 }
               : defaultCallback
           );
@@ -411,6 +486,10 @@ class PlayerBody {
     });
   }
 
+  setFriction(f: number) {
+    this.compoundBody.friction = f;
+  }
+
   setCollidesWith(categories: Array<number>) {
     this.collidesWith = categories;
     var flags = 0;
@@ -422,6 +501,22 @@ class PlayerBody {
       }
     }
     this.compoundBody.collisionFilter.mask = flags;
+  }
+
+  setCollisionCategory(value) {
+    this.category = value;
+    this.compoundBody.collisionFilter.category = value;
+  }
+
+  addCollidesWith(categories: Array<number>) {
+    this.setCollidesWith([...this.collidesWith, ...categories]);
+  }
+
+  removeCollidesWith(categories: Array<number>) {
+    this.collidesWith = this.collidesWith.filter(
+      (cat) => !categories.includes(cat)
+    );
+    this.setCollidesWith(this.collidesWith);
   }
 
   getVelocity() {
@@ -475,6 +570,8 @@ class PlayerBody {
             this.compoundBody.positionPrev.x -= this.mainBody.centerOffset.x;
           }
         }
+        this.setCollisionCategory(this.category);
+        this.setCollidesWith(this.collidesWith);
         World.addBody(this.engine.world, this.compoundBody);
         Body.setPosition(this.compoundBody, pos);
         Body.setInertia(this.compoundBody, Infinity);
@@ -516,7 +613,7 @@ export class Player extends gameObject {
   // dead but not removed from world
   private zombiemode: boolean;
   private body: PlayerBody;
-  private state: internalState;
+  private state: playerState;
   private attributes: attributes;
   // current player input
   input;
@@ -535,7 +632,13 @@ export class Player extends gameObject {
     this.aoi = game.aoimanager;
     this.client = client;
     this.id = client.sessionId;
-    this.body = new PlayerBody(this.engine, x, y, game.frameData);
+    this.body = new PlayerBody(
+      this.engine,
+      x,
+      y,
+      game.frameData,
+      game.objectgroup
+    );
     this.body.event.on(gameEvents.body.statechange, async (change) => {
       await this.stateMachine.dispatch(change);
       this.body.deregisterAction(change.id);
@@ -544,7 +647,9 @@ export class Player extends gameObject {
       idle: new IdleState(),
       walk: new WalkState(),
       run: new RunState(),
+      roll: new RollState(),
       jump: new JumpState(),
+      airjump: new AirJump(),
       fall: new FallState(),
       attack1: new AttackState(),
       attack2: new Attack2State(),
@@ -565,6 +670,8 @@ export class Player extends gameObject {
     this.attributes = {
       groundspeed: 5,
       runspeed: 7,
+      rolldistance: 7,
+      maxairjumps: 1,
       // max air speed character can attain
       airspeed: 5,
       airaccel: 0.25,
@@ -575,9 +682,8 @@ export class Player extends gameObject {
     };
     this.state = {
       asleep: false,
-      onPlatform: false,
-      platformFall: false,
       flipX: false,
+      airjumps: 0,
       stamina: this.attributes.maxstamina,
       health: this.attributes.maxhealth,
     };
@@ -592,6 +698,10 @@ export class Player extends gameObject {
       attack: 0,
     };
     this.input = {
+      roll: {
+        isDown: false,
+        isUp: true,
+      },
       left: {
         isDown: false,
         isUp: true,
@@ -655,6 +765,18 @@ export class Player extends gameObject {
     this.body.setCollidesWith(categories);
   }
 
+  setFriction(f: number) {
+    this.body.setFriction(f);
+  }
+
+  addCollidesWith(categories: Array<number>) {
+    this.body.addCollidesWith(categories);
+  }
+
+  removeCollidesWith(categories: Array<number>) {
+    this.body.removeCollidesWith(categories);
+  }
+
   setAttribute(newstate: attributeConfig) {
     this.attributes = {
       ...this.attributes,
@@ -682,6 +804,12 @@ export class Player extends gameObject {
         0,
         this.attributes.maxstamina
       );
+    }
+    if (newstate.hasOwnProperty("onPlatform")) {
+      this.body.setBodyState({ onPlatform: newstate.onPlatform });
+    }
+    if (newstate.hasOwnProperty("platformFall")) {
+      this.body.setBodyState({ platformFall: newstate.platformFall });
     }
     if (this.state.asleep && newstate.asleep === false) {
       this.awakePlayer();
@@ -734,7 +862,7 @@ export class Player extends gameObject {
   }
 
   getInternalState(): internalState {
-    return this.state;
+    return { ...this.state, ...this.body.getBodyState() };
   }
 
   getAttributes(): attributes {

@@ -13,6 +13,7 @@ export const setupGame = (): Promise<{
   engine: Engine;
   frameData: any;
   framesInfo: any;
+  objectgroup: any;
 }> => {
   return new Promise((resolve, reject) => {
     setImmediate(() => {
@@ -69,20 +70,23 @@ export const setupGame = (): Promise<{
         //console.log(this.gametile);
         const levelmap = map.createDynamicLayer("ground", gametile, 0, 0);
         const platforms = map.getObjectLayer("platform");
+        const objectgroup = {
+          soft: [],
+          hard: levelmap.filterTiles((tile) => !tile.properties.soft),
+        };
         platforms.objects.forEach((rect) => {
-          World.addBody(
-            engine.world,
-            Bodies.rectangle(
-              rect.x + rect.width / 2,
-              rect.y + rect.height / 2,
-              rect.width,
-              rect.height,
-              {
-                isSensor: true, // It shouldn't physically interact with other bodies
-                isStatic: true, // It shouldn't move
-              }
-            )
+          const sensorobject = Bodies.rectangle(
+            rect.x + rect.width / 2,
+            rect.y + rect.height / 2,
+            rect.width,
+            rect.height,
+            {
+              isSensor: true, // It shouldn't physically interact with other bodies
+              isStatic: true, // It shouldn't move
+            }
           );
+          objectgroup.soft.push(sensorobject);
+          World.addBody(engine.world, sensorobject);
         });
         levelmap.forEachTile((tile) => {
           if (tile.properties.collides) {
@@ -124,6 +128,7 @@ export const setupGame = (): Promise<{
           engine: engine,
           framesInfo: frameInfo,
           frameData: frameData,
+          objectgroup: objectgroup,
         });
       }
       // start game

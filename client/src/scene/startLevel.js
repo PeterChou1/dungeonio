@@ -104,13 +104,15 @@ export class startLevel extends Phaser.Scene {
       right: KeyCodes.D,
       attack: KeyCodes.P,
       run: KeyCodes.SHIFT,
+      roll: KeyCodes.SPACE,
       ...(gameConfig.networkdebug && {
         up_p2: KeyCodes.UP,
         down_p2: KeyCodes.DOWN,
         left_p2: KeyCodes.LEFT,
         right_p2: KeyCodes.RIGHT,
-        attack_p2: KeyCodes.SPACE,
+        attack_p2: KeyCodes.NUMPAD_ONE,
         run_p2: KeyCodes.NUMPAD_ZERO,
+        roll_p2: KeyCodes.NUMPAD_TWO,
       }),
     });
     // request Id of the last request sent to server
@@ -311,10 +313,7 @@ export class startLevel extends Phaser.Scene {
       console.log(`client kicked code: ${code}`);
       this.room.removeAllListeners();
       this.deactiveCaptures();
-      this.scene.stop("hudScene");
-      this.scene.start("mainMenu", {
-        client: this.client,
-      });
+      this.scene.start("mainMenu");
     });
 
     document.addEventListener("visibilitychange", () => {
@@ -383,6 +382,10 @@ export class startLevel extends Phaser.Scene {
           isDown: this.keys.attack.isDown,
           isUp: this.keys.attack.isUp,
         },
+        roll: {
+          isDown: this.keys.roll.isDown,
+          isUp: this.keys.roll.isUp,
+        },
       };
       const req_p2 = {
         left: {
@@ -408,6 +411,10 @@ export class startLevel extends Phaser.Scene {
         attack: {
           isDown: this.keys.attack_p2.isDown,
           isUp: this.keys.attack_p2.isUp,
+        },
+        roll: {
+          isDown: this.keys.roll_p2.isDown,
+          isUp: this.keys.roll_p2.isUp,
         },
       };
       this.serverinstance.manualUpdateInput("test", req_p1);

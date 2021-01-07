@@ -36,7 +36,7 @@ export abstract class State {
   abstract enter(...args);
   abstract execute(...args);
   //deregister any events and clean up state and quit
-  abstract quit();
+  abstract quit(...args);
 }
 
 /**
@@ -139,14 +139,14 @@ export class StateMachine {
         // you can't cheat death
         if (this.state !== "death") {
           // quit current state and transition to new state
-          this.possibleStates[this.state].quit();
+          this.possibleStates[this.state].quit(...this.stateArgs);
           switch (event.category) {
             case "hit":
               this.stateArgs.push(event.eventConfig);
               this.transition("hurt");
               const hitresolve = (state) => {
-                if (state !== "hurt") {
-                  console.log("hitresolve ", state);
+                console.log(state);
+                if (state === "hitstun") {
                   this.stateArgs = this.stateArgs.slice(0, 1);
                   this.event.off(gameEvents.stateMachine.enter, hitresolve);
                   this.event.emit(gameEvents.stateMachine.dispatchcomplete);
@@ -213,8 +213,8 @@ export class StateMachine {
 export class IdleState extends State {
   enter(player: Player) {
     this.stateMachine.anims.play("idle");
-    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "idle");
-    player.setVelocity(0);
+    player.setInternalState({ airjumps: 0 });
+    player.setVelocityY(0);
   }
 
   execute(player: Player) {
@@ -234,22 +234,23 @@ export class IdleState extends State {
     }
     ////console.log('idle state');
     if (clientinput.left.isDown || clientinput.right.isDown) {
-      ////console.log('left');
-      this.stateMachine.transition("walk");
+      if (
+        clientinput.roll.isDown &&
+        clientrepeats.roll === 0 &&
+        newstamina >= staminaCost.standroll
+      ) {
+        this.stateMachine.transition("roll");
+      } else {
+        this.stateMachine.transition("walk");
+      }
       return;
     }
     if (clientinput.up.isDown && isTouching.bottom) {
-      ////console.log('jump');
-      if (state.onPlatform) {
-        player.setInternalState({ onPlatform: false });
-        player.setCollidesWith([collisionData.category.hard]);
-      }
       this.stateMachine.transition("jump");
       return;
     }
     if (clientinput.down.isDown && state.onPlatform) {
-      player.setCollidesWith([collisionData.category.hard]);
-      player.setInternalState({ onPlatform: false, platformFall: true });
+      player.setInternalState({ platformFall: true });
       this.stateMachine.transition("fall");
       return;
     }
@@ -269,7 +270,6 @@ export class IdleState extends State {
 export class WalkState extends State {
   enter(player: Player) {
     this.stateMachine.anims.play("walk");
-    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "walk");
     //player.awakeplayer();
   }
   execute(player: Player) {
@@ -293,13 +293,19 @@ export class WalkState extends State {
 
     if (clientinput.run.isDown && newstamina >= staminaCost.runinit) {
       this.stateMachine.transition("run");
+      return;
+    }
+
+    if (
+      clientinput.roll.isDown &&
+      clientrepeats.roll === 0 &&
+      newstamina >= staminaCost.walkroll
+    ) {
+      this.stateMachine.transition("roll");
+      return;
     }
 
     if (clientinput.up.isDown && isTouching.bottom) {
-      if (state.onPlatform) {
-        player.setInternalState({ onPlatform: false });
-        player.setCollidesWith([collisionData.category.hard]);
-      }
       this.stateMachine.transition("jump");
       return;
     } else if (!isTouching.nearbottom) {
@@ -309,8 +315,7 @@ export class WalkState extends State {
 
     if (clientinput.down.isDown && state.onPlatform) {
       // reset player to only collide with hard platform
-      player.setCollidesWith([collisionData.category.hard]);
-      player.setInternalState({ onPlatform: false });
+      player.setInternalState({ platformFall: true });
       this.stateMachine.transition("fall");
       return;
     }
@@ -335,7 +340,6 @@ export class WalkState extends State {
 export class RunState extends State {
   enter(player: Player) {
     this.stateMachine.anims.play("run");
-    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "run");
     //player.awakeplayer();
   }
   execute(player: Player) {
@@ -356,15 +360,19 @@ export class RunState extends State {
       player.setInternalState({ flipX: false });
       player.setVelocityX(attributes.runspeed);
     }
+    if (
+      clientinput.roll.isDown &&
+      clientrepeats.roll === 0 &&
+      newstamina >= staminaCost.runroll
+    ) {
+      this.stateMachine.transition("roll");
+      return;
+    }
     if (clientinput.run.isUp || newstamina <= staminaCost.run) {
       this.stateMachine.transition("walk");
       return;
     }
     if (clientinput.up.isDown && isTouching.bottom) {
-      if (state.onPlatform) {
-        player.setInternalState({ onPlatform: false });
-        player.setCollidesWith([collisionData.category.hard]);
-      }
       this.stateMachine.transition("jump");
       return;
     } else if (!isTouching.nearbottom) {
@@ -374,8 +382,7 @@ export class RunState extends State {
 
     if (clientinput.down.isDown && state.onPlatform) {
       // reset player to only collide with hard platform
-      player.setCollidesWith([collisionData.category.hard]);
-      player.setInternalState({ onPlatform: false });
+      player.setInternalState({ platformFall: true });
       this.stateMachine.transition("fall");
       return;
     }
@@ -397,10 +404,66 @@ export class RunState extends State {
   quit() {}
 }
 
+export class RollState extends State {
+  clearid;
+  enter(player: Player) {
+    this.stateMachine.anims.play("smrslt");
+    const clientinput = player.input;
+    player.setFriction(0);
+    const attributes = player.getAttributes();
+    const state = player.getInternalState();
+    var newstamina = state.stamina;
+    var rolltime;
+    var rolldistance = attributes.rolldistance;
+    // roll based on previous state
+    // TODO: extract this to a config file
+    if (this.stateMachine.prevstate === "idle") {
+      newstamina -= staminaCost.standroll;
+      rolltime = 200;
+    } else if (this.stateMachine.prevstate === "walk") {
+      newstamina -= staminaCost.walkroll;
+      rolldistance *= 1.25;
+      rolltime = 300;
+    } else {
+      newstamina -= staminaCost.runroll;
+      rolldistance *= 1.5;
+      rolltime = 400;
+    }
+    player.setInternalState({ stamina: newstamina });
+    var flipX =
+      clientinput.left.isDown === state.flipX ? !state.flipX : state.flipX;
+    if (clientinput.right.isDown) {
+      player.setVelocityX(rolldistance);
+    } else {
+      player.setVelocityX(-rolldistance);
+    }
+    //TODO add enemy category in future
+    player.removeCollidesWith([collisionData.category.player]);
+    this.clearid = setTimeout(() => {
+      player.setFriction(0.1);
+      const isTouching = player.getIsTouching();
+      if (isTouching.bottom) {
+        this.stateMachine.transition("idle");
+      } else {
+        this.stateMachine.transition("fall");
+      }
+      player.addCollidesWith([collisionData.category.player]);
+      player.setInternalState({ flipX: flipX });
+    }, rolltime);
+  }
+
+  execute() {}
+
+  quit(player: Player) {
+    player.setFriction(0.1);
+    player.addCollidesWith([collisionData.category.player]);
+    clearTimeout(this.clearid);
+  }
+}
+
 export class FallState extends State {
   enter(player: Player) {
     this.stateMachine.anims.play("fall");
-    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "fall");
   }
   execute(player: Player) {
     const clientinput = player.input;
@@ -410,6 +473,14 @@ export class FallState extends State {
     const state = player.getInternalState();
     const newstamina = state.stamina + attributes.staminaregen;
     player.setInternalState({ stamina: newstamina });
+
+    if (
+      state.airjumps < attributes.maxairjumps &&
+      clientinput.up.isDown &&
+      clientrepeats.up === 0
+    ) {
+      this.stateMachine.transition("airjump");
+    }
 
     const v = player.getVelocity();
     if (clientinput.right.isDown && !isTouching.right) {
@@ -451,6 +522,39 @@ export class FallState extends State {
   quit() {}
 }
 
+export class AirJump extends State {
+  callback;
+  enter(player: Player) {
+    this.stateMachine.anims.play("smrslt");
+    const attributes = player.getAttributes();
+    const state = player.getInternalState();
+    player.setInternalState({ airjumps: (state.airjumps += 1) });
+    player.setVelocityY(-attributes.jumpheight);
+    // two rolls before transition to fall state
+
+    this.callback = () => {
+      this.stateMachine.transition("fall");
+      this.stateMachine.anims.event.off(
+        gameEvents.anims.animationrepeat,
+        this.callback
+      );
+    };
+    this.stateMachine.anims.event.on(
+      gameEvents.anims.animationrepeat,
+      this.callback
+    );
+  }
+
+  execute() {}
+
+  quit() {
+    this.stateMachine.anims.event.off(
+      gameEvents.anims.animationrepeat,
+      this.callback
+    );
+  }
+}
+
 export class JumpState extends State {
   callback;
 
@@ -470,7 +574,6 @@ export class JumpState extends State {
         player.setVelocityX(-vx);
       }
       player.setVelocityY(-attributes.jumpheight);
-
       setTimeout(() => {
         this.stateMachine.transition("fall");
       }, 100);
@@ -499,9 +602,7 @@ export class DashAttack extends State {
     const state = player.getInternalState();
     const newstamina = state.stamina - staminaCost.dashattack;
     player.setInternalState({ stamina: newstamina });
-
     this.stateMachine.anims.play("dashattack");
-    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "dashattack");
     this.clearId = setTimeout(() => {
       const clientinput = player.input;
       if (
@@ -540,7 +641,6 @@ export class AttackState extends State {
     const newstamina = state.stamina - staminaCost.attack1;
     player.setInternalState({ stamina: newstamina });
     this.stateMachine.anims.play("attack1");
-    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "attack1");
     this.callback = () => {
       const clientinput = player.input;
       if (clientinput.attack.isDown && newstamina >= staminaCost.attack2) {
@@ -579,9 +679,7 @@ export class Attack2State extends State {
     const state = player.getInternalState();
     const newstamina = state.stamina - staminaCost.attack2;
     player.setInternalState({ stamina: newstamina });
-
     this.stateMachine.anims.play("attack2");
-    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "attack2");
     this.callback = () => {
       const clientinput = player.input;
       if (clientinput.attack.isDown && newstamina >= staminaCost.attack3) {
@@ -620,9 +718,7 @@ export class Attack3State extends State {
     const state = player.getInternalState();
     const newstamina = state.stamina - staminaCost.attack3;
     player.setInternalState({ stamina: newstamina });
-
     this.stateMachine.anims.play("attack3");
-    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "attack3");
     this.callback = () => {
       this.stateMachine.transition("idle");
       return;
@@ -654,7 +750,6 @@ export class AirAttack1 extends State {
   callback;
   enter(player: Player) {
     this.stateMachine.anims.play("airattack1");
-    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "airattack1");
     const state = player.getInternalState();
     const newstamina = state.stamina - staminaCost.airattack1;
     player.setInternalState({ stamina: newstamina });
@@ -690,8 +785,6 @@ export class Hurt extends State {
   callback;
   enter(player: Player, hitconfig: hitConfig) {
     this.stateMachine.anims.play("hurt");
-    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "hurt");
-    console.log(hitconfig);
     if (hitconfig.flipX) {
       player.setVelocity(-hitconfig.knockback.x, hitconfig.knockback.y);
     } else {
@@ -726,8 +819,8 @@ export class HitStun extends State {
   timerhandle;
 
   enter(player: Player, hitconfig: hitConfig) {
-    this.stateMachine.anims.play("hitstun");
     this.stateMachine.event.emit(gameEvents.stateMachine.enter, "hitstun");
+    this.stateMachine.anims.play("hitstun");
     if (hitconfig !== undefined) {
       this.timerhandle = setTimeout(() => {
         const isTouching = player.getIsTouching();
@@ -760,7 +853,6 @@ export class HitStun extends State {
 export class Death extends State {
   enter(player: Player) {
     this.stateMachine.anims.play("death");
-    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "death");
     this.stateMachine.anims.event.once(
       gameEvents.anims.animationcomplete,
       () => {

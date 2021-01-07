@@ -8,7 +8,7 @@ export class GameRoom extends Room<GameState> {
   game: Game;
   async onCreate(options) {
     // how many client each room can hold
-    this.maxClients = 50;
+    this.maxClients = 10;
     // every 100ms send an update to all clients
     this.setPatchRate(100);
     this.setState(new GameState());

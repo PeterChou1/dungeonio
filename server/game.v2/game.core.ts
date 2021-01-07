@@ -16,7 +16,7 @@ export class Game {
   private allplayers: {
     [id: string]: Player;
   };
-  // tick rate is in ms 
+  // tick rate is in ms
   //(Game loop) 60fps
   private tickrate = 1000 / 60;
   //(Broad cast loop) per 10 updates per second
@@ -27,23 +27,24 @@ export class Game {
   private updatetimer;
   // colyseus.js room
   private room;
-  private aoimanager : AOImanager;
+  private aoimanager: AOImanager;
   // frame data of player character
   private framesInfo;
   private frameData;
+  private objectgroup;
   private render;
 
   public static async createGame(room?): Promise<Game> {
-    const { engine, framesInfo, frameData } = await setupGame();
-    return new Game(engine, framesInfo, frameData, room);
+    const { engine, framesInfo, frameData, objectgroup } = await setupGame();
+    return new Game(engine, framesInfo, frameData, objectgroup, room);
   }
 
-  private constructor(engine, framesInfo, frameData, room?) {
-    
+  private constructor(engine, framesInfo, frameData, objectgroup, room?) {
     this.engine = engine;
     this.allplayers = {};
     this.framesInfo = framesInfo;
     this.frameData = frameData;
+    this.objectgroup = objectgroup;
 
     console.log(`running at tick rate ${Math.trunc(this.tickrate)}m`);
     if (gameConfig.networkdebug) {
@@ -56,11 +57,19 @@ export class Game {
       Render.run(this.render);
     } else {
       this.aoimanager = new AOImanager();
-      const NanoTimer = require('nanotimer');
+      const NanoTimer = require("nanotimer");
       this.gametimer = new NanoTimer();
       this.updatetimer = new NanoTimer();
-      this.updatetimer.setInterval(this.broadcastClients.bind(this), '', `${Math.trunc(this.updaterate)}m`);
-      this.gametimer.setInterval(this.updateGame.bind(this), '', `${Math.trunc(this.tickrate)}m`);
+      this.updatetimer.setInterval(
+        this.broadcastClients.bind(this),
+        "",
+        `${Math.trunc(this.updaterate)}m`
+      );
+      this.gametimer.setInterval(
+        this.updateGame.bind(this),
+        "",
+        `${Math.trunc(this.tickrate)}m`
+      );
       this.room = room;
       this.room.onMessage(messageType.playerinput, (client, playerinput) => {
         this.allplayers[client.sessionId].updatePlayerInput(playerinput);
@@ -81,10 +90,9 @@ export class Game {
     Engine.update(this.engine, delta);
   }
 
-  broadcastClients()  {
+  broadcastClients() {
     this.aoimanager.aoibroadcast();
   }
-
 
   manualUpdateInput(clientId, playerinput) {
     this.allplayers[clientId].updatePlayerInput(playerinput);
@@ -121,7 +129,7 @@ export class Game {
   destroy() {
     World.clear(this.engine.world);
     Engine.clear(this.engine);
-    if (gameConfig.networkdebug) { 
+    if (gameConfig.networkdebug) {
       clearInterval(this.clearid);
     } else {
       this.gametimer.clearInterval();
