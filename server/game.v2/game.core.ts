@@ -34,6 +34,7 @@ export class Game {
   private objectgroup;
   private render;
   private previoustick;
+  private previousdelta;
   private hrtimeMs = function() {
     let time = process.hrtime()
     return time[0] * 1000 + time[1] / 1000000
@@ -51,6 +52,7 @@ export class Game {
     this.frameData = frameData;
     this.objectgroup = objectgroup;
     this.previoustick = this.hrtimeMs();
+    this.previousdelta = this.tickrate;
 
     console.log(`running at tick rate ${Math.trunc(this.tickrate)}m`);
     if (gameConfig.networkdebug) {
@@ -89,15 +91,16 @@ export class Game {
     }
   }
 
-  updateGame(delta = 16) {
+  updateGame() {
     let now = this.hrtimeMs()
-    let deltaAct = (now - this.previoustick);
-    //console.log(`delta: ${deltaAct}`);
+    let delta = (now - this.previoustick);
+    let correction = (delta / this.previousdelta);
     for (const clientId in this.allplayers) {
       this.allplayers[clientId].update();
     }
+    this.previousdelta = delta;
     this.previoustick = now;
-    Engine.update(this.engine, delta);
+    Engine.update(this.engine, delta, correction);
   }
 
   broadcastClients() {
