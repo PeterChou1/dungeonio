@@ -42,7 +42,7 @@ export class GameRoom extends Room<GameState> {
         console.log(`delta threshold not met delta: ${delta} correction: ${correction}`);
         //Engine.update(this.engine, delta);
       }
-    }, "", '1000m')
+    }, "", '100m')
     //this.game = await Game.createGame(this);
   }
 
