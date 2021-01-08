@@ -107,11 +107,12 @@ export class Game {
       this.previousdelta = delta;
       this.previoustick = now;
       //console.log(`delta: ${delta} correction: ${correction}`)
-      if (Math.abs(1 - correction) <= this.tolerance) {
-        Engine.update(this.engine, delta, correction);
-      } else {
-        Engine.update(this.engine, delta);
-      }
+      Engine.update(this.engine, 16);
+      //if (Math.abs(1 - correction) <= this.tolerance) {
+      //  Engine.update(this.engine, delta, correction);
+      //} else {
+      //  Engine.update(this.engine, delta);
+      //}
       
     }
   }
@@ -160,8 +161,6 @@ export class Game {
     } else {
       this.gametimer.clearInterval();
       this.updatetimer.clearInterval();
-      //clearInterval(this.gametimer);
-      //clearInterval(this.updatetimer);
     }
   }
 }
