@@ -22,26 +22,26 @@ export class GameRoom extends Room<GameState> {
     // every 100ms send an update to all clients
     this.setPatchRate(100);
     this.setState(new GameState());
+    const hrtimeMs = function() {
+      let time = process.hrtime()
+      return time[0] * 1000 + time[1] / 1000000
+    }
+    const TICK_RATE = 60
 
-
-    const NanoTimer = require("nanotimer");
-    const gametimer = new NanoTimer();
-    gametimer.setInterval(() => {
-      let now = this.hrtimeMs()
-      let delta = (now - this.previoustick);
-      let correction = (delta / this.previousdelta);
-      this.previousdelta = delta;
-      this.previoustick = now;
-      //console.log(`delta: ${delta} correction: ${correction}`)
-      //Engine.update(this.engine, 16);
-      if (Math.abs(1 - correction) <= this.tolerance) {
-        console.log(`delta: ${delta} correction: ${correction}`);
-        //Engine.update(this.engine, delta, correction);
-      } else {
-        console.log(`delta threshold not met delta: ${delta} correction: ${correction}`);
-        //Engine.update(this.engine, delta);
-      }
-    }, "", '16m')
+    let previous = hrtimeMs()
+    let tickLengthMs = 1000 / TICK_RATE
+    
+    const loop = () => {
+        setTimeout(loop, tickLengthMs)
+        let now = hrtimeMs()
+        let delta = (now - previous) / 1000;
+        //let correction = delta / this.previousdelta;
+        console.log('delta', delta)
+        // game.update(delta, tick) // game logic would go here
+        previous = now;
+        //this.previousdelta = delta;
+    }
+    loop() 
     //this.game = await Game.createGame(this);
   }
 
