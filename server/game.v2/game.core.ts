@@ -18,7 +18,7 @@ export class Game {
   };
   // correction tolerance for matterjs engine if correction ocillates more than the tolerance limit
   // default rate is used
-  private tolerance = 0.1;
+  private tolerance = 0.01;
   // tick rate is in ms
   //(Game loop) 60fps
   private tickrate = 1000 / 60;
@@ -107,12 +107,12 @@ export class Game {
       this.previousdelta = delta;
       this.previoustick = now;
       //console.log(`delta: ${delta} correction: ${correction}`)
-      Engine.update(this.engine, 16);
-      //if (Math.abs(1 - correction) <= this.tolerance) {
-      //  Engine.update(this.engine, delta, correction);
-      //} else {
-      //  Engine.update(this.engine, delta);
-      //}
+      //Engine.update(this.engine, 16);
+      if (Math.abs(1 - correction) <= this.tolerance) {
+        Engine.update(this.engine, delta, correction);
+      } else {
+        Engine.update(this.engine, delta);
+      }
       
     }
   }
