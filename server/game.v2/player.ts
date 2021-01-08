@@ -598,10 +598,11 @@ class PlayerBody {
    */
   setCamera(renderer) {
     Render.lookAt(renderer, this.compoundBody, {
-      x: 200,
-      y: 150,
+      x: 150,
+      y: 100,
     });
   }
+
 
   destroy() {
     this.event.removeAllListeners();

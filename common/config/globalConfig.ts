@@ -14,6 +14,10 @@ export const gameConfig = {
   },
 };
 
+export const levelData = {
+  "level2" : ""
+}
+
 /**
  * @description maps category id to class
  */
