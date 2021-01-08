@@ -102,6 +102,7 @@ class MockAnimsManager {
   destroy() {
     clearInterval(this.clearId);
   }
+  
 }
 
 export class StateMachine {
