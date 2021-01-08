@@ -22,9 +22,12 @@ export class Game {
   private allplayers: {
     [id: string]: Player;
   };
-  // correction tolerance for matterjs engine if correction ocillates more than the tolerance limit
-  // default rate is used
-  private tolerance = 0.01;
+  // how much time has elaspsed since start of simulation
+  private elaspsedtime = 0;
+  // number tracking how ahead or behind the gameloop is 
+  // accumulator > tickrate === gameloop is behind 
+  // accumulator < tickrate === gameloop is ahead
+  private accumulator = 0;
   // tick rate is in ms
   //(Game loop) 60fps
   private tickrate = 1000 / 60;
@@ -39,7 +42,6 @@ export class Game {
   private aoimanager: AOImanager;
   private render;
   private previoustick;
-  private previousdelta;
   // frame data of player character
   framesInfo;
   frameData;
@@ -70,7 +72,6 @@ export class Game {
       Render.run(this.render);
     } else {
       this.previoustick = this.hrtimeMs();
-      this.previousdelta = this.tickrate;
       this.aoimanager = new AOImanager();
       const NanoTimer = require("nanotimer");
       this.gametimer = new NanoTimer();
@@ -104,26 +105,30 @@ export class Game {
   }
 
   updateGame() {
-    for (const clientId in this.allplayers) {
-      this.allplayers[clientId].update();
-    }
-    if (gameConfig.networkdebug){
-      Engine.update(this.engine, 16);
+    if (gameConfig.networkdebug) {
+      this.simulateTick();
     } else {
       let now = this.hrtimeMs()
       let delta = (now - this.previoustick);
-      let correction = (delta / this.previousdelta);
-      this.previousdelta = delta;
-      this.previoustick = now;
-      //console.log(`delta: ${delta} correction: ${correction}`)
-      //Engine.update(this.engine, 16);
-      if (Math.abs(1 - correction) <= this.tolerance) {
-        Engine.update(this.engine, delta, correction);
-      } else {
-        //console.log(`delta threshold not met delta: ${delta} correction: ${correction}`);
-        Engine.update(this.engine, 16);
+      this.accumulator += delta;
+      var i = 0;
+      while (this.accumulator >= this.tickrate) {
+        // update game
+        this.simulateTick();
+        this.accumulator -= this.tickrate
+        this.elaspsedtime += this.tickrate;
+        i++;
       }
+      console.log('simulated ticks: ', i);
+      this.previoustick = now;
     }
+  }
+
+  simulateTick() {
+    for (const clientId in this.allplayers) {
+      this.allplayers[clientId].update();
+    }
+    Engine.update(this.engine, this.tickrate);
   }
 
   broadcastClients() {

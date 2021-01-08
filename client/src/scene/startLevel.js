@@ -140,7 +140,7 @@ export class startLevel extends Phaser.Scene {
     }
     if (gameConfig.networkdebug) {
       //inject server instance into client side
-      this.serverinstance = await Game.createGame();
+      this.serverinstance = new Game();
       this.serverinstance.addPlayer({ sessionId: "test" }, "test");
       this.testplayer = new Player(
         this,
@@ -236,9 +236,6 @@ export class startLevel extends Phaser.Scene {
           mattertile.setCollisionCategory(collisionData.category.soft);
         } else {
           mattertile.setCollisionCategory(collisionData.category.hard);
-        }
-        if (tile.properties.debug && gameConfig.debug) {
-          //console.log(`x: ${tile.pixelX} y: ${tile.pixelY}`);
         }
       }
     });

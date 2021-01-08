@@ -250,7 +250,6 @@ export const generateFrameTiming = (frameinfo) => {
   const frametiming = {};
   for (const anim of copy) {
     const frames = generateFrameNames(anim.frames[1]).reverse();
-    console.log(frames);
     frametiming[anim.key] = {
       frames: frames,
       interval: 1000 / anim.frameRate,
