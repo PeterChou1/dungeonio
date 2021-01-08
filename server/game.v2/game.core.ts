@@ -95,9 +95,9 @@ export class Game {
   }
 
   updateGame() {
-    for (const clientId in this.allplayers) {
-      this.allplayers[clientId].update();
-    }
+    //for (const clientId in this.allplayers) {
+    //  this.allplayers[clientId].update();
+    //}
     if (gameConfig.networkdebug){
       Engine.update(this.engine, 16);
     } else {
@@ -110,10 +110,10 @@ export class Game {
       //Engine.update(this.engine, 16);
       if (Math.abs(1 - correction) <= this.tolerance) {
         console.log(`delta: ${delta} correction: ${correction}`);
-        Engine.update(this.engine, delta, correction);
+        //Engine.update(this.engine, delta, correction);
       } else {
         console.log(`delta threshold not met delta: ${delta} correction: ${correction}`);
-        Engine.update(this.engine, delta);
+        //Engine.update(this.engine, delta);
       }
     }
   }
