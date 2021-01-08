@@ -65,7 +65,7 @@ export class startLevel extends Phaser.Scene {
           port = "";
         }
         var websocket =
-          location.protocol.replace("http", "ws") + "//" + host + ':5000';
+          location.protocol.replace("http", "ws") + "//" + host + port;
         console.log(location);
         console.log(`connected to web socket protocol ${websocket}`);
         this.client = new Colyseus.Client(websocket);
