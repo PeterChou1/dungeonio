@@ -4,6 +4,7 @@ import { Player } from "./player";
 import { Vector } from "matter-js";
 
 type hitConfig = {
+  parent : Player;
   knockback: { x: number; y: number };
   damage: number;
   hitstun: number;
@@ -746,6 +747,44 @@ export class Attack3State extends State {
   }
 }
 
+
+export class StrongAttack extends State {
+  callback;
+  holdthreshold = 3;
+  holdlimit = 10;
+  multiplier;
+
+  enter(player: Player) {
+    this.stateMachine.anims.play("strattack-start");
+    var heldcount = 0;
+    this.multiplier = 0;
+    this.callback = () => {
+      this.multiplier += 1;
+      const clientinput = player.input;
+      if ((this.holdthreshold <= heldcount || heldcount <= this.holdlimit) 
+          && (clientinput.stratk.isUp || heldcount === this.holdlimit)) {
+
+            this.stateMachine.anims.play("strattack-end");
+
+
+
+      }
+
+    }
+    this.stateMachine.anims.event.on(
+      gameEvents.anims.animationrepeat,
+      this.callback
+    );
+  }
+
+  execute(player: Player) {
+
+  }
+
+  quit() {}
+
+}
+
 export class AirAttack1 extends State {
   callback;
   enter(player: Player) {
@@ -793,7 +832,9 @@ export class Hurt extends State {
 
     this.callback = () => {
       const state = player.getInternalState();
-      const newhealth = state.health - hitconfig.damage;
+      const enemystate = hitconfig.parent.getInternalState();
+      console.log(enemystate.atkmultiplier);
+      const newhealth = state.health - hitconfig.damage * enemystate.atkmultiplier;
       player.setInternalState({ health: newhealth });
       if (newhealth > 0) {
         this.stateMachine.transition("hitstun");

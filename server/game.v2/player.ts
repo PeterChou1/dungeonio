@@ -58,6 +58,7 @@ type playerState = {
   asleep: boolean; //whether or not player is asleep
   flipX: boolean;
   airjumps: number;
+  atkmultiplier: number;
   health: number;
   stamina: number;
 };
@@ -74,6 +75,7 @@ type internalStateConfig = {
   onPlatform?: boolean;
   platformFall?: boolean;
   flipX?: boolean;
+  atkmultiplier?: number;
   airjumps?: number;
   stamina?: number;
   health?: number;
@@ -129,6 +131,7 @@ class PlayerBody {
   // ex: grab, hit
   event: EventEmitter;
   // a object keeps track of action being done to user
+  private parent : Player;
   private registeredActions: {
     [id: string]: event;
   };
@@ -210,7 +213,8 @@ class PlayerBody {
     sleepThreshold: -1,
   };
 
-  constructor(engine, x, y, frameData, objectgroup) {
+  constructor(parent, engine, x, y, frameData, objectgroup) {
+    this.parent = parent;
     this.objectgroup = objectgroup;
     this.engine = engine;
     this.event = new EventEmitter();
@@ -265,6 +269,7 @@ class PlayerBody {
           id: hitboxbody.id,
           category: "hit",
           eventConfig: {
+            parent: hitboxbody.config.parent,
             knockback: hitboxbody.config.knockback,
             damage: hitboxbody.config.damage,
             hitstun: hitboxbody.config.hitstun,
@@ -320,7 +325,6 @@ class PlayerBody {
     Body.setInertia(this.compoundBody, Infinity);
     Body.setPosition(this.compoundBody, { x: x, y: y });
     Body.setVelocity(this.compoundBody, v);
-
     this.setCollisionCategory(this.category);
     this.setCollidesWith(this.collidesWith);
     World.addBody(this.engine.world, this.compoundBody);
@@ -429,6 +433,7 @@ class PlayerBody {
           //add collision callbacks
           registerCollisionCallback(bodyparts);
           bodyparts["config"] = {
+            parent : this.parent,
             flipX: false,
             orgh: frameBody.bounds.max.y - frameBody.bounds.min.y,
             orgw: frameBody.bounds.max.x - frameBody.bounds.min.x,
@@ -633,6 +638,7 @@ export class Player extends gameObject {
     this.client = client;
     this.id = client.sessionId;
     this.body = new PlayerBody(
+      this,
       this.engine,
       x,
       y,
@@ -684,6 +690,7 @@ export class Player extends gameObject {
       asleep: false,
       flipX: false,
       airjumps: 0,
+      atkmultiplier: 1,
       stamina: this.attributes.maxstamina,
       health: this.attributes.maxhealth,
     };
@@ -726,6 +733,10 @@ export class Player extends gameObject {
         isDown: false,
         isUp: true,
       },
+      stratk: {
+        isDown: false,
+        isUp: true
+      }
     };
     //console.log('--aoi init--');
     if (!gameConfig.networkdebug) {

@@ -199,6 +199,18 @@ export const playerAnims: Array<anims> = [
     repeat: 0,
   },
   {
+    key: "strattack-start",
+    frames: ["mainchar", { end: 2, prefix: "adventure-attack3-", zeroPad: 2} ],
+    frameRate: 10,
+    repeat: -1
+  },
+  { 
+    key: "strattack-end",
+    frames: ["mainchar", { start: 2, end: 5, prefix: "adventure-attack3-", zeroPad: 2} ],
+    frameRate: 10,
+    repeat: 0
+  },
+  {
     key: "airattack1",
     frames: [
       "mainchar",
