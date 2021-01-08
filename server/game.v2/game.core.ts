@@ -110,7 +110,7 @@ export class Game {
       if (Math.abs(1 - correction) <= this.tolerance) {
         Engine.update(this.engine, delta, correction);
       } else {
-        Engine.update(this.engine, delta, correction);
+        Engine.update(this.engine, delta);
       }
       
     }
