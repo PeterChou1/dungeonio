@@ -1,18 +1,12 @@
-
 export const createanims = (scene, anims) => {
   // deep clone anims to prevent mutation if
   // if you do not include this it will mutate the object so if a user joins again
   // the game will crash
-  const frameNames = [];
   const anims_copy = JSON.parse(JSON.stringify(anims));
   anims_copy.forEach((anim) => {
     anim.frames = scene.anims.generateFrameNames(...anim.frames);
-    for (const frame of anim.frames) {
-      frameNames.push(frame.frame);
-    }
     scene.anims.create(anim);
   });
-  return frameNames;
 };
 
 export function randomInteger(min, max) {
@@ -120,5 +114,3 @@ export class RequestQueue {
     return _.cloneDeep(this.unackReq);
   }
 }
-
-

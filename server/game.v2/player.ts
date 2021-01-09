@@ -6,6 +6,7 @@ import {
   playerConfig,
   messageType,
   playerHitboxData,
+  hitboxconfig,
 } from "../../common";
 import {
   StateMachine,
@@ -21,9 +22,12 @@ import {
   Attack3State,
   DashAttack,
   AirAttack1,
+  AirAttack2,
   Hurt,
   HitStun,
   Death,
+  StrongAttack,
+  StrongAirAtk,
 } from "./state";
 import { gameObject } from "./gameobject";
 import Phaser from "phaser";
@@ -131,7 +135,7 @@ class PlayerBody {
   // ex: grab, hit
   event: EventEmitter;
   // a object keeps track of action being done to user
-  private parent : Player;
+  private parent: Player;
   private registeredActions: {
     [id: string]: event;
   };
@@ -264,7 +268,7 @@ class PlayerBody {
     const { bodyA, bodyB } = pair;
     const hitboxbody = this.mainBody === bodyA ? bodyB : bodyA;
     if (!(hitboxbody.id in this.registeredActions)) {
-      if (hitboxbody.label === "hitbox") {
+      if (hitboxbody.label.includes("hitbox")) {
         this.registeredActions[hitboxbody.id] = {
           id: hitboxbody.id,
           category: "hit",
@@ -299,7 +303,6 @@ class PlayerBody {
    * @param id
    */
   deregisterAction(id: number) {
-    console.log("deregister action: ", id);
     delete this.registeredActions[id];
   }
 
@@ -432,8 +435,24 @@ class PlayerBody {
         for (const bodyparts of this.frameData[frameName]) {
           //add collision callbacks
           registerCollisionCallback(bodyparts);
+          var hitboxdata;
+          if (playerHitboxData.hasOwnProperty(frameName)) {
+            if (Array.isArray(playerHitboxData[frameName])) {
+              const hitboxarray = playerHitboxData[
+                frameName
+              ] as Array<hitboxconfig>;
+              for (const hitbox of hitboxarray) {
+                if (bodyparts.label === hitbox.label) {
+                  hitboxdata = hitbox;
+                }
+              }
+            } else {
+              const hitbox = playerHitboxData[frameName] as hitboxconfig;
+              if (bodyparts.label === hitbox.label) hitboxdata = hitbox;
+            }
+          }
           bodyparts["config"] = {
-            parent : this.parent,
+            parent: this.parent,
             flipX: false,
             orgh: frameBody.bounds.max.y - frameBody.bounds.min.y,
             orgw: frameBody.bounds.max.x - frameBody.bounds.min.x,
@@ -443,9 +462,7 @@ class PlayerBody {
             w:
               this.frameData[frameName][0].bounds.max.x -
               this.frameData[frameName][0].bounds.min.x,
-            ...(playerHitboxData.hasOwnProperty(frameName) &&
-              bodyparts.label === playerHitboxData[frameName].label &&
-              playerHitboxData[frameName]),
+            ...hitboxdata,
           };
         }
       }
@@ -603,7 +620,6 @@ class PlayerBody {
     });
   }
 
-
   destroy() {
     this.event.removeAllListeners();
     Events.off(this.compoundBody);
@@ -661,8 +677,11 @@ export class Player extends gameObject {
       attack1: new AttackState(),
       attack2: new Attack2State(),
       attack3: new Attack3State(),
+      stratk: new StrongAttack(),
       dashattack: new DashAttack(),
       airattack1: new AirAttack1(),
+      airattack2: new AirAttack2(),
+      strairatk: new StrongAirAtk(),
       hurt: new Hurt(),
       hitstun: new HitStun(),
       death: new Death(),
@@ -695,7 +714,6 @@ export class Player extends gameObject {
       stamina: this.attributes.maxstamina,
       health: this.attributes.maxhealth,
     };
-
     // track if input repeats
     this.inputrepeats = {
       left: 0,
@@ -736,8 +754,8 @@ export class Player extends gameObject {
       },
       stratk: {
         isDown: false,
-        isUp: true
-      }
+        isUp: true,
+      },
     };
     //console.log('--aoi init--');
     if (!gameConfig.networkdebug) {

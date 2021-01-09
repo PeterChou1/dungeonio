@@ -1,10 +1,11 @@
-type hitboxdata = {
-  [propName: string]: {
-    label: string; // which body parts connect to which hitbox
-    knockback: { x: number; y: number };
-    hitstun: number;
-    damage: number;
-  };
+export type hitboxconfig = {
+  label: string; // which body parts connect to which hitbox
+  knockback: { x: number; y: number };
+  hitstun: number;
+  damage: number;
+};
+export type hitboxdata = {
+  [propName: string]: Array<hitboxconfig> | hitboxconfig;
 };
 /**
  * @description describes hitbox data
@@ -12,7 +13,7 @@ type hitboxdata = {
 export const playerHitboxData: hitboxdata = {
   "adventurer-air-attack1-01": {
     label: "hitbox",
-    knockback: { x: 5, y: -5 },
+    knockback: { x: -3, y: 0 },
     damage: 5,
     hitstun: 200,
   },
@@ -34,12 +35,26 @@ export const playerHitboxData: hitboxdata = {
     damage: 5,
     hitstun: 200,
   },
-  "adventurer-air-attack-3-end-00": {
-    label: "hitbox",
-    knockback: { x: 5, y: -5 },
-    damage: 5,
-    hitstun: 200,
-  },
+  "adventurer-air-attack-3-end-00": [
+    {
+      label: "left-hitbox",
+      knockback: { x: -5, y: -5 },
+      damage: 10,
+      hitstun: 200,
+    },
+    {
+      label: "center-hitbox",
+      knockback: { x: 0, y: 5 },
+      damage: 20,
+      hitstun: 200,
+    },
+    {
+      label: "right-hitbox",
+      knockback: { x: 5, y: -5 },
+      damage: 10,
+      hitstun: 200,
+    },
+  ],
   "adventurer-attack1-02": {
     label: "hitbox",
     knockback: { x: -3, y: 0 },
@@ -123,9 +138,7 @@ type anims = {
 /**
  * @description default stat
  */
-export const defaultStats = {
-  
-}
+export const defaultStats = {};
 /**
  * @description cost of each active player action
  */
@@ -136,8 +149,12 @@ export const staminaCost = {
   standroll: 10,
   walkroll: 20,
   runroll: 30,
-  airattack1: 30,
+  airattack1: 20,
+  airattack2: 20,
   dashattack: 20,
+  strairatk: 30,
+  stratk: 30,
+  stratkheld: 10,
   attack1: 20,
   attack2: 20,
   attack3: 20,
@@ -199,22 +216,52 @@ export const playerAnims: Array<anims> = [
     repeat: 0,
   },
   {
-    key: "strattack-start",
-    frames: ["mainchar", { end: 2, prefix: "adventure-attack3-", zeroPad: 2} ],
+    key: "strairatk-loop",
+    frames: [
+      "mainchar",
+      { end: 1, prefix: "adventurer-air-attack3-loop-", zeroPad: 2 },
+    ],
     frameRate: 10,
-    repeat: -1
+    repeat: -1,
   },
-  { 
-    key: "strattack-end",
-    frames: ["mainchar", { start: 2, end: 5, prefix: "adventure-attack3-", zeroPad: 2} ],
+  {
+    key: "strairatk-loop-end",
+    frames: [
+      "mainchar",
+      { end: 2, prefix: "adventurer-air-attack-3-end-", zeroPad: 2 },
+    ],
     frameRate: 10,
-    repeat: 0
+    repeat: 0,
+  },
+  {
+    key: "strattack-start",
+    frames: ["mainchar", { end: 1, prefix: "adventurer-attack3-", zeroPad: 2 }],
+    frameRate: 10,
+    repeat: -1,
+  },
+  {
+    key: "strattack-end",
+    frames: [
+      "mainchar",
+      { start: 2, end: 5, prefix: "adventurer-attack3-", zeroPad: 2 },
+    ],
+    frameRate: 10,
+    repeat: 0,
   },
   {
     key: "airattack1",
     frames: [
       "mainchar",
       { end: 3, prefix: "adventurer-air-attack1-", zeroPad: 2 },
+    ],
+    frameRate: 10,
+    repeat: 0,
+  },
+  {
+    key: "airattack2",
+    frames: [
+      "mainchar",
+      { end: 3, prefix: "adventurer-air-attack2-", zeroPad: 2 },
     ],
     frameRate: 10,
     repeat: 0,

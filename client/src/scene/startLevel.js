@@ -43,9 +43,13 @@ export class startLevel extends Phaser.Scene {
     }
   }
 
-
   preload() {
-    this.load.scenePlugin('floatingNumbersPlugin', FloatingNumbersPlugin, 'floatingNumbersPlugin', 'floatingNumbers');
+    this.load.scenePlugin(
+      "floatingNumbersPlugin",
+      FloatingNumbersPlugin,
+      "floatingNumbersPlugin",
+      "floatingNumbers"
+    );
   }
 
   async connect() {
@@ -89,14 +93,10 @@ export class startLevel extends Phaser.Scene {
       this.room = await this.connect();
       this.setupnetwork();
     }
-    this.frameData = this.cache.json.get("frameData");
     // create player animations;
-    this.frameNames = createanims(this, playerAnims);
+    createanims(this, playerAnims);
     // track request numbers
     this.requestNum = 0;
-    // random number generated for network latency test
-    this.randlatency = 50; //randomInteger(0, 500);
-    console.log("random latency (client) ", this.randlatency);
     // unique id of session
     this.sessionId = gameConfig.networkdebug ? "test" : this.room.sessionId;
     // unique id of room
@@ -108,6 +108,7 @@ export class startLevel extends Phaser.Scene {
       left: KeyCodes.A,
       right: KeyCodes.D,
       attack: KeyCodes.P,
+      stratk: KeyCodes.O,
       run: KeyCodes.SHIFT,
       roll: KeyCodes.SPACE,
       ...(gameConfig.networkdebug && {
@@ -115,9 +116,10 @@ export class startLevel extends Phaser.Scene {
         down_p2: KeyCodes.DOWN,
         left_p2: KeyCodes.LEFT,
         right_p2: KeyCodes.RIGHT,
-        attack_p2: KeyCodes.NUMPAD_ONE,
-        run_p2: KeyCodes.NUMPAD_ZERO,
-        roll_p2: KeyCodes.NUMPAD_TWO,
+        attack_p2: KeyCodes.SEVEN,
+        stratk_p2: KeyCodes.EIGHT,
+        run_p2: KeyCodes.NINE,
+        roll_p2: KeyCodes.ZERO,
       }),
     });
     // request Id of the last request sent to server
@@ -207,38 +209,6 @@ export class startLevel extends Phaser.Scene {
         0
       ),
     };
-    this.objectgroup = {
-      soft: [], // soft tiles
-      hard: this.gamelayer.ground.filterTiles((tile) => !tile.properties.soft),
-    };
-    const platforms = this.map.getObjectLayer("platform");
-    platforms.objects.forEach((rect) => {
-      this.objectgroup.soft.push(
-        this.matter.add.rectangle(
-          rect.x + rect.width / 2,
-          rect.y + rect.height / 2,
-          rect.width,
-          rect.height,
-          {
-            isSensor: true, // It shouldn't physically interact with other bodies
-            isStatic: true, // It shouldn't move
-          }
-        )
-      );
-    });
-    this.gamelayer.ground.forEachTile((tile) => {
-      if (tile.properties.collides) {
-        const mattertile = new Phaser.Physics.Matter.TileBody(
-          this.matter.world,
-          tile
-        );
-        if (tile.properties.soft) {
-          mattertile.setCollisionCategory(collisionData.category.soft);
-        } else {
-          mattertile.setCollisionCategory(collisionData.category.hard);
-        }
-      }
-    });
     this.aoiclient = new AOImanagerClient(
       this.gamelayer.ground.height,
       this.gamelayer.ground.width
@@ -362,68 +332,15 @@ export class startLevel extends Phaser.Scene {
         this.room.send(messageType.playerinput, req);
       }, this.randlatency);
     } else if (gameConfig.networkdebug) {
-      const req_p1 = {
-        left: {
-          isDown: this.keys.left.isDown,
-          isUp: this.keys.left.isUp,
-        },
-        right: {
-          isDown: this.keys.right.isDown,
-          isUp: this.keys.right.isUp,
-        },
-        up: {
-          isDown: this.keys.up.isDown,
-          isUp: this.keys.up.isUp,
-        },
-        down: {
-          isDown: this.keys.down.isDown,
-          isUp: this.keys.down.isUp,
-        },
-        run: {
-          isDown: this.keys.run.isDown,
-          isUp: this.keys.run.isUp,
-        },
-        attack: {
-          isDown: this.keys.attack.isDown,
-          isUp: this.keys.attack.isUp,
-        },
-        roll: {
-          isDown: this.keys.roll.isDown,
-          isUp: this.keys.roll.isUp,
-        },
-      };
-      const req_p2 = {
-        left: {
-          isDown: this.keys.left_p2.isDown,
-          isUp: this.keys.left_p2.isUp,
-        },
-        right: {
-          isDown: this.keys.right_p2.isDown,
-          isUp: this.keys.right_p2.isUp,
-        },
-        up: {
-          isDown: this.keys.up_p2.isDown,
-          isUp: this.keys.up_p2.isUp,
-        },
-        down: {
-          isDown: this.keys.down_p2.isDown,
-          isUp: this.keys.down_p2.isUp,
-        },
-        run: {
-          isDown: this.keys.run_p2.isDown,
-          isUp: this.keys.run_p2.isUp,
-        },
-        attack: {
-          isDown: this.keys.attack_p2.isDown,
-          isUp: this.keys.attack_p2.isUp,
-        },
-        roll: {
-          isDown: this.keys.roll_p2.isDown,
-          isUp: this.keys.roll_p2.isUp,
-        },
-      };
-      this.serverinstance.manualUpdateInput("test", req_p1);
-      this.serverinstance.manualUpdateInput("test2", req_p2);
+      if (prop.includes("_p2")) {
+        delete Object.assign(req, { [prop.replace("_p2", "")]: req[prop] })[
+          prop
+        ];
+        console.log(req);
+        this.serverinstance.manualUpdateInput("test", req);
+      } else {
+        this.serverinstance.manualUpdateInput("test2", req);
+      }
     } else {
       this.room.send(messageType.playerinput, req);
     }
