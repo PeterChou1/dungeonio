@@ -15,7 +15,7 @@ const Controls = () => {
           <li>P - Strong attack</li>
         </div>
         <div>
-          <li>SPACE - Block</li>
+          <li>SPACE - Roll</li>
         </div>
         <div>
           <li>SHIFT - Run</li>
