@@ -93,7 +93,10 @@ class MockAnimsManager {
         this.event.emit(gameEvents.anims.animationcomplete, this.key);
       } else if (this.repeat === -1) {
         this.event.emit(gameEvents.anims.animationrepeat, this.key);
-        this.duration = this.anims.duration;
+        // Due to dumb async stuff this is put here to prevent frames from repeating
+        // if you remove this strong attack will register twice because the last interval
+        // is not clear during execution?
+        this.duration === 0 ? (this.duration = this.anims.duration) : null;
       }
     }
   }
@@ -146,11 +149,13 @@ export class StateMachine {
               this.stateArgs.push(event.eventConfig);
               this.transition("hurt");
               const hitresolve = (state) => {
-                console.log(state);
-                if (state === "hitstun") {
+                if (state !== "hitstun" && state !== "hurt") {
                   this.stateArgs = this.stateArgs.slice(0, 1);
                   this.event.off(gameEvents.stateMachine.enter, hitresolve);
-                  this.event.emit(gameEvents.stateMachine.dispatchcomplete);
+                  this.event.emit(
+                    gameEvents.stateMachine.dispatchcomplete,
+                    "hit"
+                  );
                   resolve(true);
                 }
               };
@@ -167,7 +172,10 @@ export class StateMachine {
                     gameEvents.stateMachine.dispatchcomplete,
                     deathresolve
                   );
-                  this.event.emit(gameEvents.stateMachine.dispatchcomplete);
+                  this.event.emit(
+                    gameEvents.stateMachine.dispatchcomplete,
+                    "death"
+                  );
                   resolve(true);
                 }
               };
@@ -192,6 +200,7 @@ export class StateMachine {
     if (this.state === null) {
       this.prevstate = this.initialState;
       this.state = this.initialState;
+      this.event.emit(gameEvents.stateMachine.enter, this.state);
       this.possibleStates[this.state].enter(...this.stateArgs);
     }
     // Run the current state's execute
@@ -201,6 +210,7 @@ export class StateMachine {
   transition(newState, ...enterArgs) {
     this.prevstate = this.state;
     this.state = newState;
+    this.event.emit(gameEvents.stateMachine.enter, this.state);
     this.possibleStates[this.state].enter(...this.stateArgs, ...enterArgs);
   }
 
@@ -246,6 +256,10 @@ export class IdleState extends State {
       }
       return;
     }
+    //if (clientinput.roll.isDown) {
+    //  this.stateMachine.transition("block");
+    //  return;
+    //}
     if (clientinput.up.isDown && isTouching.bottom) {
       this.stateMachine.transition("jump");
       return;
@@ -354,6 +368,52 @@ export class WalkState extends State {
 
   quit() {}
 }
+
+export class BlockState extends State {
+  callback;
+
+  enter(player: Player) {
+    this.stateMachine.anims.play("block-startup");
+    this.callback = () => {
+      this.stateMachine.anims.play("block");
+    };
+    this.stateMachine.anims.event.once(
+      gameEvents.anims.animationcomplete,
+      this.callback
+    );
+  }
+
+  execute(player: Player) {
+    const clientinput = player.input;
+    const isTouching = player.getIsTouching();
+    if (!isTouching.bottom && !isTouching.nearbottom) {
+      this.stateMachine.transition("fall");
+    }
+    if (clientinput.roll.isUp) {
+      this.stateMachine.transition("idle");
+    }
+  }
+
+  quit() {
+    this.stateMachine.anims.event.off(
+      gameEvents.anims.animationcomplete,
+      this.callback
+    );
+  }
+}
+
+//export class BlockStun extends State {
+//
+//  enter() {
+//
+//  }
+//  execute() {
+//
+//  }
+//  quit() {
+//
+//  }
+//}
 
 export class RunState extends State {
   enter(player: Player) {
@@ -789,8 +849,6 @@ export class StrongAttack extends State {
       this.multiplier += 1;
       const clientinput = player.input;
       if (this.holdthreshold <= heldcount && heldcount <= this.holdlimit) {
-        console.log("strong attack");
-        console.log(heldcount);
         const state = player.getInternalState();
         if (
           clientinput.stratk.isUp ||
@@ -798,11 +856,11 @@ export class StrongAttack extends State {
           state.stamina <= staminaCost.stratkheld
         ) {
           player.setInternalState({ atkmultiplier: this.multiplier });
-          this.stateMachine.anims.play("strattack-end");
           this.stateMachine.anims.event.off(
             gameEvents.anims.animationrepeat,
             this.callback
           );
+          this.stateMachine.anims.play("strattack-end");
           this.stateMachine.anims.event.once(
             gameEvents.anims.animationcomplete,
             this.endcallback
@@ -827,7 +885,14 @@ export class StrongAttack extends State {
     );
   }
 
-  execute(player: Player) {}
+  execute(player: Player) {
+    const clientinput = player.input;
+    if (clientinput.left.isDown) {
+      player.setInternalState({ flipX: true });
+    } else if (clientinput.right.isDown) {
+      player.setInternalState({ flipX: false });
+    }
+  }
 
   quit() {
     this.stateMachine.anims.event.off(
@@ -854,13 +919,22 @@ export class StrongAirAtk extends State {
   }
 
   execute(player: Player) {
-    const istouching = player.getIsTouching();
-    if (istouching.bottom && !this.finished) {
+    const isTouching = player.getIsTouching();
+    const clientinput = player.input;
+    const attributes = player.getAttributes();
+    const v = player.getVelocity();
+    if (clientinput.down.isDown && !isTouching.bottom) {
+      Vector.add(v, { x: 0, y: 2 * attributes.airaccel }, v);
+      if (Math.abs(v.y) >= 3 * attributes.airspeed) {
+        player.setVelocityY(3 * attributes.airspeed);
+      } else {
+        player.setVelocity(v.x, v.y);
+      }
+    }
+    if (isTouching.bottom && !this.finished) {
       this.stateMachine.anims.play("strairatk-loop-end");
       this.finished = true;
-      console.log("finished");
       this.callback = () => {
-        console.log("animation end");
         this.stateMachine.transition("idle");
       };
       this.stateMachine.anims.event.once(
@@ -965,17 +1039,13 @@ export class Hurt extends State {
     } else {
       player.setVelocity(hitconfig.knockback.x, hitconfig.knockback.y);
     }
+    const state = player.getInternalState();
+    const enemystate = hitconfig.parent.getInternalState();
+    const newhealth =
+      state.health - hitconfig.damage * enemystate.atkmultiplier;
+    player.setInternalState({ health: newhealth });
 
     this.callback = () => {
-      const state = player.getInternalState();
-      const enemystate = hitconfig.parent.getInternalState();
-
-      const newhealth =
-        state.health - hitconfig.damage * enemystate.atkmultiplier;
-      console.log("--- hurt --");
-      console.log(newhealth);
-      console.log(enemystate.atkmultiplier);
-      player.setInternalState({ health: newhealth });
       if (newhealth > 0) {
         this.stateMachine.transition("hitstun");
       }
@@ -1000,7 +1070,6 @@ export class HitStun extends State {
   timerhandle;
 
   enter(player: Player, hitconfig: hitConfig) {
-    this.stateMachine.event.emit(gameEvents.stateMachine.enter, "hitstun");
     this.stateMachine.anims.play("hitstun");
     if (hitconfig !== undefined) {
       this.timerhandle = setTimeout(() => {

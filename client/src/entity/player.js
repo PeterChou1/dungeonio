@@ -35,6 +35,7 @@ export default class Player {
       health: 100,
       maxstamina: 100,
       stamina: 100,
+      combocount: 0,
     };
     this.scene = scene;
     this.sprite = scene.matter.add.sprite(
@@ -117,43 +118,69 @@ export default class Player {
 
   /**
    * @description damage pop up indicator
-   * @param {*} damage 
+   * @param {*} damage
    */
-  damagePopup(damage) {
-    if (damage > 0) {
-      this.scene.floatingNumbers.createFloatingText({
-        textOptions: {
-            fontFamily: 'uifont',
-            fontSize: 20,
-            color: "#ff0000",
-            strokeThickness: 2,
-            fontWeight: "bold",
-            stroke: "#000000",
-            shadow: {
-                offsetX: 0,
-                offsetY: 0,
-                color: '#000',
-                blur: 4,
-                stroke: true,
-                fill: false
-            }
+  popup(text, options) {
+    if (!options) options = {};
+    this.scene.floatingNumbers.createFloatingText({
+      textOptions: {
+        fontFamily: "uifont",
+        fontSize: options.fontsize ? options.fontsize : 20,
+        color: options.color ? options.color : "#ff0000",
+        strokeThickness: 2,
+        fontWeight: "bold",
+        stroke: "#000000",
+        shadow: {
+          offsetX: 0,
+          offsetY: 0,
+          color: "#000",
+          blur: 4,
+          stroke: true,
+          fill: false,
         },
-        text: damage.toString(),
-        align: "top-center",
-        parentObject: this.sprite,
-        animation: "smoke",
-        animationEase: "Linear"
-      });
+      },
+      text: text.toString(),
+      align: "top-center",
+      parentObject: this.sprite,
+      animation: options.animation ? options.animation : "up",
+      animationEase: "Linear",
+    });
+  }
+
+  updateText(newhealth) {
+    const dmgdealt = this.meta.health - newhealth;
+    if (dmgdealt > 0) {
+      if (this.animationstate === "hitstun") {
+        this.meta.combocount++;
+        if (this.meta.combocount > 1) {
+          this.popup(`combo ${this.meta.combocount}`, {
+            fontsize: 12,
+            animation: "smoke",
+            color: "#11ff00",
+          });
+        }
+      } else {
+        this.meta.combocount = 1;
+      }
+      this.popup(dmgdealt.toString());
+    } else if (
+      this.animationstate !== "hitstun" &&
+      this.animationstate !== "hurt"
+    ) {
+      this.meta.combocount = 0;
     }
   }
 
   updatePlayer({ x, y, flipX, anims, maxhealth, health, maxstamina, stamina }) {
-    this.damagePopup(this.meta.health - health);
+    this.updateText(health);
     this.meta = {
-      maxstamina: maxstamina,
-      stamina: stamina,
-      maxhealth: maxhealth,
-      health: health,
+      ...this.meta,
+      ...{
+        maxstamina: maxstamina,
+        stamina: stamina,
+        maxhealth: maxhealth,
+        health: health,
+      },
     };
     this.sprite.setFlipX(flipX);
     this.setPosition(x, y);

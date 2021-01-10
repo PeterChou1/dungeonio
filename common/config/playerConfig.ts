@@ -55,35 +55,71 @@ export const playerHitboxData: hitboxdata = {
       hitstun: 200,
     },
   ],
-  "adventurer-attack1-02": {
-    label: "hitbox",
-    knockback: { x: -3, y: 0 },
-    damage: 5,
-    hitstun: 200,
-  },
-  "adventurer-attack2-03": {
-    label: "hitbox",
-    knockback: { x: 0, y: 0 },
-    damage: 5,
-    hitstun: 100,
-  },
-  "adventurer-attack3-02": {
-    label: "hitbox",
-    knockback: { x: 5, y: -3 },
-    damage: 5,
-    hitstun: 100,
-  },
+  "adventurer-attack1-02": [
+    {
+      label: "hitbox",
+      knockback: { x: -3, y: 0 },
+      damage: 5,
+      hitstun: 300,
+    },
+    {
+      label: "hitbox-tipper",
+      knockback: { x: 0, y: 0 },
+      damage: 10,
+      hitstun: 500,
+    },
+  ],
+  "adventurer-attack2-03": [
+    {
+      label: "hitbox-front",
+      knockback: { x: 0, y: 0 },
+      damage: 5,
+      hitstun: 400,
+    },
+    {
+      label: "hitbox-back",
+      knockback: { x: -3, y: 0 },
+      damage: 5,
+      hitstun: 400,
+    },
+    {
+      label: "hitbox-tipper",
+      knockback: { x: 0, y: 0 },
+      damage: 10,
+      hitstun: 400,
+    },
+  ],
+  "adventurer-attack3-02": [
+    {
+      label: "hitbox-tipper",
+      knockback: { x: 10, y: -3 },
+      damage: 15,
+      hitstun: 500,
+    },
+    {
+      label: "hitbox-front",
+      knockback: { x: 7, y: -3 },
+      damage: 5,
+      hitstun: 400,
+    },
+    {
+      label: "hitbox-back",
+      knockback: { x: -3, y: 0 },
+      damage: 2,
+      hitstun: 100,
+    },
+  ],
   "adventurer-slide-00": {
     label: "hitbox",
     knockback: { x: 5, y: -5 },
     damage: 2,
-    hitstun: 100,
+    hitstun: 300,
   },
   "adventurer-slide-01": {
     label: "hitbox",
     knockback: { x: 5, y: -5 },
     damage: 5,
-    hitstun: 100,
+    hitstun: 300,
   },
 };
 
@@ -168,6 +204,24 @@ export const staminaCost = {
  */
 export const playerAnims: Array<anims> = [
   {
+    key: "block-startup",
+    frames: [
+      "mainchar",
+      { start: 3, end: 3, prefix: "adventurer-cast-", zeroPad: 2 },
+    ],
+    frameRate: 20,
+    repeat: 0,
+  },
+  {
+    key: "block",
+    frames: [
+      "mainchar",
+      { end: 3, prefix: "adventurer-cast-loop-", zeroPad: 2 },
+    ],
+    frameRate: 10,
+    repeat: -1,
+  },
+  {
     key: "walk",
     frames: ["mainchar", { end: 5, prefix: "adventurer-run-", zeroPad: 2 }],
     frameRate: 10,
@@ -200,7 +254,7 @@ export const playerAnims: Array<anims> = [
   {
     key: "attack1",
     frames: ["mainchar", { end: 4, prefix: "adventurer-attack1-", zeroPad: 2 }],
-    frameRate: 10,
+    frameRate: 8,
     repeat: 0,
   },
   {

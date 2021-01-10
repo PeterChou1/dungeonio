@@ -11,6 +11,7 @@ import {
 import {
   StateMachine,
   IdleState,
+  BlockState,
   WalkState,
   RollState,
   RunState,
@@ -131,6 +132,8 @@ class PlayerBody {
     onPlatform: false,
     platformFall: false,
   };
+  // internal event id generated every frame change
+  private eventId: number = 0;
   // register event emitter for when a state change to body happens
   // ex: grab, hit
   event: EventEmitter;
@@ -148,6 +151,9 @@ class PlayerBody {
   private category: number = collisionData.category.player;
   // keep track if player is flipped or not
   private flipX = false;
+  // sensors defined by physics editor
+  private bodysensors;
+  // sensors to keep track of directions
   private sensors;
   private sensorsConfig: sensorConfig = {
     virtualbody: {
@@ -261,26 +267,34 @@ class PlayerBody {
     });
   }
   /**
+   * used for collision callback of sensor body
+   * @param pair
+   */
+  private sensorBodyCallback(pair) {}
+  /**
    * used for collision callback of mainbody
    * @param pair
    */
   private mainBodyCallback(pair) {
     const { bodyA, bodyB } = pair;
     const hitboxbody = this.mainBody === bodyA ? bodyB : bodyA;
-    if (!(hitboxbody.id in this.registeredActions)) {
-      if (hitboxbody.label.includes("hitbox")) {
-        this.registeredActions[hitboxbody.id] = {
-          id: hitboxbody.id,
-          category: "hit",
-          eventConfig: {
-            parent: hitboxbody.config.parent,
-            knockback: hitboxbody.config.knockback,
-            damage: hitboxbody.config.damage,
-            hitstun: hitboxbody.config.hitstun,
-            flipX: hitboxbody.config.flipX,
-          },
-        };
-      }
+    if (
+      hitboxbody.config &&
+      !(hitboxbody.config.eventid in this.registeredActions) &&
+      hitboxbody.label.includes("hitbox")
+    ) {
+      console.log("registered hitbox ", hitboxbody.config.eventid);
+      this.registeredActions[hitboxbody.config.eventid] = {
+        id: hitboxbody.config.eventid,
+        category: "hit",
+        eventConfig: {
+          parent: hitboxbody.config.parent,
+          knockback: hitboxbody.config.knockback,
+          damage: hitboxbody.config.damage,
+          hitstun: hitboxbody.config.hitstun,
+          flipX: hitboxbody.config.flipX,
+        },
+      };
     }
   }
 
@@ -452,6 +466,7 @@ class PlayerBody {
             }
           }
           bodyparts["config"] = {
+            eventid: 0,
             parent: this.parent,
             flipX: false,
             orgh: frameBody.bounds.max.y - frameBody.bounds.min.y,
@@ -559,6 +574,12 @@ class PlayerBody {
   setFrameBody(frame) {
     setImmediate(() => {
       if (this.frameData[frame]) {
+        // every frame change with framedata increment event id
+        // this ensures the same move frame never hits twice while same move hits
+        this.eventId++;
+        this.frameData[frame].forEach(
+          (body) => (body.config.eventid = this.eventId)
+        );
         var pos = this.getInternalPosition();
         var v = this.getVelocity();
         World.remove(this.engine.world, this.compoundBody);
@@ -592,6 +613,9 @@ class PlayerBody {
             this.compoundBody.positionPrev.x -= this.mainBody.centerOffset.x;
           }
         }
+        console.log("set collides with");
+        console.log(this.category);
+        console.log(this.collidesWith);
         this.setCollisionCategory(this.category);
         this.setCollidesWith(this.collidesWith);
         World.addBody(this.engine.world, this.compoundBody);
@@ -668,6 +692,7 @@ export class Player extends gameObject {
     });
     const playerState = {
       idle: new IdleState(),
+      block: new BlockState(),
       walk: new WalkState(),
       run: new RunState(),
       roll: new RollState(),
@@ -690,6 +715,7 @@ export class Player extends gameObject {
       this,
     ]);
     this.stateMachine.anims.event.on(gameEvents.anims.framechange, (frame) => {
+      if (this.name === "test2") console.log(frame);
       this.body.setFrameBody(frame);
     });
     // default attributes
@@ -775,6 +801,7 @@ export class Player extends gameObject {
       }
     }
   }
+
   updatePlayerInput(playerinput) {
     this.input = { ...this.input, ...playerinput };
   }
@@ -934,12 +961,20 @@ export class Player extends gameObject {
    */
   kill() {
     this.stateMachine.dispatch({ category: "death" });
-    this.stateMachine.event.once(
-      gameEvents.stateMachine.dispatchcomplete,
-      () => {
+    const callback = (dispatch) => {
+      console.log(dispatch);
+      if (dispatch === "death") {
         // send kill request to client -> cause client to leave -> trigger onLeave -> call destroy
-        this.client.send(messageType.kill);
+        if (!gameConfig.networkdebug) this.client.send(messageType.kill);
+        this.stateMachine.event.off(
+          gameEvents.stateMachine.dispatchcomplete,
+          callback
+        );
       }
+    };
+    this.stateMachine.event.on(
+      gameEvents.stateMachine.dispatchcomplete,
+      callback
     );
   }
 

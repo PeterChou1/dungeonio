@@ -1,4 +1,4 @@
-import { StartMenu } from "../components/startMenu.components";
+import { StartMenu, Controls } from "../components/startMenu.components";
 import * as React from "jsx-dom";
 
 export class mainMenu extends Phaser.Scene {
@@ -24,6 +24,12 @@ export class mainMenu extends Phaser.Scene {
       this.cameras.main.centerX,
       this.cameras.main.centerY - 100,
       "logo"
+    );
+    console.log(Controls);
+    this.add.dom(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY + 150,
+      <Controls />
     );
     this.add.dom(
       this.cameras.main.centerX,

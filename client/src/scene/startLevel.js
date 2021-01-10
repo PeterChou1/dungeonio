@@ -107,8 +107,8 @@ export class startLevel extends Phaser.Scene {
       down: KeyCodes.S,
       left: KeyCodes.A,
       right: KeyCodes.D,
-      attack: KeyCodes.P,
-      stratk: KeyCodes.O,
+      attack: KeyCodes.O,
+      stratk: KeyCodes.P,
       run: KeyCodes.SHIFT,
       roll: KeyCodes.SPACE,
       ...(gameConfig.networkdebug && {
