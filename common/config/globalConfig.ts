@@ -14,6 +14,7 @@ export const gameConfig = {
   },
 };
 
+
 /**
  * @description maps category id to class
  */
