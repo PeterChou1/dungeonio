@@ -34,7 +34,7 @@
         <key>dataFormat</key>
         <string>phaser</string>
         <key>textureFileName</key>
-        <filename></filename>
+        <filename>spritesheet/mainchar.png</filename>
         <key>flipPVR</key>
         <false/>
         <key>pvrCompressionQuality</key>
@@ -132,7 +132,7 @@
             <key>json</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename></filename>
+                <filename>spritesheet/json/mainchar.json</filename>
             </struct>
         </map>
         <key>multiPack</key>
@@ -151,7 +151,7 @@
         <key>autoAliasEnabled</key>
         <true/>
         <key>trimSpriteNames</key>
-        <false/>
+        <true/>
         <key>prependSmartFolderName</key>
         <false/>
         <key>autodetectAnimations</key>

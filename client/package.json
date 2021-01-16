@@ -43,20 +43,11 @@
   },
   "dependencies": {
     "@babel/preset-react": "^7.12.5",
-    "@geckos.io/phaser-on-nodejs": "^1.2.3",
-    "colyseus": "^0.13.7",
     "colyseus.js": "^0.13.2",
-    "deep-object-diff": "^1.1.0",
     "jsx-dom": "^6.4.23",
-    "lodash": "^4.17.20",
-    "matter-js": "^0.14.2",
     "path": "^0.12.7",
     "phaser": "^3.20.1",
     "phaser-matter-collision-plugin": "^0.10.2",
-    "phaser3-rex-plugins": "^1.1.31",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "socket.io": "^2.3.0",
-    "uuid": "^8.3.0"
+    "phaser3-rex-plugins": "^1.1.31"
   }
 }

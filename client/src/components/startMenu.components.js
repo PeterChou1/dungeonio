@@ -1,5 +1,6 @@
 import * as React from "jsx-dom";
 
+
 const Controls = () => {
   return (
     <div style="color: white;">
@@ -7,7 +8,6 @@ const Controls = () => {
         <div>
           <li>WASD - movement</li>
         </div>
-
         <div>
           <li>O - Weak attack</li>
         </div>
@@ -15,7 +15,7 @@ const Controls = () => {
           <li>P - Strong attack</li>
         </div>
         <div>
-          <li>SPACE - Roll</li>
+          <li>SPACE - Roll/Block</li>
         </div>
         <div>
           <li>SHIFT - Run</li>

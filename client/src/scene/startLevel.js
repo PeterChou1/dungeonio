@@ -3,7 +3,6 @@ import Player from "../entity/player";
 import { AOImanagerClient } from "../interest/aoi.manager";
 import {
   gameConfig,
-  collisionData,
   messageType,
   playerAnims,
 } from "../../../common";
@@ -336,10 +335,9 @@ export class startLevel extends Phaser.Scene {
         delete Object.assign(req, { [prop.replace("_p2", "")]: req[prop] })[
           prop
         ];
-        console.log(req);
-        this.serverinstance.manualUpdateInput("test", req);
-      } else {
         this.serverinstance.manualUpdateInput("test2", req);
+      } else {
+        this.serverinstance.manualUpdateInput("test", req);
       }
     } else {
       this.room.send(messageType.playerinput, req);
