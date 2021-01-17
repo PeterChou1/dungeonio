@@ -66,6 +66,8 @@ class MockAnimsManager {
   // Note a tolerance of 0.1 we tolerate up to 0.1ms error rate 
   // meaning no frame data should have increments lower than 0.1ms or 1/16th of a frame 
   tolerance = 0.1;
+  // destroy marker
+  destroyed = false; 
 
   constructor(frameInfo) {
     this.frame = null;
@@ -95,8 +97,7 @@ class MockAnimsManager {
    * @param prevkey internal variable used to keep track of previous callstate
    */
   playAnimation(prevkey?) {
-    console.log(this.key);
-    if (prevkey === undefined || this.key === prevkey) {
+    if (prevkey === undefined || this.key === prevkey && !this.destroyed) {
       this.duration -= this.anims.interval;
       this.frame = this.anims.frames[Math.trunc(this.duration / this.anims.interval)];
       if (this.frame === undefined) {
@@ -121,6 +122,7 @@ class MockAnimsManager {
   }
 
   destroy() {
+    this.destroyed = true;
     clearTimeout(this.clearId);
   }
 }

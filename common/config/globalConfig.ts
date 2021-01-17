@@ -1,8 +1,8 @@
 export const serverport = 4000;
 
 export const gameConfig = {
-  debug: true, // enable debug graphics
-  networkdebug: true, // inject server instance into client side
+  debug: false, // enable debug graphics
+  networkdebug: false, // inject server instance into client side
   simulatelatency: false, // simulate latency for testing client side prediction @deprecated
   size: {
     width: 1024,

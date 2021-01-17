@@ -148,7 +148,7 @@ export default class Player {
       animationEase: "Linear",
     });
   }
-
+  
   updateText(newhealth) {
     const dmgdealt = this.meta.health - newhealth;
     if (dmgdealt > 0) {

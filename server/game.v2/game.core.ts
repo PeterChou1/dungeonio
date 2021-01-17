@@ -50,7 +50,7 @@ export class Game {
 
   constructor(room?) {
     this.engine = Engine.create({
-      enableSleeping: true, // perf optimzation for engine
+      enableSleeping: false, // perf optimzation for engine
     });
     /* setup level using tile map data*/
     const tilemap = require("../../client/assets/tilemaps/json/level2.json");
