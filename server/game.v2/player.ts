@@ -619,9 +619,7 @@ class PlayerBody {
         if (this.flipX !== this.mainBody.config.flipX) {
           Body.scale(this.compoundBody, -1, 1);
           this.frameBodies[frame].forEach(
-
             (body) => {
-              console.log(body.isSleeping);
               body.config.flipX = this.flipX;
             }
           );
@@ -641,7 +639,6 @@ class PlayerBody {
         Body.setPosition(this.compoundBody, pos);
         Body.setInertia(this.compoundBody, Infinity);
         Body.setVelocity(this.compoundBody, v);
-        console.log(this.compoundBody.isSleeping);
       } else if (this.mainBody !== this.default) {
         const pos = this.getInternalPosition();
         this.sensoroffset = {
@@ -668,7 +665,6 @@ class PlayerBody {
     this.event.removeAllListeners();
     World.remove(this.engine.world, this.compoundBody, true);
     Events.off(this.engine, "beforeUpdate", this.sensoroffcallback);
-    console.log('removing callback');
     for (const part of this.compoundBody.parts) {
       World.remove(this.engine.world, part, true);
       part.onCollide(null);
@@ -684,9 +680,7 @@ class PlayerBody {
         part.onCollideEnd(null);
       })
     }
-    console.log('end remove callback');
     this.parent = null;
-    console.log('body part destroy');
   }
 }
 
