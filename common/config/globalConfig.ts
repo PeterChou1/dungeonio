@@ -1,8 +1,8 @@
 export const serverport = 4000;
 
 export const gameConfig = {
-  debug: false, // enable debug graphics
-  networkdebug: false, // inject server instance into client side
+  debug: true, // enable debug graphics
+  networkdebug: true, // inject server instance into client side
   simulatelatency: false, // simulate latency for testing client side prediction @deprecated
   size: {
     width: 1024,
@@ -31,6 +31,7 @@ export const collisionData = {
 };
 
 export const messageType = {
+  ping: 7, // ping server for latency
   playerinput: 0,
   playersleep: 1, // when player navigates away from tab
   playerawake: 2, // when user navigates back to tab

@@ -23,14 +23,14 @@ export class Game {
     [id: string]: Player;
   };
   // how much time has elaspsed since start of simulation
-  private elaspsedtime = 0;
+  private elaspsedtime = 1;
   // number tracking how ahead or behind the gameloop is
   // accumulator > tickrate === gameloop is behind
   // accumulator < tickrate === gameloop is ahead
   private accumulator = 0;
   // tick rate is in ms
   //(Game loop) 60fps
-  private tickrate = 1000 / 60;
+  private tickrate = Math.trunc(1000 / 60);
   //(Broad cast loop) per 10 updates per second
   private updaterate = 1000 / 10;
   // game timer
@@ -119,7 +119,6 @@ export class Game {
         // update game
         this.simulateTick();
         this.accumulator -= this.tickrate;
-        this.elaspsedtime += this.tickrate;
       }
       this.previoustick = now;
     }
@@ -130,6 +129,8 @@ export class Game {
       this.allplayers[clientId].update();
     }
     Engine.update(this.engine, this.tickrate);
+    this.elaspsedtime += this.tickrate;
+    //console.log(this.elaspsedtime)
   }
 
   broadcastClients() {

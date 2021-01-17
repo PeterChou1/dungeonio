@@ -18,6 +18,14 @@ type eventHit = {
   category: "hit";
   eventConfig: hitConfig;
 };
+
+type eventBlock = {
+  id: number;
+  category: "block";
+  eventConfig: {
+    blockstun: number
+  }
+}
 type eventGrab = {
   id: number;
   category: "grab";
@@ -26,7 +34,7 @@ type eventGrab = {
   };
 };
 
-export type event = eventHit | eventGrab | eventDeath;
+export type event = eventHit | eventGrab | eventDeath | eventBlock;
 
 export interface PossibleStates {
   [key: string]: State;
@@ -53,6 +61,11 @@ class MockAnimsManager {
   duration;
   repeat;
   clearId;
+  // since duration can sometimes be float point number
+  // we have to set a tolerance for 0 equality comparison
+  // Note a tolerance of 0.1 we tolerate up to 0.1ms error rate 
+  // meaning no frame data should have increments lower than 0.1ms or 1/16th of a frame 
+  tolerance = 0.1;
 
   constructor(frameInfo) {
     this.frame = null;
@@ -62,16 +75,14 @@ class MockAnimsManager {
   }
 
   play(key) {
-    clearInterval(this.clearId);
-    this.key = key;
-    this.anims = this.frameInfo[this.key];
-    this.duration = this.anims.duration;
-    this.repeat = this.anims.repeat;
-    this.frameExecution();
-    this.clearId = setInterval(
-      this.frameExecution.bind(this),
-      this.anims.interval
-    );
+    clearTimeout(this.clearId);
+    setTimeout(() => {
+      this.key = key;
+      this.anims = this.frameInfo[this.key];
+      this.duration = this.anims.duration;
+      this.repeat = this.anims.repeat;
+      this.playAnimation();
+    }, 0);
   }
   /**
    * @description return current key of animation return null if no animation is playing
@@ -79,30 +90,38 @@ class MockAnimsManager {
   getKey() {
     return this.key;
   }
-
-  frameExecution() {
-    this.duration -= this.anims.interval;
-    this.frame = this.anims.frames[this.duration / this.anims.interval];
-    this.event.emit(gameEvents.anims.framechange, this.frame);
-    if (this.duration === 0) {
-      if (this.repeat > 0) {
-        this.event.emit(gameEvents.anims.animationrepeat, this.key);
-        this.repeat -= 1;
-      } else if (this.repeat === 0) {
-        clearInterval(this.clearId);
-        this.event.emit(gameEvents.anims.animationcomplete, this.key);
-      } else if (this.repeat === -1) {
-        this.event.emit(gameEvents.anims.animationrepeat, this.key);
-        // Due to dumb async stuff this is put here to prevent frames from repeating
-        // if you remove this strong attack will register twice because the last interval
-        // is not clear during execution?
-        this.duration === 0 ? (this.duration = this.anims.duration) : null;
+  /**
+   * plays animation until end
+   * @param prevkey internal variable used to keep track of previous callstate
+   */
+  playAnimation(prevkey?) {
+    console.log(this.key);
+    if (prevkey === undefined || this.key === prevkey) {
+      this.duration -= this.anims.interval;
+      this.frame = this.anims.frames[Math.trunc(this.duration / this.anims.interval)];
+      if (this.frame === undefined) {
+        //find out what fucked up
+        debugger;
+      }
+      this.event.emit(gameEvents.anims.framechange, this.frame);
+      if (Math.abs(this.duration) < this.tolerance) {
+        if (this.repeat > 0 || this.repeat === -1) {
+          this.event.emit(gameEvents.anims.animationrepeat, this.key);
+          if (this.repeat > 0) this.repeat -= 1;
+          this.clearId = setTimeout(this.playAnimation.bind(this, this.key), this.anims.interval);
+          this.duration = this.anims.duration;
+        } else if (this.repeat === 0) {
+          this.event.emit(gameEvents.anims.animationcomplete, this.key);
+        }
+      } else {
+        this.clearId = setTimeout(this.playAnimation.bind(this, this.key), this.anims.interval)
       }
     }
+    
   }
 
   destroy() {
-    clearInterval(this.clearId);
+    clearTimeout(this.clearId);
   }
 }
 
@@ -139,7 +158,6 @@ export class StateMachine {
    */
   async dispatch(event: event): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      setImmediate(() => {
         // you can't cheat death
         if (this.state !== "death") {
           // quit current state and transition to new state
@@ -191,7 +209,6 @@ export class StateMachine {
         } else {
           resolve(false);
         }
-      });
     });
   }
 
@@ -215,6 +232,8 @@ export class StateMachine {
   }
 
   destroy() {
+    console.log('state Machine destroy');
+    this.stateArgs = null;
     this.anims.event.removeAllListeners();
     this.event.removeAllListeners();
     this.anims.destroy();
@@ -256,10 +275,11 @@ export class IdleState extends State {
       }
       return;
     }
-    //if (clientinput.roll.isDown) {
-    //  this.stateMachine.transition("block");
-    //  return;
-    //}
+
+    if (clientinput.roll.isDown) {
+      this.stateMachine.transition("block");
+      return;
+    }
     if (clientinput.up.isDown && isTouching.bottom) {
       this.stateMachine.transition("jump");
       return;
@@ -373,7 +393,8 @@ export class BlockState extends State {
   callback;
 
   enter(player: Player) {
-    this.stateMachine.anims.play("block-startup");
+    //debugger;
+    //this.stateMachine.anims.play("block");
     this.callback = () => {
       this.stateMachine.anims.play("block");
     };
@@ -381,15 +402,18 @@ export class BlockState extends State {
       gameEvents.anims.animationcomplete,
       this.callback
     );
+    this.stateMachine.anims.play("block-startup");
   }
 
   execute(player: Player) {
     const clientinput = player.input;
     const isTouching = player.getIsTouching();
     if (!isTouching.bottom && !isTouching.nearbottom) {
+      this.quit();
       this.stateMachine.transition("fall");
     }
     if (clientinput.roll.isUp) {
+      this.quit();
       this.stateMachine.transition("idle");
     }
   }
@@ -555,16 +579,23 @@ export class FallState extends State {
 
     const v = player.getVelocity();
     if (clientinput.right.isDown && !isTouching.right) {
-      Vector.add(v, { x: attributes.airaccel, y: 0 }, v);
-      if (Math.abs(v.x) >= attributes.airspeed) {
-        player.setVelocityX(attributes.airspeed);
+      Vector.add(v, { x: attributes.airaccel.x, y: 0 }, v);
+      if (Math.abs(v.x) >= attributes.airspeed.x) {
+        player.setVelocityX(attributes.airspeed.x);
       } else {
         player.setVelocity(v.x, v.y);
       }
     } else if (clientinput.left.isDown && !isTouching.left) {
-      Vector.add(v, { x: -attributes.airaccel, y: 0 }, v);
-      if (Math.abs(v.x) >= attributes.airspeed) {
-        player.setVelocityX(-attributes.airspeed);
+      Vector.add(v, { x: -attributes.airaccel.x, y: 0 }, v);
+      if (Math.abs(v.x) >= attributes.airspeed.x) {
+        player.setVelocityX(-attributes.airspeed.x);
+      } else {
+        player.setVelocity(v.x, v.y);
+      }
+    } else if (clientinput.down.isDown && !isTouching.bottom) {
+      Vector.add(v, { x: 0, y: attributes.airaccel.y }, v);
+      if (Math.abs(v.y) >= attributes.airspeed.y) {
+        player.setVelocityY(attributes.airspeed.y);
       } else {
         player.setVelocity(v.x, v.y);
       }
@@ -642,15 +673,15 @@ export class JumpState extends State {
   callback;
 
   enter(player: Player) {
-    this.stateMachine.anims.play("jump");
+    //debugger;
     //player.awakeplayer();
     const attributes = player.getAttributes();
     this.callback = () => {
       const clientinput = player.input;
       const vx =
         this.stateMachine.prevstate === "run"
-          ? attributes.airspeed
-          : attributes.airspeed / 2;
+          ? attributes.airspeed.x
+          : attributes.airspeed.x / 2;
       if (clientinput.right.isDown) {
         player.setVelocityX(vx);
       } else if (clientinput.left.isDown) {
@@ -666,6 +697,7 @@ export class JumpState extends State {
       gameEvents.anims.animationcomplete,
       this.callback
     );
+    this.stateMachine.anims.play("jump");
   }
 
   execute() {}
@@ -685,12 +717,11 @@ export class DashAttack extends State {
     const state = player.getInternalState();
     const newstamina = state.stamina - staminaCost.dashattack;
     player.setInternalState({ stamina: newstamina });
-    this.stateMachine.anims.play("dashattack");
     this.clearId = setTimeout(() => {
       const clientinput = player.input;
       if (
         clientinput.attack.isDown &&
-        this.dashcount < 1 &&
+        this.dashcount < 5 &&
         newstamina >= staminaCost.dashattack
       ) {
         this.dashcount += 1;
@@ -700,6 +731,7 @@ export class DashAttack extends State {
         this.stateMachine.transition("idle");
       }
     }, 200);
+    this.stateMachine.anims.play("dashattack");
   }
 
   execute(player: Player) {
@@ -723,7 +755,6 @@ export class AttackState extends State {
     const state = player.getInternalState();
     const newstamina = state.stamina - staminaCost.attack1;
     player.setInternalState({ stamina: newstamina });
-    this.stateMachine.anims.play("attack1");
     this.callback = () => {
       const clientinput = player.input;
       if (clientinput.attack.isDown && newstamina >= staminaCost.attack2) {
@@ -737,6 +768,7 @@ export class AttackState extends State {
       gameEvents.anims.animationcomplete,
       this.callback
     );
+    this.stateMachine.anims.play("attack1");
   }
 
   execute(player: Player) {
@@ -759,10 +791,10 @@ export class AttackState extends State {
 export class Attack2State extends State {
   callback;
   enter(player: Player) {
+    //debugger;
     const state = player.getInternalState();
     const newstamina = state.stamina - staminaCost.attack2;
     player.setInternalState({ stamina: newstamina });
-    this.stateMachine.anims.play("attack2");
     this.callback = () => {
       const clientinput = player.input;
       if (clientinput.attack.isDown && newstamina >= staminaCost.attack3) {
@@ -776,6 +808,7 @@ export class Attack2State extends State {
       gameEvents.anims.animationcomplete,
       this.callback
     );
+    this.stateMachine.anims.play("attack2");
   }
 
   execute(player: Player) {
@@ -801,7 +834,6 @@ export class Attack3State extends State {
     const state = player.getInternalState();
     const newstamina = state.stamina - staminaCost.attack3;
     player.setInternalState({ stamina: newstamina });
-    this.stateMachine.anims.play("attack3");
     this.callback = () => {
       this.stateMachine.transition("idle");
       return;
@@ -810,6 +842,7 @@ export class Attack3State extends State {
       gameEvents.anims.animationcomplete,
       this.callback
     );
+    this.stateMachine.anims.play("attack3");
   }
 
   execute(player: Player) {
@@ -837,7 +870,6 @@ export class StrongAttack extends State {
   multiplier;
 
   enter(player: Player) {
-    this.stateMachine.anims.play("strattack-start");
     var heldcount = 0;
     this.multiplier = 1;
     const state = player.getInternalState();
@@ -883,6 +915,7 @@ export class StrongAttack extends State {
       gameEvents.anims.animationrepeat,
       this.callback
     );
+    this.stateMachine.anims.play("strattack-start");
   }
 
   execute(player: Player) {
@@ -924,19 +957,19 @@ export class StrongAirAtk extends State {
     const attributes = player.getAttributes();
     const v = player.getVelocity();
     if (clientinput.down.isDown && !isTouching.bottom) {
-      Vector.add(v, { x: 0, y: 2 * attributes.airaccel }, v);
-      if (Math.abs(v.y) >= 3 * attributes.airspeed) {
-        player.setVelocityY(3 * attributes.airspeed);
+      Vector.add(v, { x: 0, y: attributes.airaccel.y }, v);
+      if (Math.abs(v.y) >= attributes.airspeed.y) {
+        player.setVelocityY(attributes.airspeed.y);
       } else {
         player.setVelocity(v.x, v.y);
       }
     }
+    this.callback = () => {
+      this.stateMachine.transition("idle");
+    };
     if (isTouching.bottom && !this.finished) {
       this.stateMachine.anims.play("strairatk-loop-end");
       this.finished = true;
-      this.callback = () => {
-        this.stateMachine.transition("idle");
-      };
       this.stateMachine.anims.event.once(
         gameEvents.anims.animationcomplete,
         this.callback

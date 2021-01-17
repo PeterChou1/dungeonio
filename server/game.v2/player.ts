@@ -36,6 +36,7 @@ import { AOImanager } from "../interest/aoi.manager";
 import { EventEmitter } from "events";
 import { event } from "./state";
 import { registerCollisionCallback } from "../utils/utils";
+import { parseJsonText } from "typescript";
 
 const PhysicsEditorParser = Phaser.Physics.Matter.PhysicsEditorParser;
 
@@ -88,12 +89,12 @@ type internalStateConfig = {
 
 type attributeConfig = {
   groundspeed?: number;
-  airspeed?: number;
+  airspeed?: {x: number, y: number};
   runspeed?: number;
   rolldistance?: number;
   maxairjumps?: number;
   jumpheight?: number;
-  airaccel?: number;
+  airaccel?: {x: number, y: number};
   staminaregen?: number;
   maxstamina?: number;
   maxhealth?: number;
@@ -101,9 +102,9 @@ type attributeConfig = {
 
 type attributes = {
   groundspeed: number;
-  airspeed: number;
+  airspeed: {x: number, y: number};
   rolldistance: number;
-  airaccel: number;
+  airaccel: {x: number, y: number};
   maxairjumps: number;
   runspeed: number;
   jumpheight: number;
@@ -149,6 +150,9 @@ class PlayerBody {
     collisionData.category.player,
   ];
   private category: number = collisionData.category.player;
+  private sensoroffcallback;
+  // array of entities player has hit
+  private hitentities = [];
   // keep track if player is flipped or not
   private flipX = false;
   // sensors defined by physics editor
@@ -209,13 +213,14 @@ class PlayerBody {
       dim: ({ h }) => ({ w: 10, h: h * 0.75 }),
     },
   };
-  private frameData;
+  private frameBodies;
   private mainBody;
   // default matterjs body used if no custom body is used
   private default;
   private objectgroup;
   // main matterjs body
   private compoundBody;
+  private bodylabel = 'playerbody'
   private compoundBodyConfig: compoundBodyConfig = {
     frictionStatic: 0,
     frictionAir: 0.02,
@@ -224,30 +229,15 @@ class PlayerBody {
   };
 
   constructor(parent, engine, x, y, frameData, objectgroup) {
+    //debugger;
     this.parent = parent;
     this.objectgroup = objectgroup;
     this.engine = engine;
     this.event = new EventEmitter();
-    this.generateframeBody(frameData);
-    this.default = Bodies.rectangle(
-      0,
-      0,
-      playerConfig.dim.w,
-      playerConfig.dim.h,
-      {
-        chamfer: { radius: 10 },
-      }
-    );
-    //store height and width in default body
-    this.default.config = {
-      h: this.default.bounds.max.y - this.default.bounds.min.y,
-      w: this.default.bounds.max.x - this.default.bounds.min.x,
-    };
-    //console.log(this.default.inertia);
-    this.h = this.default.config.h;
-    this.w = this.default.config.w;
     this.sensors = {};
     this.isTouching = {};
+    this.generateframeBody(frameData);
+    this.createDefaultBody(x, y);
     this.registeredActions = new Proxy(
       {},
       {
@@ -258,19 +248,44 @@ class PlayerBody {
         },
       }
     );
-    this.createSensors(this.sensorsConfig);
-    this.createDefaultBody(x, y);
-    Events.on(this.engine, "beforeUpdate", () => {
+
+    this.sensoroffcallback = () => {
       for (const sensor in this.isTouching) {
         this.isTouching[sensor] = false;
       }
-    });
+    }
+    Events.on(this.engine, "beforeUpdate", this.sensoroffcallback);
   }
   /**
    * used for collision callback of sensor body
    * @param pair
    */
-  private sensorBodyCallback(pair) {}
+  private sensorBodyCallback(pair) {
+    //const { bodyA, bodyB } = pair;
+    //const collidedbody = this.bodysensors.includes(bodyA) ? bodyB : bodyA;
+    //const sensorbody = this.bodysensors.includes(bodyA) ? bodyA : bodyB;
+    //// handle this by case
+    //if (sensorbody.label.includes("hitbox") && (collidedbody.label === this.bodylabel || collidedbody.label.includes("block"))) {
+    //  // case 1: player hitbox landed or blocked
+    //  //console.log('collided with player body');
+    //  //console.log(collidedbody);
+    //  //console.log('sensor body');
+    //  //console.log(sensorbody);
+    //} else if (sensorbody.label.includes("block") && collidedbody.label.includes("hitbox")){
+    //  // case 2: player blocked attack
+    //  //console.log("blocked attack");
+    //  //console.log(collidedbody);
+    //  this.registeredActions[collidedbody.config.eventid] = {
+    //    id : collidedbody.config.eventid,
+    //    category: "block",
+    //    eventConfig : {
+    //      blockstun : collidedbody.config.blockstun
+    //    }
+    //  }
+    //}
+  }
+
+
   /**
    * used for collision callback of mainbody
    * @param pair
@@ -283,7 +298,6 @@ class PlayerBody {
       !(hitboxbody.config.eventid in this.registeredActions) &&
       hitboxbody.label.includes("hitbox")
     ) {
-      console.log("registered hitbox ", hitboxbody.config.eventid);
       this.registeredActions[hitboxbody.config.eventid] = {
         id: hitboxbody.config.eventid,
         category: "hit",
@@ -320,105 +334,123 @@ class PlayerBody {
     delete this.registeredActions[id];
   }
 
+
+  setBody(body, pos, v) {
+    if (this.compoundBody) World.remove(this.engine.world, this.compoundBody);
+    this.compoundBody = body;
+    const mainbody = body.parts.find(part => part.label === this.bodylabel);
+    if (mainbody.config) {
+      if (this.flipX !== mainbody.config.flipX) {
+        Body.scale(this.compoundBody, -1, 1);
+        mainbody.config.flipX = this.flipX;
+      }
+      //if (this.w < mainbody.config.orgw) {
+      //  if (this.flipX) {
+      //    this.compoundBody.position.x += this.mainBody.centerOffset.x;
+      //    this.compoundBody.positionPrev.x += this.mainBody.centerOffset.x;
+      //  } else {
+      //    this.compoundBody.position.x -= this.mainBody.centerOffset.x;
+      //    this.compoundBody.positionPrev.x -= this.mainBody.centerOffset.x;
+      //  }
+      //}
+    }
+    Body.setInertia(this.compoundBody, Infinity);
+    Body.setPosition(this.compoundBody, pos);
+    Body.setVelocity(this.compoundBody, v);
+    this.setCollisionCategory(this.category);
+    this.setCollidesWith(this.collidesWith);
+    this.sensors = {};
+    body.parts.forEach(part => {
+      if (part.isSensor) {
+        this.sensors[part.label] = part
+      }
+    })
+    World.addBody(this.engine.world, this.compoundBody);
+  }
   /**
    * @description recreates default body
    * @param x
    * @param y
    */
   createDefaultBody(x, y) {
-    if (this.compoundBody) World.remove(this.engine.world, this.compoundBody);
-    this.h = this.default.config.h;
-    this.w = this.default.config.w;
-    this.createSensors(this.sensorsConfig);
-    this.mainBody = this.default;
-    this.mainBody.onCollide(this.mainBodyCallback.bind(this));
-    this.mainBody.onCollideActive(this.mainBodyCallback.bind(this));
-    this.mainBody.onCollideEnd(this.mainBodyCallback.bind(this));
-    this.compoundBody = Body.create({
-      parts: [this.default, ...Object.values(this.sensors)],
+    console.log('create default body');
+    const mainbody = Bodies.rectangle(
+      0,
+      0,
+      playerConfig.dim.w,
+      playerConfig.dim.h,
+      {
+        label: this.bodylabel,
+        chamfer: { radius: 10 },
+      }
+    );
+    const h = mainbody.bounds.max.y - mainbody.bounds.min.y;
+    const w = mainbody.bounds.max.x - mainbody.bounds.min.x;
+    const sensors = this.createSensorsBody(this.sensorsConfig, w, h);
+    mainbody.onCollide(this.mainBodyCallback.bind(this));
+    mainbody.onCollideActive(this.mainBodyCallback.bind(this));
+    mainbody.onCollideEnd(this.mainBodyCallback.bind(this));
+    this.default = Body.create({
+      parts: [mainbody, ...Object.values(sensors)],
       ...this.compoundBodyConfig,
     });
-    const v = this.getVelocity();
-    Body.setInertia(this.compoundBody, Infinity);
-    Body.setPosition(this.compoundBody, { x: x, y: y });
-    Body.setVelocity(this.compoundBody, v);
-    this.setCollisionCategory(this.category);
-    this.setCollidesWith(this.collidesWith);
-    World.addBody(this.engine.world, this.compoundBody);
+    this.setBody(this.default, {x: x, y: y}, {x: 0, y: 0});
   }
 
-  /**
-   *
-   * @param {string} sensor
-   * @param config
-   */
-  setSensor(sensor: string, config: configObj) {
-    this.sensorsConfig[sensor] = {
-      ...this.sensorsConfig,
-      ...config,
-    };
-    this.createSensors(this.sensorsConfig);
-  }
 
   /**
    * create body sensors based on configurations
    * @param config
    * @param offset whether or not to offset the sensor to account for body shift
    */
-  createSensors(config: sensorConfig) {
+  createSensorsBody(config: sensorConfig, w, h, offset = {x: 0 ,y: 0}) {
+    const sensors = {};
+    console.log(`w:${w} h:${h}`);
+    console.log(offset);
     for (const sensor in config) {
       const cur: configObj = config[sensor];
-      const pos = cur.pos({ w: this.w, h: this.h });
-      const dim = cur.dim({ w: this.w, h: this.h });
-      Vector.add(pos, this.sensoroffset, pos);
-      // if there is a sensor modify it
-      if (this.sensors[sensor]) {
-        Body.scale(
-          this.sensors[sensor],
-          dim.w / cur.prev.w,
-          dim.h / cur.prev.h
-        );
-        Body.setPosition(this.sensors[sensor], { x: pos.x, y: pos.y });
+      const pos = cur.pos({ w: w, h: h });
+      const dim = cur.dim({ w: w, h: h });
+      Vector.add(pos, offset, pos);
+      // if there is no sensor create it
+      sensors[sensor] = Bodies.rectangle(pos.x, pos.y, dim.w, dim.h, {
+        label: sensor,
+        isSensor: true,
+      });
+      // set default sensor if no sensors exist
+      const defaultCallback = () => (this.isTouching[sensor] = true);
+      if (cur.onCollision) {
+        const wrapper = (pair) => {
+          defaultCallback();
+          cur.onCollision(pair);
+        };
+        sensors[sensor].onCollide(wrapper);
+        sensors[sensor].onCollideActive(wrapper);
       } else {
-        // if there is no sensor create it
-        this.sensors[sensor] = Bodies.rectangle(pos.x, pos.y, dim.w, dim.h, {
-          label: "sensor",
-          isSensor: true,
-        });
-        this.isTouching[sensor] = false;
-        // set default sensor if no sensors exist
-        const defaultCallback = () => (this.isTouching[sensor] = true);
-        if (cur.onCollision) {
-          const wrapper = (pair) => {
-            defaultCallback();
-            cur.onCollision(pair);
-          };
-          this.sensors[sensor].onCollide(wrapper);
-          this.sensors[sensor].onCollideActive(wrapper);
-        } else {
-          this.sensors[sensor].onCollide(
-            cur.onCollide
-              ? (pair) => {
-                  defaultCallback();
-                  cur.onCollide(pair);
-                }
-              : defaultCallback
-          );
-          this.sensors[sensor].onCollideActive(
-            cur.onCollideActive
-              ? (pair) => {
-                  defaultCallback();
-                  cur.onCollideActive(pair);
-                }
-              : defaultCallback
-          );
-        }
-        cur.onCollideEnd
-          ? this.sensors[sensor].onCollideEnd(cur.onCollideEnd)
-          : null;
+        sensors[sensor].onCollide(
+          cur.onCollide
+            ? (pair) => {
+                defaultCallback();
+                cur.onCollide(pair);
+              }
+            : defaultCallback
+        );
+        sensors[sensor].onCollideActive(
+          cur.onCollideActive
+            ? (pair) => {
+                defaultCallback();
+                cur.onCollideActive(pair);
+              }
+            : defaultCallback
+        );
       }
+      cur.onCollideEnd
+        ? sensors[sensor].onCollideEnd(cur.onCollideEnd)
+        : null;
+
       cur.prev = dim;
     }
+    return sensors;
   }
 
   /**
@@ -426,7 +458,7 @@ class PlayerBody {
    * @param frameData
    */
   generateframeBody(frameData) {
-    this.frameData = {};
+    this.frameBodies = {};
     // body generate hitboxs for each frame
     for (const frameName in frameData) {
       // if there are no fixtures do not generate body
@@ -441,14 +473,31 @@ class PlayerBody {
         );
         //scale body by two to be visible
         Body.scale(frameBody, 2, 2);
-        this.frameData[frameName] = frameBody.parts.slice(
+        const body = frameBody.parts.slice(
           1,
           frameBody.parts.length
         );
+        console.log(body[0]);
+        const offset = {x: body[0].position.x, y: body[0].position.y};
+        const w = body[0].bounds.max.x - body[0].bounds.min.x
+        const h = body[0].bounds.max.y - body[0].bounds.min.y
+        const orgh = frameBody.bounds.max.y - frameBody.bounds.min.y
+        const orgw = frameBody.bounds.max.x - frameBody.bounds.min.x
         // set custom configuration for body
-        for (const bodyparts of this.frameData[frameName]) {
+        body.forEach((bodyparts) => {
           //add collision callbacks
-          registerCollisionCallback(bodyparts);
+          const parts = registerCollisionCallback(bodyparts);
+          if (parts.isSensor) {
+            parts.onCollide(this.sensorBodyCallback.bind(this));
+            parts.onCollideActive(this.sensorBodyCallback.bind(this));
+            parts.onCollideEnd(this.sensorBodyCallback.bind(this));
+            // first body part is aways considered the mainbody
+          } else {
+            parts.label = this.bodylabel;
+            parts.onCollide(this.mainBodyCallback.bind(this));
+            parts.onCollideActive(this.mainBodyCallback.bind(this));
+            parts.onCollideEnd(this.mainBodyCallback.bind(this));
+          }
           var hitboxdata;
           if (playerHitboxData.hasOwnProperty(frameName)) {
             if (Array.isArray(playerHitboxData[frameName])) {
@@ -456,30 +505,31 @@ class PlayerBody {
                 frameName
               ] as Array<hitboxconfig>;
               for (const hitbox of hitboxarray) {
-                if (bodyparts.label === hitbox.label) {
+                if (parts.label === hitbox.label) {
                   hitboxdata = hitbox;
                 }
               }
             } else {
               const hitbox = playerHitboxData[frameName] as hitboxconfig;
-              if (bodyparts.label === hitbox.label) hitboxdata = hitbox;
+              if (parts.label === hitbox.label) hitboxdata = hitbox;
             }
           }
-          bodyparts["config"] = {
+          parts["config"] = {
             eventid: 0,
             parent: this.parent,
             flipX: false,
-            orgh: frameBody.bounds.max.y - frameBody.bounds.min.y,
-            orgw: frameBody.bounds.max.x - frameBody.bounds.min.x,
-            h:
-              this.frameData[frameName][0].bounds.max.y -
-              this.frameData[frameName][0].bounds.min.y,
-            w:
-              this.frameData[frameName][0].bounds.max.x -
-              this.frameData[frameName][0].bounds.min.x,
+            orgh: orgh,
+            orgw: orgw,
+            h: h,
+            w: w,
             ...hitboxdata,
           };
-        }
+        })
+        const sensors = this.createSensorsBody(this.sensorsConfig, h, w, offset);
+        this.frameBodies[frameName] = Body.create({
+          parts: [...body, ...Object.values(sensors)],
+          ...this.compoundBodyConfig,
+        });
       }
     }
   }
@@ -572,65 +622,32 @@ class PlayerBody {
    * @param frame
    */
   setFrameBody(frame) {
-    setImmediate(() => {
-      if (this.frameData[frame]) {
-        // every frame change with framedata increment event id
-        // this ensures the same move frame never hits twice while same move hits
-        this.eventId++;
-        this.frameData[frame].forEach(
-          (body) => (body.config.eventid = this.eventId)
-        );
-        var pos = this.getInternalPosition();
-        var v = this.getVelocity();
-        World.remove(this.engine.world, this.compoundBody);
-        this.mainBody = this.frameData[frame][0];
-        this.mainBody.onCollide(this.mainBodyCallback.bind(this));
-        this.mainBody.onCollideActive(this.mainBodyCallback.bind(this));
-        this.mainBody.onCollideEnd(this.mainBodyCallback.bind(this));
-        this.h = this.mainBody.config.h;
-        this.w = this.mainBody.config.w;
-        this.sensoroffset = {
-          x: this.mainBody.position.x,
-          y: this.mainBody.position.y,
-        };
-        this.createSensors(this.sensorsConfig);
-        this.compoundBody = Body.create({
-          parts: [...this.frameData[frame], ...Object.values(this.sensors)],
-          ...this.compoundBodyConfig,
-        });
-        if (this.flipX !== this.mainBody.config.flipX) {
-          Body.scale(this.compoundBody, -1, 1);
-          this.frameData[frame].forEach(
-            (body) => (body.config.flipX = this.flipX)
-          );
-        }
-        if (this.w < this.mainBody.config.orgw) {
-          if (this.flipX) {
-            this.compoundBody.position.x += this.mainBody.centerOffset.x;
-            this.compoundBody.positionPrev.x += this.mainBody.centerOffset.x;
-          } else {
-            this.compoundBody.position.x -= this.mainBody.centerOffset.x;
-            this.compoundBody.positionPrev.x -= this.mainBody.centerOffset.x;
+    if (this.frameBodies[frame]) {
+      console.log('create body ', frame)
+      // every frame change with framedata increment event id
+      // this ensures the same move frame never hits twice while same move hits
+      //this.bodysensors = []
+      this.eventId++;
+      this.frameBodies[frame].parts.forEach(
+        (body) => {
+          if (body.config) {
+            body.config.eventid = this.eventId 
+            if (body.isSensor) {
+              //this.bodysensors.push(body);
+            }
           }
         }
-        console.log("set collides with");
-        console.log(this.category);
-        console.log(this.collidesWith);
-        this.setCollisionCategory(this.category);
-        this.setCollidesWith(this.collidesWith);
-        World.addBody(this.engine.world, this.compoundBody);
-        Body.setPosition(this.compoundBody, pos);
-        Body.setInertia(this.compoundBody, Infinity);
-        Body.setVelocity(this.compoundBody, v);
-      } else if (this.mainBody !== this.default) {
-        const pos = this.getInternalPosition();
-        this.sensoroffset = {
-          x: this.default.position.x,
-          y: this.default.position.y,
-        };
-        this.createDefaultBody(pos.x, pos.y);
-      }
-    });
+      );
+      var pos = this.getInternalPosition();
+      var v = this.getVelocity();
+      this.setBody(this.frameBodies[frame], pos, v);
+    } else if (this.compoundBody !== this.default) {
+      console.log('create default body');
+      var pos = this.getInternalPosition();
+      var v = this.getVelocity();
+      this.setBody(this.default, pos, v)
+    }
+ 
   }
 
   /**
@@ -646,8 +663,27 @@ class PlayerBody {
 
   destroy() {
     this.event.removeAllListeners();
-    Events.off(this.compoundBody);
-    World.remove(this.engine.world, this.compoundBody);
+    World.remove(this.engine.world, this.compoundBody, true);
+    Events.off(this.engine, "beforeUpdate", this.sensoroffcallback);
+    console.log('removing callback');
+    for (const part of this.compoundBody.parts) {
+      World.remove(this.engine.world, part, true);
+      part.onCollide(null);
+      part.onCollideActive(null);
+      part.onCollideEnd(null);
+    }
+    for (const hitboxdata in this.frameBodies) {
+      this.frameBodies[hitboxdata].parts.forEach(part => {
+        World.remove(this.engine.world, part, true);
+        part.config.parent = null;
+        part.onCollide(null);
+        part.onCollideActive(null);
+        part.onCollideEnd(null);
+      })
+    }
+    console.log('end remove callback');
+    this.parent = null;
+    console.log('body part destroy');
   }
 }
 
@@ -715,7 +751,7 @@ export class Player extends gameObject {
       this,
     ]);
     this.stateMachine.anims.event.on(gameEvents.anims.framechange, (frame) => {
-      if (this.name === "test2") console.log(frame);
+      //if (this.name === "test" && frame.startsWith("adventurer-attack3-")) console.log(frame);
       this.body.setFrameBody(frame);
     });
     // default attributes
@@ -725,8 +761,8 @@ export class Player extends gameObject {
       rolldistance: 7,
       maxairjumps: 1,
       // max air speed character can attain
-      airspeed: 5,
-      airaccel: 0.25,
+      airspeed: {x: 5, y: 10},
+      airaccel: {x: 0.25, y: 0.5},
       jumpheight: 12,
       staminaregen: 0.5,
       maxstamina: 100,
@@ -993,5 +1029,6 @@ export class Player extends gameObject {
     }
     this.stateMachine.destroy();
     this.body.destroy();
+    console.log('end destroy');
   }
 }

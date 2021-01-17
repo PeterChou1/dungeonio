@@ -3,6 +3,7 @@ export type hitboxconfig = {
   knockback: { x: number; y: number };
   hitstun: number;
   damage: number;
+  blockstun: number;
 };
 export type hitboxdata = {
   [propName: string]: Array<hitboxconfig> | hitboxconfig;
@@ -15,44 +16,51 @@ export const playerHitboxData: hitboxdata = {
     label: "hitbox",
     knockback: { x: -3, y: 0 },
     damage: 5,
-    hitstun: 200,
+    hitstun: 400,
+    blockstun: 200
   },
   "adventurer-air-attack2-00": {
     label: "hitbox",
     knockback: { x: 5, y: -5 },
     damage: 5,
-    hitstun: 200,
+    hitstun: 400,
+    blockstun: 200
   },
   "adventurer-air-attack3-loop-00": {
     label: "hitbox",
     knockback: { x: 5, y: -5 },
     damage: 5,
-    hitstun: 200,
+    hitstun: 400,
+    blockstun: 200
   },
   "adventurer-air-attack3-loop-01": {
     label: "hitbox",
     knockback: { x: 5, y: -5 },
     damage: 5,
-    hitstun: 200,
+    hitstun: 400,
+    blockstun: 200
   },
   "adventurer-air-attack-3-end-00": [
     {
       label: "left-hitbox",
       knockback: { x: -5, y: -5 },
       damage: 10,
-      hitstun: 200,
+      hitstun: 400,
+      blockstun: 200
     },
     {
       label: "center-hitbox",
       knockback: { x: 0, y: 5 },
       damage: 20,
-      hitstun: 200,
+      hitstun: 400,
+      blockstun: 200
     },
     {
       label: "right-hitbox",
       knockback: { x: 5, y: -5 },
       damage: 10,
-      hitstun: 200,
+      hitstun: 400,
+      blockstun: 200
     },
   ],
   "adventurer-attack1-02": [
@@ -60,13 +68,15 @@ export const playerHitboxData: hitboxdata = {
       label: "hitbox",
       knockback: { x: -3, y: 0 },
       damage: 5,
-      hitstun: 300,
+      hitstun: 400,
+      blockstun: 200
     },
     {
       label: "hitbox-tipper",
       knockback: { x: 0, y: 0 },
       damage: 10,
       hitstun: 500,
+      blockstun: 250
     },
   ],
   "adventurer-attack2-03": [
@@ -74,19 +84,22 @@ export const playerHitboxData: hitboxdata = {
       label: "hitbox-front",
       knockback: { x: 0, y: 0 },
       damage: 5,
-      hitstun: 400,
+      hitstun: 500,
+      blockstun: 250
     },
     {
       label: "hitbox-back",
       knockback: { x: -3, y: 0 },
       damage: 5,
       hitstun: 400,
+      blockstun: 250
     },
     {
       label: "hitbox-tipper",
       knockback: { x: 0, y: 0 },
       damage: 10,
       hitstun: 400,
+      blockstun: 250
     },
   ],
   "adventurer-attack3-02": [
@@ -94,19 +107,22 @@ export const playerHitboxData: hitboxdata = {
       label: "hitbox-tipper",
       knockback: { x: 10, y: -3 },
       damage: 15,
-      hitstun: 500,
+      hitstun: 600,
+      blockstun: 250
     },
     {
       label: "hitbox-front",
       knockback: { x: 7, y: -3 },
       damage: 5,
       hitstun: 400,
+      blockstun: 250
     },
     {
       label: "hitbox-back",
       knockback: { x: -3, y: 0 },
       damage: 2,
-      hitstun: 100,
+      hitstun: 400,
+      blockstun: 200
     },
   ],
   "adventurer-slide-00": {
@@ -114,12 +130,14 @@ export const playerHitboxData: hitboxdata = {
     knockback: { x: 5, y: -5 },
     damage: 2,
     hitstun: 300,
+    blockstun: 200
   },
   "adventurer-slide-01": {
     label: "hitbox",
     knockback: { x: 5, y: -5 },
     damage: 5,
     hitstun: 300,
+    blockstun: 200
   },
 };
 
@@ -209,7 +227,7 @@ export const playerAnims: Array<anims> = [
       "mainchar",
       { start: 3, end: 3, prefix: "adventurer-cast-", zeroPad: 2 },
     ],
-    frameRate: 20,
+    frameRate: 60,
     repeat: 0,
   },
   {
@@ -254,7 +272,7 @@ export const playerAnims: Array<anims> = [
   {
     key: "attack1",
     frames: ["mainchar", { end: 4, prefix: "adventurer-attack1-", zeroPad: 2 }],
-    frameRate: 8,
+    frameRate: 10,
     repeat: 0,
   },
   {

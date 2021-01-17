@@ -1,6 +1,8 @@
 import { gameConfig, frontEndEvent } from "../../../common";
 import { HealthBar } from "../ui/bar";
 
+
+
 export default class Player {
   /**
    * @param {*} scene
