@@ -12,6 +12,10 @@ export declare class ActionQueue {
     executeActions(): void;
 }
 export declare function randomInteger(min: any, max: any): any;
-export declare const createanims: (scene: any, anims: any) => any[];
-export declare const createFrameNames: (animsManager: any, anims: any) => any[];
+/**
+ * @description generates frame data from player animations configurations
+ * @param frameinfo
+ */
+export declare const generateFrameTiming: (frameinfo: any) => {};
+export declare const generateFrameNames: (config: any) => Array<String>;
 export {};

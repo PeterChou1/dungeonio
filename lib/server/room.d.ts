@@ -8,8 +8,8 @@ export declare class GameRoom extends Room<GameState> {
     previousdelta: any;
     tolerance: number;
     private hrtimeMs;
-    onCreate(options: any): Promise<void>;
-    onJoin(client: any, options: any): Promise<void>;
-    onLeave(client: any): Promise<void>;
-    onDispose(): Promise<void>;
+    onCreate(): void;
+    onJoin(client: any, options: any): void;
+    onLeave(client: any): void;
+    onDispose(): void;
 }
