@@ -2,7 +2,6 @@ const webpack = require("webpack");
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-console.log('path resolved: ', path.resolve(__dirname, "../"));
 
 module.exports = {
   mode: "development",
