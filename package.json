@@ -42,7 +42,8 @@
     "ts-loader": "^8.0.3",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.11.0",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^4.2.2",
+    "path": "^0.12.7"
   },
   "dependencies": {
     "@colyseus/monitor": "^0.12.2",
