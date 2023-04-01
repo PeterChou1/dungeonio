@@ -53,7 +53,7 @@ export default class MatterCollisionPlugin extends Phaser.Plugins.ScenePlugin {
      * @param {Phaser.Plugins.PluginManager} pluginManager
      */
     constructor(scene, pluginManager) {
-      super(scene, pluginManager);
+      super(scene, pluginManager, "MatterCollisionPlugin");
       console.log('matter collision plugin installed');
       this.scene = scene;
   

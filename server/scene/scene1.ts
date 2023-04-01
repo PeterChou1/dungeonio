@@ -9,7 +9,7 @@ import PhaserMatterCollisionPlugin from "../utils/matterCollision";
 export class StartLevel extends Phaser.Scene {
   map: Phaser.Tilemaps.Tilemap;
   tileset: Phaser.Tilemaps.Tileset;
-  ground: Phaser.Tilemaps.DynamicTilemapLayer;
+  ground: Phaser.Tilemaps.TilemapLayer;
   playergroup: PlayerGroup;
   objectgroup; // map collision data
   eventQueue: ActionQueue;
@@ -69,7 +69,7 @@ export class StartLevel extends Phaser.Scene {
     this.playergroup = new PlayerGroup(this);
     this.map = this.add.tilemap("map");
     this.tileset = this.map.addTilesetImage("mainlevbuild", "tiles");
-    this.ground = this.map.createDynamicLayer("ground", this.tileset, 0, 0);
+    this.ground = this.map.createLayer("ground", this.tileset, 0, 0);
     const height = this.ground.height;
     const width = this.ground.width;
     this.matter.world.setBounds(0, 0, width, height);
