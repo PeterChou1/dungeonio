@@ -61,7 +61,7 @@
   },
   "homepage": "https://github.com/PeterChou1/phaser3-project-template#readme",
   "engines": {
-    "node": "12.18.3"
+    "node": "14.x"
   },
   "husky": {
     "hooks": {

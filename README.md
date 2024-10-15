@@ -32,102 +32,11 @@ Planned Features
     
 ## Setup
 
-To setup the development environment 
+```
+npm install
 
-cd phaser3-project-template 
-
-npm install 
-
-cd client 
-
-npm install 
-
-cd .. 
-
-npm run start 
-
-cd client 
-
-npm run start 
-
---------------------------------------------------------------------
-
-To setup production environment 
-
-set NODE_ENV to production
-
-cd phaser3-project-template 
-
-npm install 
-
-cd client 
-
-npm install 
-
-npm run build  
-
-cd .. 
-
-npm run start 
-
---------------------------------------------------------------------
-
-game instance runs on localhost
-
-colyseus monitoring portal instance runs on localhost/colyseus
-
-
-
-## Phaser 3 Template
-
-Created from phaser3 project template
-
-A Phaser 3 project template with ES6 support via [Babel 7](https://babeljs.io/) and [Webpack 4](https://webpack.js.org/)
-that includes hot-reloading for development and production-ready builds.
-
-Loading images via JavaScript module `import` is also supported.
-
-## Requirements
-
-[Node.js](https://nodejs.org) is required to install dependencies and run scripts via `npm`.
-
-## Available Commands
-
-In client folder
-| Command | Description |
-|---------|-------------|
-| `npm install` | Install project dependencies |
-| `npm start` | Build project and open web server running project |
-| `npm run build` | Builds code bundle with production settings (minification, uglification, etc..) |
-
-In root folder
-| Command | Description |
-|---------|-------------|
-| `npm install` | Install project dependencies |
-| `npm run start` | Run server code |
-| `npm run dev` | Runs development server code |
-| `npm run postinstall`| cd into client folder and runs a build |
-
-
-## Customizing Template
-
-### Babel
-You can write modern ES6+ JavaScript and Babel will transpile it to a version of JavaScript that you
-want your project to support. The targeted browsers are set in the `.babelrc` file and the default currently
-targets all browsers with total usage over "0.25%" but excludes IE11 and Opera Mini.
-
-  ```
-  "browsers": [
-    ">0.25%",
-    "not ie 11",
-    "not op_mini all"
-  ]
-  ```
-
-### Webpack
-If you want to customize your build, such as adding a new webpack loader or plugin (i.e. for loading CSS or fonts), you can
-modify the `webpack/base.js` file for cross-project changes, or you can modify and/or create
-new configuration files and target them in specific npm tasks inside of `package.json'.
+npm start
+```
 
 ## Deploying Code
 The staging branch of this github repository is linked to heroku app located https://game-dungeonio-test.herokuapp.com/ whenever you push to the staging branch it will be automatically deployed on the app. 
